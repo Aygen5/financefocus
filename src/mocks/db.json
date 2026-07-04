@@ -1,0 +1,123 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "demo@financefocus.com",
+      "name": "Aygen Demirel"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "t1",
+      "userId": "1",
+      "amount": 5000,
+      "type": "income",
+      "category": "Maaş",
+      "date": "2026-07-01",
+      "description": "Temmuz ayı maaş ödemesi"
+    },
+    {
+      "id": "t2",
+      "userId": "1",
+      "amount": 120,
+      "type": "expense",
+      "category": "Market",
+      "date": "2026-07-02",
+      "description": "Haftalık mutfak alışverişi"
+    },
+    {
+      "id": "t3",
+      "userId": "1",
+      "amount": 450,
+      "type": "expense",
+      "category": "Fatura",
+      "date": "2026-07-03",
+      "description": "Elektrik faturası ödemesi"
+    }
+  ],
+  "budgets": [
+    {
+      "id": "b1",
+      "userId": "1",
+      "category": "Market",
+      "limitAmount": 1500,
+      "spentAmount": 120,
+      "period": "2026-07"
+    },
+    {
+      "id": "b2",
+      "userId": "1",
+      "category": "Fatura",
+      "limitAmount": 2000,
+      "spentAmount": 450,
+      "period": "2026-07"
+    }
+  ],
+  "goals": [
+    {
+      "id": "g1",
+      "userId": "1",
+      "name": "Acil Durum Fonu",
+      "targetAmount": 50000,
+      "currentAmount": 15000,
+      "deadline": "2026-12-31",
+      "monthlyContribution": 5000
+    },
+    {
+      "id": "g2",
+      "userId": "1",
+      "name": "Yeni Laptop",
+      "targetAmount": 30000,
+      "currentAmount": 5000,
+      "deadline": "2026-09-30",
+      "monthlyContribution": 8333
+    }
+  ],
+  "portfolio": [
+    { "type": "cash", "amount": 12500, "valueInBaseCurrency": 12500 },
+    { "type": "gold", "amount": 5, "valueInBaseCurrency": 5000 },
+    { "type": "usd", "amount": 1000, "valueInBaseCurrency": 1000 },
+    { "type": "eur", "amount": 800, "valueInBaseCurrency": 860 },
+    { "type": "stocks", "amount": 50, "valueInBaseCurrency": 3200 }
+  ],
+  "subscriptions": [
+    {
+      "id": "s1",
+      "userId": "1",
+      "name": "Netflix",
+      "cost": 15.99,
+      "billingCycle": "monthly",
+      "nextBillingDate": "2026-07-15",
+      "category": "Eğlence"
+    },
+    {
+      "id": "s2",
+      "userId": "1",
+      "name": "SaaS Cloud Hosting",
+      "cost": 49.00,
+      "billingCycle": "monthly",
+      "nextBillingDate": "2026-07-20",
+      "category": "Yazılım"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "n1",
+      "title": "Platforma Hoş Geldiniz",
+      "message": "FinanceFocus platformuna başarıyla giriş yaptınız. Bütçe planlarınızı hemen oluşturabilirsiniz.",
+      "type": "success",
+      "read": false,
+      "createdAt": "2026-07-04T18:00:00.000Z"
+    }
+  ],
+  "activities": [
+    {
+      "id": "a1",
+      "userId": "1",
+      "action": "Giriş Yapıldı",
+      "details": "Kullanıcı sisteme giriş yaptı.",
+      "timestamp": "2026-07-04T18:00:00.000Z"
+    }
+  ],
+  "reports": []
+}

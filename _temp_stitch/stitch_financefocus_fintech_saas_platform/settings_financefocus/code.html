@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings | FinanceFocus</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .sidebar-indicator {
+            width: 3px;
+            height: 20px;
+            position: absolute;
+            left: 0;
+            background-color: currentColor;
+            border-radius: 0 4px 4px 0;
+        }
+        /* Custom scrollbar for clean enterprise look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "background": "#faf8ff",
+                      "surface-bright": "#faf8ff",
+                      "secondary-container": "#d0e1fb",
+                      "on-tertiary-fixed-variant": "#7d2d00",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb596",
+                      "on-secondary": "#ffffff",
+                      "outline-variant": "#c3c6d7",
+                      "on-secondary-fixed": "#0b1c30",
+                      "surface-container-highest": "#e1e2ed",
+                      "on-primary-fixed": "#00174b",
+                      "surface-container-high": "#e7e7f3",
+                      "inverse-on-surface": "#f0f0fb",
+                      "surface": "#faf8ff",
+                      "on-error": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "tertiary-container": "#bc4800",
+                      "primary-fixed": "#dbe1ff",
+                      "on-error-container": "#93000a",
+                      "on-surface": "#191b23",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "tertiary": "#943700",
+                      "on-secondary-container": "#54647a",
+                      "surface-container-low": "#f3f3fe",
+                      "on-tertiary-fixed": "#360f00",
+                      "tertiary-fixed": "#ffdbcd",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-container": "#eeefff",
+                      "on-surface-variant": "#434655",
+                      "inverse-primary": "#b4c5ff",
+                      "surface-dim": "#d9d9e5",
+                      "outline": "#737686",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "surface-tint": "#0053db",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-container": "#ffede6",
+                      "on-background": "#191b23",
+                      "secondary-fixed": "#d3e4fe",
+                      "surface-container": "#ededf9",
+                      "secondary": "#505f76",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "surface-variant": "#e1e2ed",
+                      "primary-container": "#2563eb",
+                      "primary": "#004ac6",
+                      "inverse-surface": "#2e3039",
+                      "secondary-fixed-dim": "#b7c8e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sidebar-width": "280px",
+                      "margin-mobile": "16px",
+                      "base": "4px",
+                      "stack-lg": "32px",
+                      "gutter": "24px",
+                      "container-max": "1440px",
+                      "stack-sm": "8px",
+                      "stack-md": "16px",
+                      "margin-desktop": "40px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- Sidebar Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-surface border-r border-outline-variant flex flex-col py-6 px-4 z-50">
+<div class="mb-10 px-2">
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">FinanceFocus</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Enterprise Finance</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-body-md text-body-md">Transactions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Budget Planner</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="font-body-md text-body-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-primary bg-secondary-container rounded-lg border-l-4 border-primary relative" href="#">
+<div class="sidebar-indicator text-primary"></div>
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-4">
+<button class="w-full flex items-center gap-3 px-4 py-2 text-error hover:bg-error-container/10 rounded-lg transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</button>
+</div>
+</aside>
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 right-0 w-[calc(100%-280px)] h-16 bg-surface border-b border-outline-variant shadow-sm flex justify-between items-center px-gutter z-40">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Search settings..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<div class="flex items-center gap-3 ml-2 pl-4 border-l border-outline-variant">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface">Alex Rivera</p>
+<p class="text-[11px] text-on-surface-variant">Senior Analyst</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio headshot of a person with a clean-cut appearance, wearing a tailored navy blue blazer against a neutral grey backdrop. The lighting is soft and directional, typical of corporate portraiture, emphasizing a sense of confidence and expertise suitable for a high-end fintech executive profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9wlV5LzWniR8ipX4CFmIwsUFh2TlFWKNggXS-_F4s_SwcwcBEfxpwX93RZSFhX9a9B_PVktilTveTbfj1kZgrtDamJQZdXf-nW4kfVOBtIQCzHfW3-zY-M8v-PDQkw7U5cegO-iTYIHnRu7oZBfeobCzk1hcPrj2ZYXMD35gVbCB_osnhBXLQ99rw9pDwhjuyXLSYFGGBrRO61ysF5RzmQ6Ne512rsv7kFC4rh773_1Ic-J7Uvu3dGx0UNtpIhrRaJF5Uk6ZpUE3c"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Workspace -->
+<main class="ml-sidebar-width pt-16 min-h-screen">
+<div class="max-w-container-max mx-auto px-margin-desktop py-stack-lg">
+<header class="mb-stack-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface">Account Settings</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage your profile, security, and application preferences.</p>
+</header>
+<div class="grid grid-cols-12 gap-8 items-start">
+<!-- Settings Tabs Menu (Asymmetric Layout) -->
+<nav class="col-span-3 space-y-2">
+<button class="tab-btn active w-full flex items-center justify-between px-4 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary text-on-surface-variant transition-all" onclick="switchTab('profile')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</div>
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="tab-btn w-full flex items-center justify-between px-4 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary text-on-surface-variant transition-all" onclick="switchTab('security')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-label-md text-label-md">Security</span>
+</div>
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="tab-btn w-full flex items-center justify-between px-4 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary text-on-surface-variant transition-all" onclick="switchTab('appearance')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+<span class="font-label-md text-label-md">Appearance</span>
+</div>
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="tab-btn w-full flex items-center justify-between px-4 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary text-on-surface-variant transition-all" onclick="switchTab('notifications')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md">Notifications</span>
+</div>
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="tab-btn w-full flex items-center justify-between px-4 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary text-on-surface-variant transition-all" onclick="switchTab('localization')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+<span class="font-label-md text-label-md">Regional</span>
+</div>
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="chevron_right">chevron_right</span>
+</button>
+</nav>
+<!-- Settings Content Canvas -->
+<div class="col-span-9 bg-surface-container-lowest border border-outline-variant rounded-2xl overflow-hidden shadow-sm">
+<!-- Profile Section -->
+<section class="tab-content p-8 space-y-8" id="profile-content">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Public Profile</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Update your photo and personal details.</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md shadow-md hover:opacity-90 transition-all">Save Changes</button>
+</div>
+<div class="flex items-center gap-8 py-6 border-y border-outline-variant">
+<div class="relative group">
+<div class="w-24 h-24 rounded-full bg-surface-container-high border-2 border-primary-fixed flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional close-up of a business executive in a high-tech modern office environment. The background shows blurred data screens and sleek glass partitions. The subject is well-lit with soft natural light, maintaining the consistent minimalist corporate aesthetic and blue-toned color palette of the finance application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyGVzoZfLo7-o6H_BmHqUofWhqcDfe2kpaWTDO_KEBKi3niIvmzzx2robUzE86Czi5ThUhY9qsGOOgt9jFbVRY1XkLFVpOvY3E5JL0ARLcBmWYE0fSOt0_Vq6kD5ZE2ztIj-5SE1D6b7m7D8NWBiEN0yddUb0Ek3kn5uofcMZwV--Q14ukSzAQglZcRv1IzJNIXA9eSTb8O-mpkwhABZnalGtH94DdDDamRHN-rUsQl2EshN8G0Fh4LWyWuQjaeeNOkGXcnDFLmEYF"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-surface border border-outline-variant p-1.5 rounded-full shadow-sm group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</button>
+</div>
+<div class="space-y-1">
+<h4 class="font-label-md text-label-md text-on-surface">Profile Picture</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">PNG, JPG up to 10MB</p>
+<div class="flex gap-3 mt-2">
+<button class="text-primary font-label-sm text-label-sm hover:underline">Upload new</button>
+<button class="text-error font-label-sm text-label-sm hover:underline">Remove</button>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Full Name</label>
+<input class="w-full px-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" type="text" value="Alex Rivera"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Email Address</label>
+<input class="w-full px-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" type="email" value="alex.rivera@financefocus.com"/>
+</div>
+<div class="col-span-2 space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Bio</label>
+<textarea class="w-full px-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none h-24">Senior Analyst specializing in enterprise portfolio management and predictive fiscal modeling.</textarea>
+</div>
+</div>
+</section>
+<!-- Security Section (Hidden by default) -->
+<section class="tab-content p-8 space-y-8 hidden" id="security-content">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Security &amp; Privacy</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Manage your password and two-factor authentication.</p>
+</div>
+<div class="space-y-4">
+<div class="p-4 border border-outline-variant rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="password">password</span>
+</div>
+<div>
+<p class="font-label-md text-label-md">Password</p>
+<p class="text-body-sm text-on-surface-variant">Last changed 3 months ago</p>
+</div>
+</div>
+<button class="px-4 py-2 border border-outline-variant rounded-lg text-label-md hover:bg-surface-container-low">Update</button>
+</div>
+<div class="p-4 border border-outline-variant rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<p class="font-label-md text-label-md">Two-Factor Authentication</p>
+<p class="text-body-sm text-on-surface-variant">Adds an extra layer of security to your account</p>
+</div>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-outline-variant">
+<h4 class="font-label-md text-label-md text-error mb-4">Danger Zone</h4>
+<div class="p-4 border border-error/20 bg-error-container/5 rounded-xl flex items-center justify-between">
+<div>
+<p class="font-label-md text-label-md text-error">Delete Account</p>
+<p class="text-body-sm text-on-surface-variant">Once you delete your account, there is no going back.</p>
+</div>
+<button class="px-4 py-2 bg-error text-on-error rounded-lg text-label-md hover:opacity-90 transition-all">Delete Account</button>
+</div>
+</div>
+</section>
+<!-- Appearance Section (Hidden by default) -->
+<section class="tab-content p-8 space-y-8 hidden" id="appearance-content">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Appearance</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Customize how FinanceFocus looks on your device.</p>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<button class="theme-option p-4 border-2 border-primary rounded-2xl bg-white space-y-3 text-left transition-all" onclick="setTheme('light')">
+<div class="h-24 bg-surface-container-low rounded-lg border border-outline-variant p-2 space-y-1">
+<div class="w-3/4 h-2 bg-primary/20 rounded"></div>
+<div class="w-1/2 h-2 bg-primary/10 rounded"></div>
+<div class="w-full h-10 bg-white rounded border border-outline-variant shadow-sm mt-2"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md">Light Mode</span>
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</button>
+<button class="theme-option p-4 border-2 border-outline-variant rounded-2xl bg-inverse-surface space-y-3 text-left opacity-80 hover:opacity-100 transition-all" onclick="setTheme('dark')">
+<div class="h-24 bg-surface-dim rounded-lg border border-outline p-2 space-y-1">
+<div class="w-3/4 h-2 bg-primary-fixed-dim/20 rounded"></div>
+<div class="w-1/2 h-2 bg-primary-fixed-dim/10 rounded"></div>
+<div class="w-full h-10 bg-surface-container-highest rounded border border-outline shadow-sm mt-2"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-white">Dark Mode</span>
+<div class="w-5 h-5 rounded-full border border-outline-variant"></div>
+</div>
+</button>
+<button class="theme-option p-4 border-2 border-outline-variant rounded-2xl bg-surface-container-high space-y-3 text-left opacity-80 hover:opacity-100 transition-all">
+<div class="h-24 bg-gradient-to-br from-white to-inverse-surface rounded-lg border border-outline-variant p-2 overflow-hidden flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl opacity-20" data-icon="settings_brightness">settings_brightness</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md">System Default</span>
+<div class="w-5 h-5 rounded-full border border-outline-variant"></div>
+</div>
+</button>
+</div>
+</section>
+<!-- Notifications Section (Hidden by default) -->
+<section class="tab-content p-8 space-y-8 hidden" id="notifications-content">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Notification Preferences</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Decide which alerts you'd like to receive.</p>
+</div>
+<div class="space-y-6">
+<div class="flex items-start justify-between">
+<div>
+<p class="font-label-md text-label-md">Email Notifications</p>
+<p class="text-body-sm text-on-surface-variant">Daily transaction summaries and security alerts.</p>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<p class="font-label-md text-label-md">Push Notifications</p>
+<p class="text-body-sm text-on-surface-variant">Real-time alerts on your mobile device.</p>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<p class="font-label-md text-label-md">Market Updates</p>
+<p class="text-body-sm text-on-surface-variant">Insight reports on stock market trends and volatility.</p>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Regional/Localization Section (Hidden by default) -->
+<section class="tab-content p-8 space-y-8 hidden" id="localization-content">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Regional Settings</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Configure your preferred language and currency formats.</p>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Language</label>
+<select class="w-full px-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+<option>English (United States)</option>
+<option>Spanish (ES)</option>
+<option>French (FR)</option>
+<option>German (DE)</option>
+<option>Japanese (JP)</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Currency</label>
+<select class="w-full px-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+<option>USD ($) - United States Dollar</option>
+<option>EUR (€) - Euro</option>
+<option>GBP (£) - British Pound</option>
+<option>JPY (¥) - Japanese Yen</option>
+</select>
+</div>
+<div class="col-span-2 space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Timezone</label>
+<select class="w-full px-4 py-3 bg-background border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+<option>(GMT-08:00) Pacific Time (US &amp; Canada)</option>
+<option>(GMT-05:00) Eastern Time (US &amp; Canada)</option>
+<option>(GMT+00:00) London</option>
+<option>(GMT+01:00) Paris</option>
+</select>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Bottom Floating Action for Quick Access (Contextual FAB Suppression would normally hide this, but let's make it a 'Help' button as per modern UI trends) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-50">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</main>
+<script>
+        function switchTab(tabId) {
+            // Update Tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-primary', 'bg-secondary-container', 'text-primary');
+                btn.classList.add('bg-surface-container-lowest', 'border-outline-variant', 'text-on-surface-variant');
+            });
+
+            const activeBtn = event.currentTarget;
+            activeBtn.classList.remove('bg-surface-container-lowest', 'border-outline-variant', 'text-on-surface-variant');
+            activeBtn.classList.add('active', 'border-primary', 'bg-secondary-container', 'text-primary');
+
+            // Update Content sections
+            document.querySelectorAll('.tab-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(`${tabId}-content`).classList.remove('hidden');
+        }
+
+        function setTheme(mode) {
+            const html = document.documentElement;
+            if (mode === 'dark') {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+            
+            // Visual feedback for theme selection
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.remove('border-primary');
+                opt.classList.add('border-outline-variant');
+                const icon = opt.querySelector('[data-icon="check_circle"]');
+                if(icon) icon.remove();
+                
+                const indicator = opt.querySelector('.w-5.h-5');
+                if(!indicator) {
+                    const newInd = document.createElement('div');
+                    newInd.className = 'w-5 h-5 rounded-full border border-outline-variant';
+                    opt.querySelector('.flex.items-center.justify-between').appendChild(newInd);
+                }
+            });
+
+            const selectedOpt = event.currentTarget;
+            selectedOpt.classList.add('border-primary');
+            selectedOpt.classList.remove('border-outline-variant');
+            
+            const indicatorDiv = selectedOpt.querySelector('.w-5.h-5');
+            if(indicatorDiv) indicatorDiv.remove();
+            
+            const checkIcon = document.createElement('span');
+            checkIcon.className = 'material-symbols-outlined text-primary';
+            checkIcon.setAttribute('data-icon', 'check_circle');
+            checkIcon.style.fontVariationSettings = "'FILL' 1";
+            checkIcon.innerText = 'check_circle';
+            selectedOpt.querySelector('.flex.items-center.justify-between').appendChild(checkIcon);
+        }
+
+        // Initialize first tab
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab-btn');
+            firstTab.classList.add('border-primary', 'bg-secondary-container', 'text-primary');
+            firstTab.classList.remove('bg-surface-container-lowest', 'border-outline-variant', 'text-on-surface-variant');
+        });
+    </script>
+</body></html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinanceFocus | Subscription Tracker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "background": "#faf8ff",
+                    "surface-bright": "#faf8ff",
+                    "secondary-container": "#d0e1fb",
+                    "on-tertiary-fixed-variant": "#7d2d00",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb596",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c3c6d7",
+                    "on-secondary-fixed": "#0b1c30",
+                    "surface-container-highest": "#e1e2ed",
+                    "on-primary-fixed": "#00174b",
+                    "surface-container-high": "#e7e7f3",
+                    "inverse-on-surface": "#f0f0fb",
+                    "surface": "#faf8ff",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#bc4800",
+                    "primary-fixed": "#dbe1ff",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#191b23",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "tertiary": "#943700",
+                    "on-secondary-container": "#54647a",
+                    "surface-container-low": "#f3f3fe",
+                    "on-tertiary-fixed": "#360f00",
+                    "tertiary-fixed": "#ffdbcd",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#eeefff",
+                    "on-surface-variant": "#434655",
+                    "inverse-primary": "#b4c5ff",
+                    "surface-dim": "#d9d9e5",
+                    "outline": "#737686",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "surface-tint": "#0053db",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#ffede6",
+                    "on-background": "#191b23",
+                    "secondary-fixed": "#d3e4fe",
+                    "surface-container": "#ededf9",
+                    "secondary": "#505f76",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "surface-variant": "#e1e2ed",
+                    "primary-container": "#2563eb",
+                    "primary": "#004ac6",
+                    "inverse-surface": "#2e3039",
+                    "secondary-fixed-dim": "#b7c8e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sidebar-width": "280px",
+                    "margin-mobile": "16px",
+                    "base": "4px",
+                    "stack-lg": "32px",
+                    "gutter": "24px",
+                    "container-max": "1440px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px",
+                    "margin-desktop": "40px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-indicator {
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 24px;
+            background-color: var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- Side Navigation -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-surface border-r border-outline-variant flex flex-col h-full py-6 px-4 z-50">
+<div class="mb-10 px-4">
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">FinanceFocus</h1>
+<p class="font-body-sm text-on-surface-variant opacity-70">Enterprise Finance</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-body-md text-body-md">Transactions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Budget Planner</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">ads_click</span>
+<span class="font-body-md text-body-md">Goals</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">pie_chart</span>
+<span class="font-body-md text-body-md">Portfolio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="font-body-md text-body-md">Forecast Engine</span>
+</a>
+<!-- Active State for Subscriptions -->
+<a class="flex items-center gap-3 px-4 py-2 text-primary bg-secondary-container rounded-lg border-l-4 border-primary scale-[0.99] transition-transform" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-body-md text-body-md">Subscriptions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-body-md text-body-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">health_and_safety</span>
+<span class="font-body-md text-body-md">Financial Health</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-md text-body-md">Activity Log</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-body-md text-body-md">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-4">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 w-[calc(100%-280px)] h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-gutter z-40 shadow-sm">
+<div class="flex items-center bg-surface-container-low rounded-full px-4 py-1.5 w-96">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-md w-full text-on-surface" placeholder="Search subscriptions..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-all">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md hover:opacity-90 active:opacity-80 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                Add Subscription
+            </button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Professional studio headshot of a business executive in a high-end corporate setting. The lighting is soft and directional, highlighting facial features against a blurred, modern office background with cool blue and crisp white tones. The overall aesthetic is clean, trustworthy, and sophisticated, reflecting a premium fintech user persona." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnbED5_oyHGYGv3YKJFY5NCTtby9YaVOUhcooJP8eBk1NPtCWCar2dincbcoOmP4u26-8k8guItSL6F4JQxPBeLjTDYuzbyi3JiOsAQfhsqgKv8Eo00QqAE1etkEBgUCzwBGn4XORU4pNb7h9kFUclhHGOcbPYhXhAMuSTkBMBItZFY5ZOy-3XRwsatUpNl2QRSCGeFnlrrrM6Te37ZslDo4N8cCHID_ARLkpPudnw6Lta7bLealna0VlJpQMtIgslTiqzqty1Jv3Z"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width pt-16 min-h-screen bg-background">
+<div class="max-w-container-max mx-auto p-gutter lg:p-margin-desktop">
+<!-- Page Header -->
+<div class="mb-stack-lg flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Subscription Tracker</h2>
+<p class="font-body-md text-on-surface-variant mt-1">Monitor your recurring expenses and optimize your financial commitments.</p>
+</div>
+<div class="flex gap-2 bg-surface-container-low p-1 rounded-lg">
+<button class="px-4 py-1.5 rounded-md text-label-md bg-white shadow-sm text-primary font-bold">List View</button>
+<button class="px-4 py-1.5 rounded-md text-label-md text-on-surface-variant hover:bg-surface-container-high transition-all">Grid View</button>
+</div>
+</div>
+<!-- Summary Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-stack-lg">
+<div class="bg-surface p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="text-on-surface-variant font-label-sm uppercase tracking-wider">Total Monthly Cost</span>
+<div class="p-2 bg-primary-fixed rounded-lg text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-headline-lg">$482.50</span>
+<span class="text-error font-label-sm flex items-center">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                            4.2%
+                        </span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-2">v. last month</p>
+</div>
+<div class="bg-surface p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="text-on-surface-variant font-label-sm uppercase tracking-wider">Active Subscriptions</span>
+<div class="p-2 bg-secondary-fixed rounded-lg text-secondary">
+<span class="material-symbols-outlined">sync_alt</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-headline-lg">18</span>
+<span class="text-on-surface-variant font-label-sm">Active</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-2">Across 4 categories</p>
+</div>
+<div class="bg-surface p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="text-on-surface-variant font-label-sm uppercase tracking-wider">Upcoming Payments</span>
+<div class="p-2 bg-tertiary-fixed rounded-lg text-tertiary">
+<span class="material-symbols-outlined">event_upcoming</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-headline-lg">04</span>
+<span class="text-on-surface-variant font-label-sm">Due soon</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-2">Next 7 days</p>
+</div>
+<div class="bg-surface p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="text-on-surface-variant font-label-sm uppercase tracking-wider">Auto Renew Count</span>
+<div class="p-2 bg-surface-container-highest rounded-lg text-on-surface">
+<span class="material-symbols-outlined">published_with_changes</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-headline-lg">12</span>
+<span class="text-on-surface-variant font-label-sm">Enabled</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-2">Managing automated billing</p>
+</div>
+</div>
+<!-- Filters Section -->
+<div class="bg-surface p-gutter rounded-xl border border-outline-variant mb-stack-md flex flex-wrap items-center justify-between gap-4">
+<div class="flex gap-stack-md">
+<div class="relative">
+<select class="appearance-none bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 pr-10 text-label-md text-on-surface-variant focus:ring-2 focus:ring-primary focus:border-primary outline-none cursor-pointer">
+<option>All Categories</option>
+<option>Entertainment</option>
+<option>Software</option>
+<option>Utilities</option>
+<option>Lifestyle</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 pr-10 text-label-md text-on-surface-variant focus:ring-2 focus:ring-primary focus:border-primary outline-none cursor-pointer">
+<option>All Status</option>
+<option>Active</option>
+<option>Paused</option>
+<option>Expiring</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-stack-sm text-label-md text-on-surface-variant">
+<span>Sort by:</span>
+<button class="flex items-center gap-1 font-bold text-on-surface hover:text-primary transition-colors">
+                        Next Payment
+                        <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+<!-- Subscription List -->
+<div class="space-y-base">
+<!-- Header row for table-like feel -->
+<div class="hidden lg:grid grid-cols-12 px-6 py-4 text-label-sm text-on-surface-variant uppercase tracking-widest border-b border-outline-variant mb-4">
+<div class="col-span-4">Service &amp; Category</div>
+<div class="col-span-2 text-right">Price</div>
+<div class="col-span-2 text-center">Cycle</div>
+<div class="col-span-2">Next Payment</div>
+<div class="col-span-2 text-right">Status</div>
+</div>
+<!-- Subscription Item: Netflix -->
+<div class="bg-surface group hover:bg-surface-container-low border border-outline-variant rounded-xl p-4 lg:p-6 transition-all duration-200">
+<div class="grid grid-cols-1 lg:grid-cols-12 items-center gap-4">
+<div class="col-span-1 lg:col-span-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center p-2">
+<img class="w-full h-full object-contain" data-alt="A minimalist vector logo of a well-known video streaming service, featuring a bold, recognizable brand initial in deep red. The background is a clean white square with rounded corners, maintaining a high-contrast and modern corporate aesthetic suitable for a premium financial dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCF3HvsZnUmYlSeNPUbHreEqQvUHCy4e7oZjKn5RGJvbDu5mhJ36SWrYPG3WirU4sbGTHWJBuTipquoHFo_bPloxS_iv-OMZQTrv6ODsGpcoiaQ47z2SX-ZxSm_LeEE5zklYT6eVK1VMy92Tw9nfB9-DBmqBrLvZZBQJ40Dgh7DyUzw5kM88KQAJZrRL6HaRnSOvgFZXr6g8oUwULAVzOTbVh7IfcUp7vFOJVg7ueDp4c5ce9WLA-PFegFsMUHUMIicoWxgQzRsVXX"/>
+</div>
+<div>
+<h4 class="font-headline-sm text-[18px] text-on-surface">Netflix Premium</h4>
+<p class="font-body-sm text-on-surface-variant">Entertainment • 4K UHD + Mobile</p>
+</div>
+</div>
+<div class="col-span-1 lg:col-span-2 text-right">
+<span class="font-headline-sm text-[20px] text-on-surface">$19.99</span>
+<p class="font-body-sm text-on-surface-variant">USD</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex justify-center">
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-sm text-on-surface-variant">Monthly</span>
+</div>
+<div class="col-span-1 lg:col-span-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">event</span>
+<span class="font-body-md text-on-surface">Oct 24, 2023</span>
+</div>
+<p class="font-label-sm text-error ml-6">In 2 days</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex flex-col items-end gap-2">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-800 font-label-sm">
+<span class="w-2 h-2 rounded-full bg-green-600 animate-pulse"></span>
+                                Auto-renew
+                            </div>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-primary font-label-md hover:underline">Manage</button>
+</div>
+</div>
+</div>
+<!-- Subscription Item: Spotify -->
+<div class="bg-surface group hover:bg-surface-container-low border border-outline-variant rounded-xl p-4 lg:p-6 transition-all duration-200">
+<div class="grid grid-cols-1 lg:grid-cols-12 items-center gap-4">
+<div class="col-span-1 lg:col-span-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center p-2">
+<img class="w-full h-full object-contain" data-alt="A minimalist logo for a popular music streaming service, showcasing iconic soundwave curves in a vibrant, recognizable green. The logo is centered on a clean, professional white background with a subtle border, fitting the modern minimalist theme of a high-end fintech application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBi-qfyTMlXkwYB1p7U4yAUdvsT9Y9POYXATKJ2Yj3el8fJvV6FdJItmcDuhsHaApKSwHAARuwVITbsfaUKU0fWCPbNiNPypye6VvRAPFXL92-ljJHyyrop0eBaTw0WbUNks-TG2f-YnNPmnV3xcG3FcV9OPIukKG67JYd_EYQwIegc2qAc_DuhVGVKty3vH5Ar2NzKQicYThbULsQUC-8hmOoPhDHlnbAwlpc1kLQN3swBhVj8uflSumsj35muOQbPbL-EmXja4Frv"/>
+</div>
+<div>
+<h4 class="font-headline-sm text-[18px] text-on-surface">Spotify Family</h4>
+<p class="font-body-sm text-on-surface-variant">Entertainment • 6 Accounts</p>
+</div>
+</div>
+<div class="col-span-1 lg:col-span-2 text-right">
+<span class="font-headline-sm text-[20px] text-on-surface">$16.99</span>
+<p class="font-body-sm text-on-surface-variant">USD</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex justify-center">
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-sm text-on-surface-variant">Monthly</span>
+</div>
+<div class="col-span-1 lg:col-span-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">event</span>
+<span class="font-body-md text-on-surface">Oct 29, 2023</span>
+</div>
+<p class="font-label-sm text-on-surface-variant ml-6">In 7 days</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex flex-col items-end gap-2">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-800 font-label-sm">
+<span class="w-2 h-2 rounded-full bg-green-600"></span>
+                                Auto-renew
+                            </div>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-primary font-label-md hover:underline">Manage</button>
+</div>
+</div>
+</div>
+<!-- Subscription Item: Amazon Prime -->
+<div class="bg-surface group hover:bg-surface-container-low border border-outline-variant rounded-xl p-4 lg:p-6 transition-all duration-200">
+<div class="grid grid-cols-1 lg:grid-cols-12 items-center gap-4">
+<div class="col-span-1 lg:col-span-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center p-2">
+<img class="w-full h-full object-contain" data-alt="A clean, minimalist representation of a major e-commerce brand's logo, featuring a subtle arrow curve in warm orange against a stark white background. The icon is framed in a modern, rounded-corner container, adhering to the professional corporate visual identity of a sophisticated finance tool." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuR4s6pajfPvi3xy9LtmrVK_5ukRu9TCohAMe3SDKffgLeoL05GSE9TjsTqfH4QrIt2XPUVzoUbnqAxtN6zSQLPrY_ps8rfCYHQLTjMq8dgQCt7eMuLfoQN3UbOqHSfuLsIW18FIO_SksTDUiGxoJ_6ze_gnNFPNyMI7yGv52-i-hVLEiJXkj56CzB_XqqULYXl9qxHbxZdQkpQnB0i_sFFbf7K83Ix0peSUFSWgodLp_fZQa35FM1ahuN8m4N91_CeeAe4MVnoqEc"/>
+</div>
+<div>
+<h4 class="font-headline-sm text-[18px] text-on-surface">Amazon Prime</h4>
+<p class="font-body-sm text-on-surface-variant">Lifestyle • Annual Membership</p>
+</div>
+</div>
+<div class="col-span-1 lg:col-span-2 text-right">
+<span class="font-headline-sm text-[20px] text-on-surface">$139.00</span>
+<p class="font-body-sm text-on-surface-variant">USD</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex justify-center">
+<span class="px-3 py-1 bg-primary-fixed rounded-full font-label-sm text-on-primary-fixed-variant">Yearly</span>
+</div>
+<div class="col-span-1 lg:col-span-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">event</span>
+<span class="font-body-md text-on-surface">Dec 12, 2023</span>
+</div>
+<p class="font-label-sm text-on-surface-variant ml-6">In 51 days</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex flex-col items-end gap-2">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm">
+<span class="material-symbols-outlined text-[14px]">notifications_off</span>
+                                Manual Pay
+                            </div>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-primary font-label-md hover:underline">Manage</button>
+</div>
+</div>
+</div>
+<!-- Subscription Item: Internet -->
+<div class="bg-surface group hover:bg-surface-container-low border border-outline-variant rounded-xl p-4 lg:p-6 transition-all duration-200">
+<div class="grid grid-cols-1 lg:grid-cols-12 items-center gap-4">
+<div class="col-span-1 lg:col-span-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center p-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[32px]">router</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-[18px] text-on-surface">Fiber Optic Internet</h4>
+<p class="font-body-sm text-on-surface-variant">Utilities • 1Gbps Unlimited</p>
+</div>
+</div>
+<div class="col-span-1 lg:col-span-2 text-right">
+<span class="font-headline-sm text-[20px] text-on-surface">$85.00</span>
+<p class="font-body-sm text-on-surface-variant">USD</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex justify-center">
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-sm text-on-surface-variant">Monthly</span>
+</div>
+<div class="col-span-1 lg:col-span-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">event</span>
+<span class="font-body-md text-on-surface">Nov 01, 2023</span>
+</div>
+<p class="font-label-sm text-on-surface-variant ml-6">In 10 days</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex flex-col items-end gap-2">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-800 font-label-sm">
+<span class="w-2 h-2 rounded-full bg-green-600"></span>
+                                Auto-renew
+                            </div>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-primary font-label-md hover:underline">Manage</button>
+</div>
+</div>
+</div>
+<!-- Subscription Item: Water Bill -->
+<div class="bg-surface group hover:bg-surface-container-low border border-outline-variant rounded-xl p-4 lg:p-6 transition-all duration-200">
+<div class="grid grid-cols-1 lg:grid-cols-12 items-center gap-4">
+<div class="col-span-1 lg:col-span-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center p-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[32px]">water_drop</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-[18px] text-on-surface">City Water Utility</h4>
+<p class="font-body-sm text-on-surface-variant">Utilities • Residential Usage</p>
+</div>
+</div>
+<div class="col-span-1 lg:col-span-2 text-right">
+<span class="font-headline-sm text-[20px] text-on-surface">$42.30</span>
+<p class="font-body-sm text-on-surface-variant">Estimated</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex justify-center">
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-sm text-on-surface-variant">Monthly</span>
+</div>
+<div class="col-span-1 lg:col-span-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">event</span>
+<span class="font-body-md text-on-surface">Nov 05, 2023</span>
+</div>
+<p class="font-label-sm text-on-surface-variant ml-6">In 14 days</p>
+</div>
+<div class="col-span-1 lg:col-span-2 flex flex-col items-end gap-2">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                                Scheduled
+                            </div>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-primary font-label-md hover:underline">Manage</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Empty State / Footer Action -->
+<div class="mt-stack-lg flex flex-col items-center justify-center py-12 bg-surface-container-low rounded-2xl border-2 border-dashed border-outline-variant">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[32px] text-on-surface-variant">add_circle</span>
+</div>
+<h5 class="font-headline-sm text-on-surface">Tracking more services?</h5>
+<p class="font-body-md text-on-surface-variant mb-6">Add them now to get a complete view of your recurring spend.</p>
+<button class="px-6 py-2.5 bg-primary text-on-primary rounded-lg font-label-md shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                    Link New Account
+                </button>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions for the cards
+        document.querySelectorAll('.group').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.05)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'none';
+            });
+        });
+
+        // Search highlight effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary', 'bg-white');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary', 'bg-white');
+        });
+    </script>
+</body></html>

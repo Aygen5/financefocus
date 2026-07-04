@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "error": "#ba1a1a",
+                "background": "#faf8ff",
+                "surface-bright": "#faf8ff",
+                "secondary-container": "#d0e1fb",
+                "on-tertiary-fixed-variant": "#7d2d00",
+                "on-primary": "#ffffff",
+                "tertiary-fixed-dim": "#ffb596",
+                "on-secondary": "#ffffff",
+                "outline-variant": "#c3c6d7",
+                "on-secondary-fixed": "#0b1c30",
+                "surface-container-highest": "#e1e2ed",
+                "on-primary-fixed": "#00174b",
+                "surface-container-high": "#e7e7f3",
+                "inverse-on-surface": "#f0f0fb",
+                "surface": "#faf8ff",
+                "on-error": "#ffffff",
+                "error-container": "#ffdad6",
+                "tertiary-container": "#bc4800",
+                "primary-fixed": "#dbe1ff",
+                "on-error-container": "#93000a",
+                "on-surface": "#191b23",
+                "primary-fixed-dim": "#b4c5ff",
+                "tertiary": "#943700",
+                "on-secondary-container": "#54647a",
+                "surface-container-low": "#f3f3fe",
+                "on-tertiary-fixed": "#360f00",
+                "tertiary-fixed": "#ffdbcd",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-container": "#eeefff",
+                "on-surface-variant": "#434655",
+                "inverse-primary": "#b4c5ff",
+                "surface-dim": "#d9d9e5",
+                "outline": "#737686",
+                "on-primary-fixed-variant": "#003ea8",
+                "surface-tint": "#0053db",
+                "on-tertiary": "#ffffff",
+                "on-tertiary-container": "#ffede6",
+                "on-background": "#191b23",
+                "secondary-fixed": "#d3e4fe",
+                "surface-container": "#ededf9",
+                "secondary": "#505f76",
+                "on-secondary-fixed-variant": "#38485d",
+                "surface-variant": "#e1e2ed",
+                "primary-container": "#2563eb",
+                "primary": "#004ac6",
+                "inverse-surface": "#2e3039",
+                "secondary-fixed-dim": "#b7c8e1"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "sidebar-width": "280px",
+                "margin-mobile": "16px",
+                "base": "4px",
+                "stack-lg": "32px",
+                "gutter": "24px",
+                "container-max": "1440px",
+                "stack-sm": "8px",
+                "stack-md": "16px",
+                "margin-desktop": "40px"
+            },
+            "fontFamily": {
+                "body-lg": ["Inter"],
+                "headline-lg": ["Inter"],
+                "body-sm": ["Inter"],
+                "headline-lg-mobile": ["Inter"],
+                "display-lg": ["Inter"],
+                "label-sm": ["Inter"],
+                "headline-sm": ["Inter"],
+                "headline-md": ["Inter"],
+                "label-md": ["Inter"],
+                "body-md": ["Inter"]
+            },
+            "fontSize": {
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #faf8ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .sidebar-active-pill { width: 3px; height: 24px; position: absolute; left: 0; background-color: #004ac6; border-radius: 0 4px 4px 0; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c3c6d7; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-surface border-r border-outline-variant flex flex-col py-6 px-4 z-50">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">FinanceFocus</h1>
+<p class="text-[11px] font-label-sm uppercase tracking-wider text-outline">Enterprise Finance</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<!-- Transactions -->
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-body-md text-body-md">Transactions</span>
+</a>
+<!-- Notifications (Active) -->
+<div class="relative">
+<div class="sidebar-active-pill"></div>
+<a class="flex items-center gap-3 px-4 py-2 text-primary bg-secondary-container rounded-lg border-l-4 border-primary" href="#">
+<span class="material-symbols-outlined" data-icon="notifications" style="font-variation-settings: 'FILL' 1;">notifications</span>
+<span class="font-body-md text-body-md font-semibold">Notifications</span>
+</a>
+</div>
+<!-- Budget Planner -->
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Budget Planner</span>
+</a>
+<!-- Goals -->
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="ads_click">ads_click</span>
+<span class="font-body-md text-body-md">Goals</span>
+</a>
+<!-- Portfolio -->
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="pie_chart">pie_chart</span>
+<span class="font-body-md text-body-md">Portfolio</span>
+</a>
+<!-- Forecast Engine -->
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-body-md text-body-md">Forecast Engine</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 w-[calc(100%-280px)] h-16 bg-surface border-b border-outline-variant shadow-sm z-40 flex justify-between items-center px-gutter ml-sidebar-width">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-label-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Search notifications or records..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md hover:opacity-90 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                Add Transaction
+            </button>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="A professional studio headshot of a financial executive in a modern business suit. The lighting is crisp and cool, featuring a neutral grey background that complements a high-end enterprise software aesthetic. The composition is centered, with sharp focus on the face and soft bokeh on the background, conveying confidence and corporate reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM8wUfvByTCFGwL3ByMmde1GAwMdiV07HVQ9wXWhy7lcFwZRTbx2Wv2OtzUi6NBWTEZg6WLP1JGkQDhQQiWVmssIncqViaZQypf_ZIPzTzyTA97ougeHxngsCjpliHFzfupyhcdihNT9V0w_0KGMRHfeRYZ_IB2ttEI0XK1zA8fsIPRJ7MEk6J1quiks-p8faBrpBheT2w_ik_-U5Wv4pWspViZUfJH489tqmKMsujUM-hx0ywqzSOX1A6RK3uMp0tK7dZx93VvsDS"/>
+</div>
+</div>
+</header>
+<!-- Main Content Stage -->
+<main class="ml-sidebar-width pt-24 pb-12 px-gutter min-h-screen">
+<div class="max-w-container-max mx-auto">
+<!-- Page Header Actions -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Notification Center</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Stay updated with your financial health and system activities.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 text-primary font-label-md hover:bg-primary-fixed rounded-lg transition-colors border border-primary/20" id="markReadBtn">
+<span class="material-symbols-outlined text-[20px]" data-icon="done_all">done_all</span>
+                        Mark all as read
+                    </button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</div>
+<!-- Filters & Stats Bar -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-gutter mb-8">
+<!-- Tabs/Filters -->
+<div class="lg:col-span-3 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="px-5 py-2.5 bg-primary text-on-primary rounded-full font-label-md transition-all">All</button>
+<button class="px-5 py-2.5 bg-surface-container-highest text-on-surface-variant rounded-full font-label-md hover:bg-outline-variant transition-all flex items-center gap-2">
+                        Payments
+                        <span class="bg-primary-container text-primary text-[10px] px-1.5 py-0.5 rounded-full font-bold">3</span>
+</button>
+<button class="px-5 py-2.5 bg-surface-container-highest text-on-surface-variant rounded-full font-label-md hover:bg-outline-variant transition-all">Budgets</button>
+<button class="px-5 py-2.5 bg-surface-container-highest text-on-surface-variant rounded-full font-label-md hover:bg-outline-variant transition-all">Updates</button>
+<button class="px-5 py-2.5 bg-surface-container-highest text-on-surface-variant rounded-full font-label-md hover:bg-outline-variant transition-all">Security</button>
+</div>
+<!-- Summary Card -->
+<div class="bg-surface-container-low border border-outline-variant p-4 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+</div>
+<div>
+<p class="text-label-sm text-outline uppercase tracking-wider">Unread</p>
+<p class="text-headline-sm font-bold text-on-surface">12 Alerts</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Notifications Bento Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter">
+<!-- Main Feed -->
+<div class="xl:col-span-8 space-y-4">
+<!-- Urgent Card: Payment -->
+<div class="group relative bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex gap-gutter">
+<div class="flex-shrink-0">
+<div class="w-12 h-12 rounded-xl bg-error/10 text-error flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]" data-icon="pending_actions" style="font-variation-settings: 'FILL' 1;">pending_actions</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-sm font-bold text-error uppercase tracking-widest">Upcoming Payment</span>
+<span class="text-label-sm text-outline">2 hours ago</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Quarterly SaaS Subscription Due</h3>
+<p class="text-body-md text-on-surface-variant mb-4">The payment of <span class="font-semibold text-on-surface">$1,240.00</span> for your Adobe Creative Cloud for Teams subscription is scheduled for tomorrow.</p>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-primary text-on-primary rounded-lg text-label-md hover:bg-primary-container transition-colors">Authorize Now</button>
+<button class="px-4 py-2 bg-surface-container text-on-surface-variant rounded-lg text-label-md hover:bg-surface-container-high transition-colors">Details</button>
+</div>
+</div>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-surface-container rounded-full text-outline"><span class="material-symbols-outlined" data-icon="more_vert">more_vert</span></button>
+</div>
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error rounded-l-xl"></div>
+</div>
+<!-- Budget Alert Card -->
+<div class="group bg-surface border border-outline-variant p-gutter rounded-xl hover:bg-surface-container-low transition-all duration-300 flex gap-gutter relative">
+<div class="flex-shrink-0">
+<div class="w-12 h-12 rounded-xl bg-tertiary-fixed text-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]" data-icon="warning">warning</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-sm font-bold text-tertiary uppercase tracking-widest">Budget Threshold</span>
+<span class="text-label-sm text-outline">5 hours ago</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Marketing Budget at 85%</h3>
+<div class="w-full bg-surface-container-highest h-2 rounded-full mb-3 overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 85%"></div>
+</div>
+<p class="text-body-md text-on-surface-variant">You have spent $8,500 of your $10,000 monthly marketing allocation. Consider reviewing your active campaigns.</p>
+</div>
+<!-- Unread Dot -->
+<div class="absolute right-6 top-6 w-2.5 h-2.5 bg-primary rounded-full"></div>
+</div>
+<!-- System Update -->
+<div class="group bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:shadow-sm transition-all duration-300 flex gap-gutter">
+<div class="flex-shrink-0">
+<div class="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]" data-icon="update">update</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-sm font-bold text-secondary uppercase tracking-widest">System Update</span>
+<span class="text-label-sm text-outline">Yesterday</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">New Portfolio Analytics v2.4</h3>
+<p class="text-body-md text-on-surface-variant">We've launched enhanced real-time tracking for international stocks and crypto assets. Explore the new dashboard view in your portfolio tab.</p>
+</div>
+</div>
+<!-- Security Alert -->
+<div class="group bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:shadow-sm transition-all duration-300 flex gap-gutter">
+<div class="flex-shrink-0">
+<div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]" data-icon="security">security</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-sm font-bold text-primary uppercase tracking-widest">Security</span>
+<span class="text-label-sm text-outline">Oct 24, 2023</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">New Login Detected</h3>
+<p class="text-body-md text-on-surface-variant">A new login was detected from a Chrome browser on a Mac OS device in London, UK. If this wasn't you, please secure your account immediately.</p>
+</div>
+</div>
+</div>
+<!-- Sidebar Contextual Content -->
+<div class="xl:col-span-4 space-y-gutter">
+<!-- Trends Widget -->
+<div class="bg-surface border border-outline-variant rounded-2xl p-6 overflow-hidden relative">
+
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-4">Notification Trends</h4>
+<div class="space-y-4 relative z-10">
+<div class="flex items-center justify-between">
+<span class="text-body-md text-on-surface-variant">Alert Volume</span>
+<span class="text-label-md font-bold text-error">+12% this week</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-body-md text-on-surface-variant">Avg. Response Time</span>
+<span class="text-label-md font-bold text-on-surface">14m</span>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-outline-variant">
+<p class="text-label-sm text-outline mb-3">MOST ACTIVE CATEGORY</p>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="payments">payments</span>
+<span class="font-body-md font-semibold text-on-surface">Transaction Alerts</span>
+</div>
+</div>
+</div>
+<!-- Scheduled Activities -->
+<div class="bg-primary-container text-on-primary-container rounded-2xl p-6">
+<h4 class="font-headline-sm text-headline-sm mb-4">Auto-Clearing Enabled</h4>
+<p class="text-body-md mb-6 opacity-90">Notifications older than 30 days are automatically archived to keep your workspace clutter-free.</p>
+<button class="w-full py-3 bg-on-primary-container text-primary font-bold rounded-xl hover:bg-opacity-90 transition-all">Manage Storage</button>
+</div>
+<!-- Mini Map for login security -->
+<div class="bg-surface border border-outline-variant rounded-2xl p-4">
+<p class="text-label-sm font-bold text-outline uppercase tracking-wider mb-3 px-2">Last Login Location</p>
+<div class="w-full h-40 rounded-xl overflow-hidden bg-surface-container relative">
+<div class="absolute inset-0 grayscale opacity-50" data-location="London, UK" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDRdJh1zKiqjZi8gvLuLuovO2eATUjVu0nULSiURTgq8bEY0A3_krmTD03LHYTWvHWW2jeDXTxxZXxwi-Ee2xVNe9n2J1nIoGb-52EfnYMfe-kssYWdN1HrqB5FFIS0ENu7aL-6s4rBCOf1aAjT20JsRYGkJuuEHnwuMDCRedtP3wii_vAilRGLv8uztLFWC_-bumiNPeoUNYTxQfOZkEgYBsfOK3sgN9nut9GAEOX3W9ZZIvmp0GUQkMGyYXVOTgowmewFy-pTZnPS')"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-4 h-4 bg-primary rounded-full animate-ping"></div>
+<div class="w-3 h-3 bg-primary rounded-full absolute shadow-lg"></div>
+</div>
+</div>
+<div class="mt-3 px-2">
+<p class="text-body-sm font-semibold text-on-surface">London, United Kingdom</p>
+<p class="text-label-sm text-outline">Oct 25, 2023 • 10:42 AM</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions
+        const markReadBtn = document.getElementById('markReadBtn');
+        markReadBtn.addEventListener('click', function() {
+            // Visual feedback for "Mark all as read"
+            const unreadDots = document.querySelectorAll('.bg-primary.rounded-full.w-2.5');
+            unreadDots.forEach(dot => {
+                dot.style.opacity = '0';
+                dot.style.transform = 'scale(0)';
+            });
+            
+            const cards = document.querySelectorAll('.bg-surface-container-low.border-outline-variant');
+            cards.forEach(card => {
+                card.classList.remove('bg-surface-container-low');
+                card.classList.add('bg-surface-container-lowest');
+            });
+
+            this.innerHTML = `<span class="material-symbols-outlined text-[20px]" data-icon="check_circle">check_circle</span> All Read`;
+            this.classList.replace('text-primary', 'text-on-surface-variant');
+            this.classList.replace('border-primary/20', 'border-outline-variant');
+        });
+
+        // Hover effects on cards
+        document.querySelectorAll('.group').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>

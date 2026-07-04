@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinanceFocus - Goals</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#003ea8",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#ededf9",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#0053db",
+                        "on-primary-container": "#eeefff",
+                        "secondary-container": "#d0e1fb",
+                        "on-primary-fixed": "#00174b",
+                        "primary": "#004ac6",
+                        "inverse-on-surface": "#f0f0fb",
+                        "surface-variant": "#e1e2ed",
+                        "secondary": "#505f76",
+                        "surface-container-low": "#f3f3fe",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-surface-variant": "#434655",
+                        "primary-fixed": "#dbe1ff",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#191b23",
+                        "background": "#faf8ff",
+                        "surface": "#faf8ff",
+                        "on-background": "#191b23",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#ffede6",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#bc4800",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e7f3",
+                        "surface-dim": "#d9d9e5",
+                        "inverse-surface": "#2e3039",
+                        "outline": "#737686",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "tertiary": "#943700",
+                        "secondary-fixed": "#d3e4fe",
+                        "tertiary-fixed": "#ffdbcd",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#c3c6d7",
+                        "on-secondary-fixed": "#0b1c30",
+                        "primary-container": "#2563eb",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container-highest": "#e1e2ed",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "surface-bright": "#faf8ff",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary-fixed": "#360f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "sidebar-width": "280px",
+                        "stack-md": "16px",
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #191b23; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03); }
+    </style>
+</head>
+<body class="bg-background flex w-full min-h-screen">
+<!-- SideNavBar -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full w-sidebar-width bg-surface dark:bg-inverse-surface border-r border-outline-variant dark:border-outline flex-col py-6 px-4 z-50">
+<div class="mb-8 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-on-primary font-bold">F</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary">FinanceFocus</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Enterprise Finance</p>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-body-md text-body-md">Transactions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Budget Planner</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-primary dark:text-inverse-primary bg-secondary-container dark:bg-secondary-fixed-dim rounded-lg border-l-4 border-primary transition-transform scale-[0.99]" href="#">
+<span class="material-symbols-outlined" data-icon="ads_click" data-weight="fill" style="font-variation-settings: 'FILL' 1;">ads_click</span>
+<span class="font-body-md text-body-md font-medium">Goals</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="pie_chart">pie_chart</span>
+<span class="font-body-md text-body-md">Portfolio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-body-md text-body-md">Forecast Engine</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-body-md text-body-md">Subscriptions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="font-body-md text-body-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+<span class="font-body-md text-body-md">Financial Health</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-body-md text-body-md">Activity Log</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-body-md text-body-md">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 w-full md:ml-sidebar-width min-h-screen pb-24 md:pb-8 flex flex-col">
+<!-- TopNavBar -->
+<header class="hidden md:flex fixed top-0 right-0 w-[calc(100%-280px)] h-16 bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none justify-between items-center px-gutter z-40">
+<div class="flex-1 max-w-md relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" placeholder="Search..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                    Add Transaction
+                </button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant cursor-pointer hover:opacity-80 transition-opacity">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A small, professional portrait photo of a user for an avatar profile picture. Neutral background, soft studio lighting, light mode corporate aesthetic, clear focus on the subject's face." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBn4ChX3HJCQinjMTALWSggxLG7N0PrFQfDP_Kr4x771Sro7k0rcul_hsgH0_Z7wFFcKJWgxPzFJpZXUWYOzyAzjacbx1Tkk_pPth5VkYfwHs2DAN4VSZhMQHiFXf7_mmLvMuLLhCbTOCr92XuoaWtZeDkXey7pbaoeFMqby8PATO_K3SyGdqGhXY-C2KoxPAbhUi-nSHeOzRzoN_9xcwLaA1-s6Sos2tAqOEkuBhLWJ5bw1NcY_Qq-t25cOSriWyTKzr_HqHbXDFyd"/>
+</div>
+</div>
+</header>
+<!-- Mobile Header (Simplified) -->
+<header class="md:hidden flex items-center justify-between p-4 bg-surface border-b border-outline-variant sticky top-0 z-40">
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">FinanceFocus</h1>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A small, professional portrait photo of a user for an avatar profile picture. Neutral background, soft studio lighting, light mode corporate aesthetic, clear focus on the subject's face." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBShBphQlNsk3f4o_Z4HxLLyQTlG_UaIdn7Sf25iuy5XklRcourFCeARVRPObsPx9CC6aYgD2x9w0omkHp3TV3RQO4ioo5Bqr4tjGjqET-lfAt-klCz2kmOwosX50lMBfiqsojsRkGaUdQg7lwZRbKJQVhLXUs-pB__CUfXHYnRjXXY5wqMwABfhUX9docQw99w6OLonPOFbFWaxyPzO-AmymRYzpf0SyTWMsUiYi4LbGsUM2n0nAakVGvDxYKZ__jjV7MVVUKouhoM"/>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 pt-6 px-4 md:px-gutter md:pt-24 max-w-[1440px] mx-auto w-full">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Financial Goals</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Track and manage your strategic financial targets.</p>
+</div>
+<button class="bg-primary text-on-primary px-5 py-2.5 rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors shadow-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                    Add Goal
+                </button>
+</div>
+<!-- Goals Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Vacation Goal Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 flex flex-col relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-primary border border-outline-variant">
+<span class="material-symbols-outlined" data-icon="flight_takeoff">flight_takeoff</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Vacation</h3>
+</div>
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-outline-variant">Aug 2024</span>
+</div>
+<div class="mt-2 mb-6 relative z-10">
+<div class="flex items-end justify-between mb-1">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">$3,750</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mb-1">of $5,000</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-2 bg-surface-variant rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-1000 ease-out w-[75%]"></div>
+</div>
+<div class="flex justify-between mt-2">
+<span class="font-label-sm text-label-sm text-primary">75% Complete</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">On Track</span>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant flex justify-between items-center relative z-10">
+<a class="font-label-md text-label-md text-primary hover:underline flex items-center gap-1" href="#">
+                            Details <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+<!-- Mini Sparkline Placeholder -->
+<svg class="w-16 h-6 text-primary opacity-60" fill="none" viewbox="0 0 64 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M2 20L15 12L25 15L40 5L55 12L62 4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- House Down Payment Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 flex flex-col relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-primary border border-outline-variant">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">House Down Payment</h3>
+</div>
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-outline-variant">2028</span>
+</div>
+<div class="mt-2 mb-6 relative z-10">
+<div class="flex items-end justify-between mb-1">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">$20,000</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mb-1">of $100,000</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-2 bg-surface-variant rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-secondary rounded-full transition-all duration-1000 ease-out w-[20%]"></div>
+</div>
+<div class="flex justify-between mt-2">
+<span class="font-label-sm text-label-sm text-secondary">20% Complete</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Long Term</span>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant flex justify-between items-center relative z-10">
+<a class="font-label-md text-label-md text-primary hover:underline flex items-center gap-1" href="#">
+                            Details <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+<!-- Mini Sparkline Placeholder -->
+<svg class="w-16 h-6 text-secondary opacity-60" fill="none" viewbox="0 0 64 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M2 22L12 18L22 20L32 15L42 12L52 10L62 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Emergency Fund Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 flex flex-col relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-primary border border-outline-variant">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Emergency Fund</h3>
+</div>
+<span class="bg-[#e6f4ea] text-[#137333] font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-[#ceead6]">Next Month</span>
+</div>
+<div class="mt-2 mb-6 relative z-10">
+<div class="flex items-end justify-between mb-1">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">$9,000</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mb-1">of $10,000</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-2 bg-surface-variant rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-[#188038] rounded-full transition-all duration-1000 ease-out w-[90%]"></div>
+</div>
+<div class="flex justify-between mt-2">
+<span class="font-label-sm text-label-sm text-[#188038]">90% Complete</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Almost There</span>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant flex justify-between items-center relative z-10">
+<a class="font-label-md text-label-md text-primary hover:underline flex items-center gap-1" href="#">
+                            Details <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+<!-- Mini Sparkline Placeholder -->
+<svg class="w-16 h-6 text-[#188038] opacity-60" fill="none" viewbox="0 0 64 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M2 18L15 15L25 10L40 8L55 4L62 2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface border-t border-outline-variant px-2 py-2 flex justify-between items-center z-50">
+<a class="flex flex-col items-center p-2 text-on-surface-variant w-1/4" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] mt-1 font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant w-1/4" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="receipt_long">receipt_long</span>
+<span class="text-[10px] mt-1 font-medium">Txns</span>
+</a>
+<div class="w-1/4 flex justify-center -mt-6">
+<button class="bg-primary text-on-primary w-12 h-12 rounded-full shadow-lg flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center p-2 text-primary w-1/4" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="ads_click" data-weight="fill" style="font-variation-settings: 'FILL' 1;">ads_click</span>
+<span class="text-[10px] mt-1 font-bold">Goals</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant w-1/4" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="more_horiz">more_horiz</span>
+<span class="text-[10px] mt-1 font-medium">More</span>
+</a>
+</nav>
+</body></html>
