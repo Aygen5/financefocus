@@ -20,9 +20,8 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-stack-lg">
-      {/* Net Worth */}
       <StatCard
-        title="Toplam Varlık (Net Worth)"
+        title="Net Varlık"
         value={formatCurrency(netWorth, "TRY", "tr-TR")}
         loading={loading}
         change={2.4}

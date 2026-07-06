@@ -5,6 +5,7 @@ export interface UserSettings {
   currency: string;
   emailNotifications: boolean;
   pushNotifications: boolean;
+  smsNotifications: boolean;
   language: string;
   timezone: string;
   twoFactorEnabled: boolean;
@@ -14,6 +15,7 @@ export interface UserSettings {
   fullName: string;
   email: string;
   bio?: string;
+  password?: string;
 }
 
 export interface SettingsState {
@@ -26,6 +28,7 @@ const defaultSettings: UserSettings = {
   currency: "TRY",
   emailNotifications: true,
   pushNotifications: true,
+  smsNotifications: false,
   language: "Turkish",
   timezone: "Europe/Istanbul",
   twoFactorEnabled: false,

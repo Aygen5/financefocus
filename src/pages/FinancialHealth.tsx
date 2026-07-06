@@ -155,7 +155,7 @@ export const FinancialHealth: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-            Financial Health Score
+            Finansal Sağlık Analizi
           </h2>
           <p className="font-body-md text-body-md text-slate-500 dark:text-slate-400 font-medium mt-1">
             Gelir dengesi, birikim, yatırımlar ve bütçe disiplin analizinizin dinamik

@@ -50,7 +50,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       {/* Dropdown Menu Items */}
       {isOpen && (
         <div
-          className={`absolute z-30 mt-2 w-56 origin-top-right rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-soft-xl focus:outline-none py-1.5 ${placements[placement]}`}
+          className={`absolute z-30 mt-2 w-56 origin-top-right rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 shadow-soft-xl focus:outline-none py-1.5 ${placements[placement]} animate-slideDown`}
           role="menu"
           aria-orientation="vertical"
         >

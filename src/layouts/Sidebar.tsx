@@ -21,7 +21,7 @@ const Sidebar: React.FC = () => {
   const handleLogout = () => {
     dispatch(
       addActivityLog({
-        action: "Logout",
+        action: "Oturumu Kapat",
         category: "Auth",
         description: "Kullanıcı sistemden çıkış yaptı.",
         user: displayName,
@@ -31,7 +31,7 @@ const Sidebar: React.FC = () => {
     );
     dispatch(
       addNotification({
-        title: "Logout",
+        title: "Çıkış Yapıldı",
         message: "Hesabınızdan güvenli şekilde çıkış yapıldı.",
         type: "info",
         icon: "LogOut",
@@ -56,7 +56,7 @@ const Sidebar: React.FC = () => {
       {/* Mobile Sidebar Backdrop */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden animate-fadeIn"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -85,7 +85,7 @@ const Sidebar: React.FC = () => {
                   FinanceFocus
                 </h1>
                 <p className="font-label-sm text-label-sm text-slate-450 dark:text-slate-550 font-semibold uppercase tracking-wider mt-1">
-                  Enterprise
+                  Kurumsal
                 </p>
               </div>
             )}
@@ -160,17 +160,17 @@ const Sidebar: React.FC = () => {
               "flex w-full items-center gap-3 px-4 py-2.5 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer select-none font-bold",
               isCollapsed && "justify-center px-0 w-12 h-10 mx-auto",
             )}
-            title={isCollapsed ? (themeMode === "dark" ? "Light Mode" : "Dark Mode") : undefined}
+            title={isCollapsed ? (themeMode === "dark" ? "Açık Tema" : "Karanlık Tema") : undefined}
           >
             {themeMode === "dark" ? (
               <>
                 <Sun size={20} className="text-amber-500 shrink-0" />
-                {!isCollapsed && <span className="text-xs">Light Mode</span>}
+                {!isCollapsed && <span className="text-xs">Açık Tema</span>}
               </>
             ) : (
               <>
                 <Moon size={20} className="text-primary shrink-0" />
-                {!isCollapsed && <span className="text-xs">Dark Mode</span>}
+                {!isCollapsed && <span className="text-xs">Karanlık Tema</span>}
               </>
             )}
           </button>
@@ -182,10 +182,10 @@ const Sidebar: React.FC = () => {
               "flex w-full items-center gap-3 px-4 py-2.5 text-slate-500 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-colors cursor-pointer select-none font-bold",
               isCollapsed && "justify-center px-0 w-12 h-10 mx-auto",
             )}
-            title={isCollapsed ? "Logout" : undefined}
+            title={isCollapsed ? "Çıkış Yap" : undefined}
           >
             <LogOut size={20} className="shrink-0" />
-            {!isCollapsed && <span className="text-xs">Logout</span>}
+            {!isCollapsed && <span className="text-xs">Çıkış Yap</span>}
           </button>
         </div>
       </aside>

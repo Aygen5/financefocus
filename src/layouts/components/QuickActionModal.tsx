@@ -104,7 +104,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
       if (addTransaction.fulfilled.match(resultAction)) {
         dispatch(
           addActivityLog({
-            action: "Transaction Added",
+            action: "İşlem Eklendi",
             category: "Transactions",
             description: `"${data.title}" işlemi başarıyla eklendi.`,
             user: "Aygen",
@@ -114,7 +114,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
         );
         dispatch(
           addNotification({
-            title: "Transaction Added",
+            title: "İşlem Eklendi",
             message: `"${data.title}" işlemi başarıyla hesabınıza eklendi.`,
             type: "success",
             icon: "PlusCircle",
@@ -135,7 +135,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
       if (addBudget.fulfilled.match(resultAction)) {
         dispatch(
           addActivityLog({
-            action: "Budget Updated",
+            action: "Bütçe Güncellendi",
             category: "Budget",
             description: `"${data.category}" için bütçe limiti tanımlandı.`,
             user: "Aygen",
@@ -145,7 +145,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
         );
         dispatch(
           addNotification({
-            title: "Budget Updated",
+            title: "Bütçe Güncellendi",
             message: `"${data.category}" bütçe limiti başarıyla tanımlandı.`,
             type: "success",
             icon: "Sliders",
@@ -168,7 +168,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
       if (addGoal.fulfilled.match(resultAction)) {
         dispatch(
           addActivityLog({
-            action: "Goal Created",
+            action: "Hedef Oluşturuldu",
             category: "Goals",
             description: `"${data.title}" isimli yeni hedef oluşturuldu.`,
             user: "Aygen",
@@ -178,7 +178,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
         );
         dispatch(
           addNotification({
-            title: "Goal Created",
+            title: "Hedef Oluşturuldu",
             message: `"${data.title}" hedefi başarıyla oluşturuldu.`,
             type: "success",
             icon: "Award",
@@ -206,7 +206,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
       if (addSubscription.fulfilled.match(resultAction)) {
         dispatch(
           addActivityLog({
-            action: "Subscription Added",
+            action: "Abonelik Eklendi",
             category: "Subscriptions",
             description: `"${data.name}" abonelik takibi eklendi.`,
             user: "Aygen",
@@ -216,7 +216,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
         );
         dispatch(
           addNotification({
-            title: "Subscription Added",
+            title: "Abonelik Eklendi",
             message: `"${data.name}" aboneliği takibe alındı.`,
             type: "success",
             icon: "CreditCard",

@@ -22,11 +22,13 @@ const Notifications = React.lazy(() => import("@/pages/Notifications"));
 const Activity = React.lazy(() => import("@/pages/ActivityLog"));
 const Settings = React.lazy(() => import("@/pages/Settings"));
 const NotFound = React.lazy(() => import("@/pages/NotFound"));
+import ErrorPage from "@/pages/ErrorPage";
 
 export const router = createBrowserRouter([
   {
     // Giriş Yapmamış Kullanıcı Rotaları (AuthRoute Koruması)
     element: <AuthRoute />,
+    errorElement: <ErrorPage />,
     children: [
       {
         element: <AuthLayout />,
@@ -46,6 +48,7 @@ export const router = createBrowserRouter([
   {
     // Giriş Yapmış Kullanıcı Rotaları (ProtectedRoute & MainLayout Koruması)
     element: <ProtectedRoute />,
+    errorElement: <ErrorPage />,
     children: [
       {
         element: <MainLayout />,
@@ -109,6 +112,7 @@ export const router = createBrowserRouter([
   {
     path: "*",
     element: <NotFound />,
+    errorElement: <ErrorPage />,
   },
 ]);
 

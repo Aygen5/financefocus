@@ -56,7 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm select-none animate-fadeIn">
       {/* Backdrop area click-handler */}
       <div className="fixed inset-0" onClick={onClose} />
 
@@ -64,7 +64,7 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         className={cn(
-          "relative w-full bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-xl shadow-soft-xl overflow-hidden text-left z-10 flex flex-col max-h-[90vh]",
+          "relative w-full bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-xl shadow-soft-xl overflow-hidden text-left z-10 flex flex-col max-h-[90vh] animate-zoomIn",
           sizes[size],
           className,
         )}

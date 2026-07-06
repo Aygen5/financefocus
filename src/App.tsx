@@ -6,14 +6,24 @@ import { router } from "@/routes";
 import { Toaster } from "react-hot-toast";
 import "./App.css";
 
+import { applyTheme } from "@/store/themeSlice";
+
 const ThemeInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const themeMode = useAppSelector((state) => state.theme.mode);
 
   useEffect(() => {
-    if (themeMode === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+    applyTheme(themeMode);
+
+    if (themeMode === "system") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const handleChange = () => {
+        applyTheme("system");
+      };
+
+      mediaQuery.addEventListener("change", handleChange);
+      return () => {
+        mediaQuery.removeEventListener("change", handleChange);
+      };
     }
   }, [themeMode]);
 

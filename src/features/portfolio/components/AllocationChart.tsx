@@ -55,7 +55,7 @@ const AllocationChart: React.FC<AllocationChartProps> = ({ data, totalValue, loa
       {/* Allocation List */}
       <div className="flex-1 w-full">
         <h3 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold mb-6">
-          Varlık Dağılımı (Asset Allocation)
+          Varlık Dağılımı
         </h3>
         <div className="space-y-4">
           {data.map((item, index) => (

@@ -10,6 +10,9 @@ import {
 } from "recharts";
 import { formatCurrency } from "@/utils/financial";
 
+import { useAppSelector } from "@/store";
+import { selectThemeMode } from "@/store/themeSlice";
+
 export interface IncomeVsProjectedPoint {
   month: string;
   income: number;
@@ -23,6 +26,24 @@ export interface IncomeVsProjectedProps {
 
 const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = false }) => {
   const [range, setRange] = useState<"6M" | "1Y" | "ALL">("6M");
+  const themeMode = useAppSelector(selectThemeMode);
+
+  // Resolve dark condition dynamically
+  const isDark = React.useMemo(() => {
+    if (themeMode === "dark") return true;
+    if (themeMode === "system") {
+      return (
+        typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    }
+    return false;
+  }, [themeMode]);
+
+  const gridColor = isDark ? "#1e293b" : "#e2e8f0";
+  const textColor = isDark ? "#94a3b8" : "#64748b";
+  const tooltipBg = isDark ? "#0f172a" : "#ffffff";
+  const tooltipColor = isDark ? "#f8fafc" : "#0f172a";
+  const tooltipBorder = isDark ? "#1e293b" : "#e2e8f0";
 
   if (loading) {
     return <div className="h-96 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />;
@@ -34,10 +55,10 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
         <div className="flex justify-between items-center mb-6">
           <div>
             <h4 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold">
-              Income vs. Projected
+              Gelir ve Tahmin Karşılaştırması
             </h4>
             <p className="text-xs font-semibold text-slate-455 mt-1">
-              Revenue performance over the last 6 months
+              Son 6 aydaki gelir performansı
             </p>
           </div>
           <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-lg">
@@ -51,7 +72,7 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
                     : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-medium"
                 }`}
               >
-                {r}
+                {r === "6M" ? "6 Ay" : r === "1Y" ? "1 Yıl" : "Tümü"}
               </button>
             ))}
           </div>
@@ -67,26 +88,26 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
                   <stop offset="95%" stopColor="#004ac6" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={gridColor} />
               <XAxis
                 dataKey="month"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#64748b", fontSize: 11, fontWeight: 500 }}
+                tick={{ fill: textColor, fontSize: 11, fontWeight: 500 }}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#64748b", fontSize: 11, fontWeight: 500 }}
-                tickFormatter={(val) => `$${(val / 1000).toFixed(0)}k`}
+                tick={{ fill: textColor, fontSize: 11, fontWeight: 500 }}
+                tickFormatter={(val) => `₺${(val / 1000).toFixed(0)}k`}
               />
               <Tooltip
-                formatter={(value) => [`$${Number(value).toLocaleString()}`, "Gelir"]}
+                formatter={(value) => [`₺${Number(value).toLocaleString()}`, "Gelir"]}
                 contentStyle={{
-                  background: "#1e293b",
-                  border: "none",
+                  background: tooltipBg,
+                  border: `1px solid ${tooltipBorder}`,
                   borderRadius: "8px",
-                  color: "#fff",
+                  color: tooltipColor,
                   fontSize: "12px",
                 }}
               />
@@ -107,7 +128,7 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
       <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-3 gap-4">
         <div>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-            Total Income
+            Toplam Gelir
           </p>
           <p className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-extrabold">
             {formatCurrency(510000, "TRY", "tr-TR")}
@@ -115,7 +136,7 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
         </div>
         <div>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-            Avg. Monthly
+            Aylık Ortalama
           </p>
           <p className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-extrabold">
             {formatCurrency(85000, "TRY", "tr-TR")}
@@ -123,7 +144,7 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
         </div>
         <div>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-            Growth Rate
+            Büyüme Oranı
           </p>
           <p className="font-headline-sm text-headline-sm text-primary dark:text-brand-400 font-extrabold">
             +15.4%

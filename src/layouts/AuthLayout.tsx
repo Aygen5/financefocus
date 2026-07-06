@@ -1,63 +1,49 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { Wallet } from "lucide-react";
+import { Landmark } from "lucide-react";
 
 const AuthLayout: React.FC = () => {
   return (
-    <div className="min-h-screen w-screen flex bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 transition-colors duration-250 select-none">
-      {/* Sol Panel: Tanıtım & Görsel Alanı (Geniş Ekranlar için) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary dark:bg-slate-900 flex-col justify-between p-12 text-white relative overflow-hidden">
-        {/* Arka plan gradiyent efekti */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-container/20 to-primary/80 dark:from-slate-950/40 dark:to-slate-900 pointer-events-none" />
-
-        {/* Üst Logo */}
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-            <Wallet size={22} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold leading-none">FinanceFocus</h1>
-            <p className="text-[10px] text-white/60 font-semibold uppercase tracking-wider mt-1">
-              Enterprise Finance
-            </p>
-          </div>
-        </div>
-
-        {/* Orta Tanıtım Metni */}
-        <div className="my-auto max-w-md relative z-10 text-left">
-          <h2 className="text-4xl font-extrabold tracking-tight leading-tight">
-            Geleceğin Finans Yönetimini Keşfedin.
-          </h2>
-          <p className="mt-4 text-white/80 font-medium text-lg leading-relaxed">
-            Yapay zeka destekli tahminler, bütçe planlama araçları ve detaylı analizlerle
-            işletmenizin ya da kişisel bütçenizin kontrolünü tamamen elinize alın.
-          </p>
-        </div>
-
-        {/* Alt Bilgi */}
-        <div className="relative z-10 text-left text-sm text-white/50 font-medium">
-          &copy; {new Date().getFullYear()} FinanceFocus. Bütün hakları saklıdır.
-        </div>
-      </div>
-
-      {/* Sağ Panel: Formların Render Edileceği Alan */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12">
-        <div className="w-full max-w-md bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800/80 shadow-soft-xl relative">
-          {/* Mobil Görünüm için Logo */}
-          <div className="flex lg:hidden items-center gap-3 mb-8 text-left justify-center">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-brand-500/10 flex items-center justify-center text-primary dark:text-brand-400">
-              <Wallet size={22} />
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 transition-colors duration-250 select-none overflow-y-auto lg:overflow-hidden">
+      {/* Sol Panel: Premium Image (Sayfanın 50% genişliğini kaplar) */}
+      <section className="w-full lg:w-1/2 relative border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 shrink-0 h-72 sm:h-[380px] lg:h-auto overflow-hidden">
+        <img
+          src="/login_visual.jpg"
+          alt="FinanceFocus Premium Mockup"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 flex items-center justify-center p-8">
+          <div className="max-w-xs relative z-10 space-y-6 text-center lg:text-left">
+            <div className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl flex items-center justify-center text-white mx-auto lg:mx-0">
+              <Landmark size={24} />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-800 dark:text-white leading-none">
+            <div className="space-y-3">
+              <h2 className="text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
                 FinanceFocus
-              </h1>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider mt-1">
-                Enterprise Finance
+              </h2>
+              <p className="text-slate-350 font-semibold text-xs leading-relaxed max-w-sm mx-auto lg:mx-0">
+                Varlıklarınızı, bütçelerinizi ve finansal hedeflerinizi Executive Precision
+                standartlarında akıllıca yönetin.
               </p>
             </div>
+            <div className="pt-6 border-t border-white/10 flex justify-center lg:justify-start gap-8 text-slate-400 text-xs font-bold uppercase tracking-wider">
+              <div>
+                <p className="text-white text-md font-black leading-none">₺0.00</p>
+                <p className="mt-1.5 text-[9px] font-bold text-slate-500">Net Varlık</p>
+              </div>
+              <div>
+                <p className="text-emerald-400 text-md font-black leading-none">100%</p>
+                <p className="mt-1.5 text-[9px] font-bold text-slate-500">Güvenlik</p>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
 
+      {/* Sağ Panel: Bütünleşik Form Kartı (Sayfanın 50% genişliğini kaplar) */}
+      <section className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-16 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+        <div className="w-full max-w-[460px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-8 rounded-2xl shadow-soft-xl animate-zoomIn">
           <React.Suspense
             fallback={
               <div className="h-64 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
@@ -66,7 +52,7 @@ const AuthLayout: React.FC = () => {
             <Outlet />
           </React.Suspense>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

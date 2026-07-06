@@ -52,43 +52,49 @@ export const TransactionsPage: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
-  const handleOpenEdit = (tx: Transaction) => {
+  const handleOpenEdit = React.useCallback((tx: Transaction) => {
     setSelectedTransaction(tx);
     setIsEditModalOpen(true);
-  };
+  }, []);
 
-  const handleOpenDelete = (tx: Transaction) => {
+  const handleOpenDelete = React.useCallback((tx: Transaction) => {
     setSelectedTransaction(tx);
     setIsDeleteOpen(true);
-  };
+  }, []);
 
-  const onAddSubmit = async (data: TransactionFormData) => {
-    setIsSubmitLoading(true);
-    const success = await handleAddTransaction({
-      ...data,
-      currency: "TRY",
-    });
-    setIsSubmitLoading(false);
-    if (success) {
-      setIsAddModalOpen(false);
-    }
-  };
+  const onAddSubmit = React.useCallback(
+    async (data: TransactionFormData) => {
+      setIsSubmitLoading(true);
+      const success = await handleAddTransaction({
+        ...data,
+        currency: "TRY",
+      });
+      setIsSubmitLoading(false);
+      if (success) {
+        setIsAddModalOpen(false);
+      }
+    },
+    [handleAddTransaction],
+  );
 
-  const onEditSubmit = async (data: TransactionFormData) => {
-    if (!selectedTransaction) return;
-    setIsSubmitLoading(true);
-    const success = await handleUpdateTransaction(selectedTransaction.id, {
-      ...data,
-      currency: "TRY",
-    });
-    setIsSubmitLoading(false);
-    if (success) {
-      setIsEditModalOpen(false);
-      setSelectedTransaction(null);
-    }
-  };
+  const onEditSubmit = React.useCallback(
+    async (data: TransactionFormData) => {
+      if (!selectedTransaction) return;
+      setIsSubmitLoading(true);
+      const success = await handleUpdateTransaction(selectedTransaction.id, {
+        ...data,
+        currency: "TRY",
+      });
+      setIsSubmitLoading(false);
+      if (success) {
+        setIsEditModalOpen(false);
+        setSelectedTransaction(null);
+      }
+    },
+    [selectedTransaction, handleUpdateTransaction],
+  );
 
-  const onDeleteConfirm = async () => {
+  const onDeleteConfirm = React.useCallback(async () => {
     if (!selectedTransaction) return;
     setIsSubmitLoading(true);
     const success = await handleDeleteTransaction(selectedTransaction.id);
@@ -97,7 +103,7 @@ export const TransactionsPage: React.FC = () => {
       setIsDeleteOpen(false);
       setSelectedTransaction(null);
     }
-  };
+  }, [selectedTransaction, handleDeleteTransaction]);
 
   // Dinamik Hata Mesajı ve İkon Belirleme Mantığı
   const getErrorConfig = (errStr: string) => {
@@ -139,95 +145,98 @@ export const TransactionsPage: React.FC = () => {
   };
 
   // Column definitions for the DataTable
-  const columns: Column<Transaction>[] = [
-    {
-      key: "date",
-      header: "Tarih",
-      render: (row) => {
-        try {
-          const parsedDate = parseISO(row.date);
-          return format(parsedDate, "dd MMMM yyyy", { locale: tr });
-        } catch {
-          return row.date;
-        }
-      },
-    },
-    {
-      key: "description",
-      header: "Açıklama",
-      render: (row) => (
-        <span className="font-bold text-slate-800 dark:text-slate-200">{row.description}</span>
-      ),
-    },
-    {
-      key: "category",
-      header: "Kategori",
-      render: (row) => {
-        const getCategoryVariant = (cat: string) => {
-          switch (cat.toLowerCase()) {
-            case "salary":
-            case "income":
-              return "success";
-            case "rent":
-            case "bills":
-              return "warning";
-            case "investment":
-              return "brand";
-            case "subscription":
-              return "primary";
-            default:
-              return "neutral";
+  const columns = React.useMemo<Column<Transaction>[]>(
+    () => [
+      {
+        key: "date",
+        header: "Tarih",
+        render: (row) => {
+          try {
+            const parsedDate = parseISO(row.date);
+            return format(parsedDate, "dd MMMM yyyy", { locale: tr });
+          } catch {
+            return row.date;
           }
-        };
-        return <Badge variant={getCategoryVariant(row.category)}>{row.category}</Badge>;
+        },
       },
-    },
-    {
-      key: "account",
-      header: "Hesap",
-      render: (row) => (
-        <span className="text-slate-500 dark:text-slate-400 font-semibold">
-          {row.account || "Default"}
-        </span>
-      ),
-    },
-    {
-      key: "amount",
-      header: "Tutar",
-      className: "text-right",
-      render: (row) => (
-        <CurrencyDisplay
-          amount={row.amount}
-          currency={row.currency || "TRY"}
-          type={row.transactionType || (row.amount > 0 ? "income" : "expense")}
-          colored
-        />
-      ),
-    },
-    {
-      key: "actions",
-      header: "Aksiyonlar",
-      className: "text-right w-28 select-none",
-      render: (row) => (
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => handleOpenEdit(row)}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 hover:text-primary dark:hover:text-brand-400 transition-colors cursor-pointer"
-            title="Düzenle"
-          >
-            <Edit2 size={14} />
-          </button>
-          <button
-            onClick={() => handleOpenDelete(row)}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-red-50 dark:hover:bg-red-950/20 text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors cursor-pointer"
-            title="Sil"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
-      ),
-    },
-  ];
+      {
+        key: "description",
+        header: "Açıklama",
+        render: (row) => (
+          <span className="font-bold text-slate-800 dark:text-slate-200">{row.description}</span>
+        ),
+      },
+      {
+        key: "category",
+        header: "Kategori",
+        render: (row) => {
+          const getCategoryVariant = (cat: string) => {
+            switch (cat.toLowerCase()) {
+              case "salary":
+              case "income":
+                return "success";
+              case "rent":
+              case "bills":
+                return "warning";
+              case "investment":
+                return "brand";
+              case "subscription":
+                return "primary";
+              default:
+                return "neutral";
+            }
+          };
+          return <Badge variant={getCategoryVariant(row.category)}>{row.category}</Badge>;
+        },
+      },
+      {
+        key: "account",
+        header: "Hesap",
+        render: (row) => (
+          <span className="text-slate-500 dark:text-slate-400 font-semibold">
+            {row.account || "Varsayılan"}
+          </span>
+        ),
+      },
+      {
+        key: "amount",
+        header: "Tutar",
+        className: "text-right",
+        render: (row) => (
+          <CurrencyDisplay
+            amount={row.amount}
+            currency={row.currency || "TRY"}
+            type={row.transactionType || (row.amount > 0 ? "income" : "expense")}
+            colored
+          />
+        ),
+      },
+      {
+        key: "actions",
+        header: "Aksiyonlar",
+        className: "text-right w-28 select-none",
+        render: (row) => (
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => handleOpenEdit(row)}
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 hover:text-primary dark:hover:text-brand-400 transition-colors cursor-pointer"
+              title="Düzenle"
+            >
+              <Edit2 size={14} />
+            </button>
+            <button
+              onClick={() => handleOpenDelete(row)}
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-red-50 dark:hover:bg-red-950/20 text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors cursor-pointer"
+              title="Sil"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [handleOpenEdit, handleOpenDelete],
+  );
 
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
@@ -235,15 +244,15 @@ export const TransactionsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-stack-lg">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-            Transactions
+            İşlem Geçmişi
           </h2>
           <p className="font-body-md text-body-md text-slate-500 dark:text-slate-400 font-medium mt-1">
             Tüm finansal hareketlerinizin ve işlemlerinizin detaylı listesi.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full sm:w-auto">
           {/* Quick Search */}
-          <div className="relative max-w-xs">
+          <div className="relative w-full sm:w-60">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none select-none">
               <Search size={16} />
             </span>
@@ -256,15 +265,16 @@ export const TransactionsPage: React.FC = () => {
               placeholder="İşlemlerde arayın..."
               value={filters.search}
               onChange={(e) => handleSetSearch(e.target.value)}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2 pl-9 pr-4 font-semibold text-xs text-slate-700 dark:text-slate-205 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder-slate-400"
+              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2 pl-9 pr-4 font-semibold text-xs text-slate-700 dark:text-slate-205 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder-slate-400"
             />
           </div>
           <Button
             variant="primary"
             icon={<Plus size={18} />}
             onClick={() => setIsAddModalOpen(true)}
+            className="w-full sm:w-auto shrink-0 justify-center"
           >
-            Add Transaction
+            Yeni İşlem Ekle
           </Button>
         </div>
       </div>

@@ -91,13 +91,13 @@ const Budget: React.FC = () => {
       {/* Page Header */}
       <div className="flex justify-between items-end mb-stack-lg">
         <div>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">Budget Planner</h2>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface">Bütçe Planlayıcı</h2>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-            Manage and track your monthly spending limits.
+            Aylık harcama limitlerinizi tanımlayın ve takip edin.
           </p>
         </div>
         <Button variant="primary" icon={<Plus size={18} />} onClick={() => setIsModalOpen(true)}>
-          Set New Budget
+          Yeni Limit Tanımla
         </Button>
       </div>
 
@@ -112,7 +112,7 @@ const Budget: React.FC = () => {
       {/* Category Breakdown list header */}
       <div className="mb-stack-md flex justify-between items-center">
         <h3 className="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">
-          Category Breakdown
+          Kategori Dağılımı
         </h3>
         <div className="font-label-md text-label-md text-slate-500 font-semibold select-none">
           Mevcut Ay Gösteriliyor
@@ -123,18 +123,18 @@ const Budget: React.FC = () => {
       <CategoryBudgets budgets={budgets} loading={loading} />
 
       {/* Modal - Yeni Limit Belirleme */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Set New Budget">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Yeni Limit Belirle">
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <Select
             label="Kategori"
             error={errors.category?.message}
             options={[
               { value: "", label: "Seçiniz" },
-              { value: "Housing", label: "Konut & Kira (Housing)" },
-              { value: "Food", label: "Gıda & Market (Food)" },
-              { value: "Transport", label: "Ulaşım (Transport)" },
-              { value: "Entertainment", label: "Eğlence (Entertainment)" },
-              { value: "Savings", label: "Birikim & Yatırım (Savings)" },
+              { value: "Housing", label: "Konut & Kira" },
+              { value: "Food", label: "Gıda & Market" },
+              { value: "Transport", label: "Ulaşım" },
+              { value: "Entertainment", label: "Eğlence" },
+              { value: "Savings", label: "Birikim & Yatırım" },
             ]}
             {...register("category")}
           />

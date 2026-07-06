@@ -32,7 +32,7 @@ const AppearanceTab: React.FC<AppearanceTabProps> = ({ theme, onChangeTheme }) =
     <div className="p-8 space-y-8 text-left">
       <div>
         <h3 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold leading-tight">
-          Appearance
+          Görünüm
         </h3>
         <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
           FinanceFocus'un cihazınızda nasıl görüneceğini özelleştirin.

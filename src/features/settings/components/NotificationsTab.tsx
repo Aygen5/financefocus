@@ -4,21 +4,21 @@ import Switch from "@/components/ui/Switch";
 export interface NotificationsTabProps {
   emailEnabled?: boolean;
   pushEnabled?: boolean;
-  marketEnabled?: boolean;
+  smsEnabled?: boolean;
   onChangeToggle?: (key: string, checked: boolean) => void;
 }
 
 const NotificationsTab: React.FC<NotificationsTabProps> = ({
   emailEnabled = true,
   pushEnabled = false,
-  marketEnabled = true,
+  smsEnabled = false,
   onChangeToggle,
 }) => {
   return (
-    <div className="p-8 space-y-8 text-left">
+    <div className="p-8 space-y-8 text-left select-none">
       <div>
         <h3 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold leading-tight">
-          Notification Preferences
+          Bildirim Tercihleri
         </h3>
         <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
           Hangi bildirimleri almak istediğinize karar verin.
@@ -30,7 +30,7 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({
         <div className="flex items-start justify-between">
           <div>
             <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold">
-              Email Notifications
+              E-posta Bildirimleri (Email)
             </p>
             <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5">
               Günlük işlem özetleri ve güvenlik uyarıları.
@@ -38,7 +38,7 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({
           </div>
           <Switch
             checked={emailEnabled}
-            onChange={(checked) => onChangeToggle?.("emailNotifications", checked)}
+            onChange={(e) => onChangeToggle?.("emailNotifications", e.target.checked)}
           />
         </div>
 
@@ -46,7 +46,7 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({
         <div className="flex items-start justify-between">
           <div>
             <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold">
-              Push Notifications
+              Mobil Anlık Uyarılar (Push)
             </p>
             <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5">
               Mobil cihazınızda gerçek zamanlı anlık uyarılar.
@@ -54,23 +54,23 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({
           </div>
           <Switch
             checked={pushEnabled}
-            onChange={(checked) => onChangeToggle?.("pushNotifications", checked)}
+            onChange={(e) => onChangeToggle?.("pushNotifications", e.target.checked)}
           />
         </div>
 
-        {/* Market */}
+        {/* SMS */}
         <div className="flex items-start justify-between">
           <div>
             <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold">
-              Market Updates
+              SMS Bildirimleri (SMS)
             </p>
             <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5">
-              Borsa trendleri ve volatilite hakkında AI raporları.
+              Önemli hesap hareketleri ve limit aşımlarında kısa mesaj.
             </p>
           </div>
           <Switch
-            checked={marketEnabled}
-            onChange={(checked) => onChangeToggle?.("marketEnabled", checked)}
+            checked={smsEnabled}
+            onChange={(e) => onChangeToggle?.("smsNotifications", e.target.checked)}
           />
         </div>
       </div>

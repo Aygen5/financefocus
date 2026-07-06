@@ -65,17 +65,17 @@ export const TransactionFiltersPanel: React.FC<TransactionFiltersPanelProps> = (
   // Kategoriler Listesi
   const categories = [
     { value: "all", label: "Tüm Kategoriler" },
-    { value: "Salary", label: "Salary" },
-    { value: "Freelance", label: "Freelance" },
-    { value: "Food", label: "Food" },
-    { value: "Shopping", label: "Shopping" },
-    { value: "Transportation", label: "Transportation" },
-    { value: "Bills", label: "Bills" },
-    { value: "Entertainment", label: "Entertainment" },
-    { value: "Investment", label: "Investment" },
-    { value: "Healthcare", label: "Healthcare" },
-    { value: "Education", label: "Education" },
-    { value: "Other", label: "Other" },
+    { value: "Salary", label: "Maaş" },
+    { value: "Freelance", label: "Serbest Çalışma" },
+    { value: "Food", label: "Gıda / Yemek" },
+    { value: "Shopping", label: "Alışveriş" },
+    { value: "Transportation", label: "Ulaşım" },
+    { value: "Bills", label: "Faturalar" },
+    { value: "Entertainment", label: "Eğlence" },
+    { value: "Investment", label: "Yatırım" },
+    { value: "Healthcare", label: "Sağlık" },
+    { value: "Education", label: "Eğitim" },
+    { value: "Other", label: "Diğer" },
   ];
 
   // Tarih Aralığı Seçenekleri
@@ -125,8 +125,8 @@ export const TransactionFiltersPanel: React.FC<TransactionFiltersPanelProps> = (
           onChange={handleTypeChange}
           options={[
             { value: "all", label: "Hepsi" },
-            { value: "income", label: "Gelir (Income)" },
-            { value: "expense", label: "Gider (Expense)" },
+            { value: "income", label: "Gelir" },
+            { value: "expense", label: "Gider" },
             { value: "neutral", label: "Nötr (Transfer)" },
           ]}
         />
@@ -148,9 +148,9 @@ export const TransactionFiltersPanel: React.FC<TransactionFiltersPanelProps> = (
           onChange={handleStatusChange}
           options={[
             { value: "all", label: "Hepsi" },
-            { value: "completed", label: "Completed" },
-            { value: "pending", label: "Pending" },
-            { value: "failed", label: "Failed" },
+            { value: "completed", label: "Tamamlandı" },
+            { value: "pending", label: "Beklemede" },
+            { value: "failed", label: "Başarısız" },
           ]}
         />
 

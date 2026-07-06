@@ -18,7 +18,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { formatDistanceToNow, parseISO } from "date-fns";
-import { enUS } from "date-fns/locale";
+import { tr } from "date-fns/locale";
 import ErrorState from "@/components/feedback/ErrorState";
 import EmptyState from "@/components/feedback/EmptyState";
 import { SkeletonCard } from "@/components/ui/Skeleton";
@@ -48,9 +48,9 @@ const getIcon = (iconName: string, type: string) => {
 const formatTimeAgo = (timestampStr: string) => {
   try {
     const date = parseISO(timestampStr);
-    return formatDistanceToNow(date, { addSuffix: true, locale: enUS });
+    return formatDistanceToNow(date, { addSuffix: true, locale: tr });
   } catch {
-    return "unknown time";
+    return "bilinmeyen zaman";
   }
 };
 
@@ -135,7 +135,7 @@ const Notifications: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-            Notification Center
+            Bildirim Merkezi
           </h2>
           <p className="font-body-md text-body-md text-slate-500 dark:text-slate-400 font-medium mt-1">
             Hesap hareketleriniz, hedefleriniz ve sistem güncellemelerinizle ilgili anlık

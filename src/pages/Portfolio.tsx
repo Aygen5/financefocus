@@ -176,7 +176,7 @@ const Portfolio: React.FC = () => {
       {/* Page Header */}
       <div className="mb-8 select-none">
         <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-          Portfolio Overview
+          Portföy Analizi
         </h2>
         <p className="font-body-md text-body-md text-on-surface-variant font-medium mt-1">
           Küresel varlık yatırımlarınızı, maliyet oranlarınızı ve anlık kâr/zarar performansınızı

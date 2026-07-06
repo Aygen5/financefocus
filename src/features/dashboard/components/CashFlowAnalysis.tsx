@@ -12,6 +12,9 @@ import {
 import Card from "@/components/ui/Card";
 import { MoreHorizontal } from "lucide-react";
 
+import { useAppSelector } from "@/store";
+import { selectThemeMode } from "@/store/themeSlice";
+
 export interface CashFlowData {
   month: string;
   income: number;
@@ -24,6 +27,25 @@ export interface CashFlowAnalysisProps {
 }
 
 const CashFlowAnalysis: React.FC<CashFlowAnalysisProps> = ({ data, loading = false }) => {
+  const themeMode = useAppSelector(selectThemeMode);
+
+  // Resolve dark condition dynamically
+  const isDark = React.useMemo(() => {
+    if (themeMode === "dark") return true;
+    if (themeMode === "system") {
+      return (
+        typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    }
+    return false;
+  }, [themeMode]);
+
+  const gridColor = isDark ? "#1e293b" : "#e2e8f0";
+  const textColor = isDark ? "#94a3b8" : "#64748b";
+  const tooltipBg = isDark ? "#0f172a" : "#ffffff";
+  const tooltipColor = isDark ? "#f8fafc" : "#0f172a";
+  const tooltipBorder = isDark ? "#1e293b" : "#e2e8f0";
+
   return (
     <Card
       title="Nakit Akış Analizi"
@@ -48,27 +70,27 @@ const CashFlowAnalysis: React.FC<CashFlowAnalysisProps> = ({ data, loading = fal
                 bottom: 5,
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
               <XAxis
                 dataKey="month"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#64748b", fontSize: 11, fontWeight: 500 }}
+                tick={{ fill: textColor, fontSize: 11, fontWeight: 500 }}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#64748b", fontSize: 11, fontWeight: 500 }}
+                tick={{ fill: textColor, fontSize: 11, fontWeight: 500 }}
               />
               <Tooltip
                 contentStyle={{
-                  background: "#1e293b",
-                  border: "none",
+                  background: tooltipBg,
+                  border: `1px solid ${tooltipBorder}`,
                   borderRadius: "8px",
-                  color: "#fff",
+                  color: tooltipColor,
                   fontSize: "12px",
                 }}
-                cursor={{ fill: "rgba(0, 0, 0, 0.02)" }}
+                cursor={{ fill: isDark ? "rgba(255, 255, 255, 0.02)" : "rgba(0, 0, 0, 0.02)" }}
               />
               <Legend
                 verticalAlign="top"

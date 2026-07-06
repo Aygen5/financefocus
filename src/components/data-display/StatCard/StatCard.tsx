@@ -26,7 +26,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   const isZero = change !== undefined && change === 0;
 
   return (
-    <Card className="relative overflow-hidden w-full text-left">
+    <Card className="relative overflow-hidden w-full text-left transition-all duration-250 hover:shadow-soft-md hover:scale-[1.01] active:scale-[0.995]">
       <div className="p-6">
         <div className="flex items-center justify-between select-none">
           <span className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">

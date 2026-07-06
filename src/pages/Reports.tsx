@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
+import { selectThemeMode } from "@/store/themeSlice";
 import { fetchTransactions } from "@/features/transactions/transactionsSlice";
 import { fetchBudgets } from "@/features/budget/budgetSlice";
 import { fetchPortfolio } from "@/features/portfolio/portfolioSlice";
@@ -51,7 +52,6 @@ import {
   FileDown,
   RotateCcw,
   TrendingUp,
-  DollarSign,
   PieChart as PieIcon,
   BarChart2,
 } from "lucide-react";
@@ -72,6 +72,24 @@ const COLORS = [
 
 export const Reports: React.FC = () => {
   const dispatch = useAppDispatch();
+  const themeMode = useAppSelector(selectThemeMode);
+
+  // Resolve dark condition dynamically
+  const isDark = React.useMemo(() => {
+    if (themeMode === "dark") return true;
+    if (themeMode === "system") {
+      return (
+        typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    }
+    return false;
+  }, [themeMode]);
+
+  const gridColor = isDark ? "#1e293b" : "#f1f5f9";
+  const textColor = isDark ? "#94a3b8" : "#64748b";
+  const tooltipBg = isDark ? "#0f172a" : "#ffffff";
+  const tooltipColor = isDark ? "#f8fafc" : "#0f172a";
+  const tooltipBorder = isDark ? "#1e293b" : "#e2e8f0";
 
   // Redux States
   const {
@@ -280,7 +298,7 @@ export const Reports: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-            Financial Reports
+            Finansal Raporlar
           </h2>
           <p className="font-body-md text-body-md text-slate-500 dark:text-slate-400 font-medium mt-1">
             Tüm modüllerin kümülatif harcama, yatırım, hedef ve bütçe analiz raporları.
@@ -292,7 +310,7 @@ export const Reports: React.FC = () => {
             icon={<FileSpreadsheet size={16} />}
             onClick={handleExportExcel}
           >
-            Excel Excel
+            Excel İndir
           </Button>
           <Button variant="outline" icon={<FileDown size={16} />} onClick={handleExportCSV}>
             CSV Aktar
@@ -331,7 +349,7 @@ export const Reports: React.FC = () => {
 
         {/* Custom Date Picker Fields */}
         {filterType === "ozel" && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <input
               type="date"
               value={customStart}
@@ -441,7 +459,7 @@ export const Reports: React.FC = () => {
         {/* Graph 1: Income vs Expense Trend */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <TrendingUp size={14} className="text-primary" /> Gelir vs Gider Eğilimi (Trend)
+            <TrendingUp size={14} className="text-primary" /> Gelir vs Gider Eğilimi
           </h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -456,15 +474,25 @@ export const Reports: React.FC = () => {
                     <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#1e293b"
-                  className="hidden dark:block"
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="date" tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }} />
+                <YAxis
+                  tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }}
+                  tickFormatter={(v) => `₺${v.toLocaleString()}`}
                 />
-                <XAxis dataKey="date" tick={{ fontSize: 9, fontWeight: 700 }} />
-                <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
-                <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                <Tooltip
+                  formatter={(value, name) => [
+                    `₺${Number(value).toLocaleString()}`,
+                    name === "income" ? "Gelir" : "Gider",
+                  ]}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    color: tooltipColor,
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                  }}
+                />
                 <Legend wrapperStyle={{ fontSize: "11px", fontWeight: "bold" }} />
                 <Area
                   type="monotone"
@@ -511,7 +539,16 @@ export const Reports: React.FC = () => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                  <Tooltip
+                    formatter={(value) => [`₺${Number(value).toLocaleString()}`, "Toplam Tutar"]}
+                    contentStyle={{
+                      background: tooltipBg,
+                      border: `1px solid ${tooltipBorder}`,
+                      color: tooltipColor,
+                      fontSize: "11px",
+                      fontWeight: "bold",
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -537,20 +574,30 @@ export const Reports: React.FC = () => {
         {/* Graph 3: Monthly Cash Flow */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <BarChart2 size={14} className="text-primary" /> Aylık Nakit Akışı (Son 6 Ay)
+            <BarChart2 size={14} className="text-primary" /> Aylık Nakit Akışı
           </h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={cashFlowData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#1e293b"
-                  className="hidden dark:block"
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="month" tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }} />
+                <YAxis
+                  tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }}
+                  tickFormatter={(v) => `₺${v.toLocaleString()}`}
                 />
-                <XAxis dataKey="month" tick={{ fontSize: 9, fontWeight: 700 }} />
-                <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
-                <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                <Tooltip
+                  formatter={(value, name) => [
+                    `₺${Number(value).toLocaleString()}`,
+                    name === "income" ? "Gelir" : "Gider",
+                  ]}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    color: tooltipColor,
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                  }}
+                />
                 <Legend wrapperStyle={{ fontSize: "11px", fontWeight: "bold" }} />
                 <Bar dataKey="income" name="Gelir" fill="#16a34a" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="expense" name="Gider" fill="#ef4444" radius={[4, 4, 0, 0]} />
@@ -562,7 +609,7 @@ export const Reports: React.FC = () => {
         {/* Graph 4: Portfolio Growth / Values */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <DollarSign size={14} className="text-primary" /> Portföy Varlık Dağılım Değerleri (TRY)
+            <TrendingUp size={14} className="text-primary" /> Portföy Varlık Dağılımı (₺)
           </h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -571,20 +618,28 @@ export const Reports: React.FC = () => {
                 layout="vertical"
                 margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#1e293b"
-                  className="hidden dark:block"
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis
+                  type="number"
+                  tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }}
+                  tickFormatter={(v) => `₺${v.toLocaleString()}`}
                 />
-                <XAxis type="number" tick={{ fontSize: 9, fontWeight: 700 }} />
                 <YAxis
                   dataKey="name"
                   type="category"
-                  tick={{ fontSize: 9, fontWeight: 700 }}
+                  tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }}
                   width={70}
                 />
-                <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                <Tooltip
+                  formatter={(value) => [`₺${Number(value).toLocaleString()}`, "Varlık Değeri"]}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    color: tooltipColor,
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                  }}
+                />
                 <Bar dataKey="value" name="Varlık Değeri" fill="#004ac6" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -599,15 +654,22 @@ export const Reports: React.FC = () => {
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={budgetUsageData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#1e293b"
-                  className="hidden dark:block"
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="name" tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }} />
+                <YAxis
+                  tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }}
+                  tickFormatter={(v) => `₺${v.toLocaleString()}`}
                 />
-                <XAxis dataKey="name" tick={{ fontSize: 9, fontWeight: 700 }} />
-                <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
-                <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                <Tooltip
+                  formatter={(value, name) => [`₺${Number(value).toLocaleString()}`, name]}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    color: tooltipColor,
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                  }}
+                />
                 <Legend wrapperStyle={{ fontSize: "11px", fontWeight: "bold" }} />
                 <Bar dataKey="Limit" name="Limit" fill="#475569" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Harcama" name="Harcanan" fill="#004ac6" radius={[4, 4, 0, 0]} />
@@ -638,7 +700,16 @@ export const Reports: React.FC = () => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                  <Tooltip
+                    formatter={(value) => [`₺${Number(value).toLocaleString()}`, "Aylık Gider"]}
+                    contentStyle={{
+                      background: tooltipBg,
+                      border: `1px solid ${tooltipBorder}`,
+                      color: tooltipColor,
+                      fontSize: "11px",
+                      fontWeight: "bold",
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>

@@ -11,6 +11,9 @@ import {
 } from "recharts";
 import Card from "@/components/ui/Card";
 
+import { useAppSelector } from "@/store";
+import { selectThemeMode } from "@/store/themeSlice";
+
 export interface ForecastPoint {
   year: number;
   historical?: number;
@@ -23,6 +26,26 @@ export interface ForecastChartProps {
 }
 
 const ForecastChart: React.FC<ForecastChartProps> = ({ data, loading = false }) => {
+  const themeMode = useAppSelector(selectThemeMode);
+
+  // Resolve dark condition dynamically
+  const isDark = React.useMemo(() => {
+    if (themeMode === "dark") return true;
+    if (themeMode === "system") {
+      return (
+        typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    }
+    return false;
+  }, [themeMode]);
+
+  const gridColor = isDark ? "#1e293b" : "#e2e8f0";
+  const textColor = isDark ? "#94a3b8" : "#64748b";
+  const tooltipBg = isDark ? "#0f172a" : "#ffffff";
+  const tooltipColor = isDark ? "#f8fafc" : "#0f172a";
+  const tooltipBorder = isDark ? "#1e293b" : "#e2e8f0";
+  const referenceLineColor = isDark ? "#475569" : "#cbd5e1";
+
   if (loading) {
     return <div className="h-[400px] animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />;
   }
@@ -63,37 +86,37 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ data, loading = false }) 
                 <stop offset="95%" stopColor="#0053db" stopOpacity={0.0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#e2e8f0" />
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={gridColor} />
             <XAxis
               dataKey="year"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#64748b", fontSize: 11, fontWeight: 500 }}
+              tick={{ fill: textColor, fontSize: 11, fontWeight: 500 }}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#64748b", fontSize: 11, fontWeight: 500 }}
+              tick={{ fill: textColor, fontSize: 11, fontWeight: 500 }}
               tickFormatter={(val) => {
-                if (val >= 1000000) return `$${val / 1000000}M`;
-                if (val >= 1000) return `$${val / 1000}k`;
-                return `$${val}`;
+                if (val >= 1000000) return `₺${val / 1000000}M`;
+                if (val >= 1000) return `₺${val / 1000}k`;
+                return `₺${val}`;
               }}
             />
             <Tooltip
-              formatter={(value) => [`$${Number(value).toLocaleString()}`, "Tutar"]}
+              formatter={(value) => [`₺${Number(value).toLocaleString()}`, "Tutar"]}
               contentStyle={{
-                background: "#1e293b",
-                border: "none",
+                background: tooltipBg,
+                border: `1px solid ${tooltipBorder}`,
                 borderRadius: "8px",
-                color: "#fff",
+                color: tooltipColor,
                 fontSize: "12px",
               }}
             />
             {/* Today Reference Line */}
             <ReferenceLine
               x={2024}
-              stroke="#cbd5e1"
+              stroke={referenceLineColor}
               strokeDasharray="3 3"
               label={{
                 value: "BUGÜN",

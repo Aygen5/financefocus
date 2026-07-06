@@ -24,7 +24,7 @@ export interface DataTableProps<T> {
   className?: string;
 }
 
-export function DataTable<T extends { id: string | number }>({
+function DataTableInner<T extends { id: string | number }>({
   columns,
   data,
   loading = false,
@@ -45,8 +45,8 @@ export function DataTable<T extends { id: string | number }>({
       )}
     >
       <div className="w-full overflow-x-auto custom-scrollbar">
-        <table className="w-full border-collapse text-left text-sm text-slate-600 dark:text-slate-400">
-          <thead className="bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/60 dark:border-slate-800/60 select-none">
+        <table className="w-full block sm:table border-collapse text-left text-sm text-slate-600 dark:text-slate-400">
+          <thead className="hidden sm:table-header-group bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/60 dark:border-slate-800/60 select-none">
             <tr>
               {columns.map((col) => {
                 const isSorted = sortKey === col.key;
@@ -83,13 +83,13 @@ export function DataTable<T extends { id: string | number }>({
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900">
+          <tbody className="block sm:table-row-group divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900">
             {loading && (
-              <tr>
-                <td colSpan={columns.length} className="px-6 py-12">
+              <tr className="block sm:table-row">
+                <td colSpan={columns.length} className="block sm:table-cell px-6 py-12">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <Spinner size="md" />
-                    <span className="text-xs font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-455 dark:text-slate-500 uppercase tracking-wider">
                       Veriler yükleniyor...
                     </span>
                   </div>
@@ -98,8 +98,8 @@ export function DataTable<T extends { id: string | number }>({
             )}
 
             {showEmpty && (
-              <tr>
-                <td colSpan={columns.length} className="px-6 py-10">
+              <tr className="block sm:table-row">
+                <td colSpan={columns.length} className="block sm:table-cell px-6 py-10">
                   <EmptyState title={emptyTitle} description={emptyDescription} />
                 </td>
               </tr>
@@ -109,13 +109,15 @@ export function DataTable<T extends { id: string | number }>({
               data.map((row, rowIndex) => (
                 <tr
                   key={row.id}
-                  className="hover:bg-slate-50/40 dark:hover:bg-slate-800/10 transition-colors"
+                  className="block sm:table-row hover:bg-slate-100/50 dark:hover:bg-slate-800/30 transition-all duration-150 py-3 sm:py-0 border-b border-slate-150 dark:border-slate-800/80 last:border-b-0"
                 >
                   {columns.map((col) => (
                     <td
                       key={col.key}
+                      data-label={col.header}
                       className={cn(
-                        "px-6 py-4 text-slate-700 dark:text-slate-300 font-medium",
+                        "flex sm:table-cell justify-between items-center px-6 py-2.5 sm:py-4 border-none text-slate-700 dark:text-slate-300 font-medium text-right sm:text-left",
+                        "before:content-[attr(data-label)] before:block before:sm:hidden before:font-bold before:text-slate-400 before:mr-4 before:text-[10px] before:uppercase before:tracking-wider before:text-left",
                         col.className,
                       )}
                     >
@@ -132,5 +134,9 @@ export function DataTable<T extends { id: string | number }>({
     </div>
   );
 }
+
+export const DataTable = React.memo(DataTableInner) as <T extends { id: string | number }>(
+  props: DataTableProps<T>,
+) => React.ReactElement;
 
 export default DataTable;

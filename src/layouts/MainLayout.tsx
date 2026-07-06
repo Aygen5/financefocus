@@ -39,7 +39,7 @@ const MainLayoutContent: React.FC = () => {
             "w-full max-w-container-max mx-auto text-left",
           )}
         >
-          <div className="w-full">
+          <div className="w-full animate-fadeIn">
             <React.Suspense fallback={<ContentFallback />}>
               <Outlet />
             </React.Suspense>

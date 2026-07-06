@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { fetchSettings, updateSettings } from "@/features/settings/settingsSlice";
+import { setTheme } from "@/store/themeSlice";
 import ProfileTab from "@/features/settings/components/ProfileTab";
 import SecurityTab from "@/features/settings/components/SecurityTab";
 import AppearanceTab from "@/features/settings/components/AppearanceTab";
@@ -10,19 +11,22 @@ import { User, Lock, Palette, Bell, Globe, HelpCircle, ChevronRight } from "luci
 import { addActivityLog } from "@/features/activity/activitySlice";
 import { addNotification } from "@/features/notifications/notificationsSlice";
 import { HelpModal } from "@/layouts/components/HelpModal";
+import { useNavigate } from "react-router-dom";
+import ROUTES from "@/constants/routes";
 import toast from "react-hot-toast";
 
-import type { ProfileFormData } from "@/features/settings/settings.types";
+import type { ProfileFormData, ChangePasswordFormData } from "@/features/settings/settings.types";
 
 type TabType = "profile" | "security" | "appearance" | "notifications" | "regional";
 
 const Settings: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { settings } = useAppSelector((state) => state.settings || {});
+  const themeMode = useAppSelector((state) => state.theme.mode);
 
   // States
   const [activeTab, setActiveTab] = useState<TabType>("profile");
-  const [themeMode, setThemeMode] = useState<"light" | "dark" | "system">("light");
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
@@ -85,16 +89,46 @@ const Settings: React.FC = () => {
     }
   };
 
-  const handleUpdatePassword = () => {
-    toast.success("Şifre güncelleme bağlantısı gönderildi.");
+  const handleUpdatePassword = async (data: ChangePasswordFormData): Promise<boolean> => {
+    // Update password in settings state (persists in LocalStorage)
+    const resultAction = await dispatch(updateSettings({ password: data.newPassword }));
+    if (updateSettings.fulfilled.match(resultAction)) {
+      dispatch(
+        addActivityLog({
+          action: "Settings Updated",
+          category: "Settings",
+          description: "Hesap giriş şifresi değiştirildi.",
+          user: "Aygen",
+          icon: "Lock",
+          status: "success",
+        }),
+      );
+      dispatch(
+        addNotification({
+          title: "Settings güncellendi",
+          message: "Şifreniz başarıyla güncellendi.",
+          type: "success",
+          icon: "Lock",
+        }),
+      );
+      toast.success("Şifreniz başarıyla güncellendi!");
+      return true;
+    }
+    return false;
   };
 
-  const handleDeleteAccount = () => {
-    toast.error("Hesap silme işlemi yetki sınırları dışındadır.");
+  const handleDeleteAccount = async () => {
+    // Clear LocalStorage mock credentials and tables
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("user_settings");
+
+    toast.success("Hesabınız ve verileriniz başarıyla silindi.");
+    navigate(ROUTES.LOGIN);
   };
 
   const handleChangeTheme = (mode: "light" | "dark" | "system") => {
-    setThemeMode(mode);
+    dispatch(setTheme(mode));
     dispatch(
       addActivityLog({
         action: "Theme Changed",
@@ -233,6 +267,7 @@ const Settings: React.FC = () => {
               onToggleTwoFactor={handleToggleTwoFactor}
               onUpdatePassword={handleUpdatePassword}
               onDeleteAccount={handleDeleteAccount}
+              userEmail={settings.email}
             />
           )}
 
@@ -244,6 +279,7 @@ const Settings: React.FC = () => {
             <NotificationsTab
               emailEnabled={settings.emailNotifications}
               pushEnabled={settings.pushNotifications}
+              smsEnabled={settings.smsNotifications}
               onChangeToggle={handleToggleNotification}
             />
           )}
@@ -253,6 +289,8 @@ const Settings: React.FC = () => {
               language={settings.language}
               currency={settings.currency}
               timezone={settings.timezone}
+              dateFormat={settings.dateFormat}
+              numberFormat={settings.numberFormat}
               onChangeRegional={handleChangeRegional}
             />
           )}

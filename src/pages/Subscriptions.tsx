@@ -168,7 +168,7 @@ export const Subscriptions: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-            Subscription Tracker
+            Abonelik Takibi
           </h2>
           <p className="font-body-md text-body-md text-slate-500 dark:text-slate-400 font-medium mt-1">
             Tekrarlayan giderlerinizi izleyin, gereksiz abonelikleri tespit edin ve bütçenizi
@@ -176,7 +176,7 @@ export const Subscriptions: React.FC = () => {
           </p>
         </div>
         <Button variant="primary" icon={<Plus size={18} />} onClick={() => setIsAddModalOpen(true)}>
-          Add Subscription
+          Abonelik Ekle
         </Button>
       </div>
 

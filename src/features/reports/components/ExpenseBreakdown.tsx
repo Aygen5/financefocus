@@ -24,7 +24,7 @@ const ExpenseBreakdown: React.FC<ExpenseBreakdownProps> = ({ data, loading = fal
     <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex flex-col h-full text-left">
       <div className="flex justify-between items-center mb-6">
         <h4 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold">
-          Expense Breakdown
+          Harcama Kırılımı
         </h4>
       </div>
 
@@ -52,7 +52,7 @@ const ExpenseBreakdown: React.FC<ExpenseBreakdownProps> = ({ data, loading = fal
           <span className="font-display-lg text-display-lg text-slate-800 dark:text-white font-extrabold leading-none">
             42%
           </span>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Housing</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Barınma</p>
         </div>
       </div>
 

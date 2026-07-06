@@ -1,26 +1,79 @@
-import React from "react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { changePasswordSchema } from "../settings.types";
+import type { ChangePasswordFormData } from "../settings.types";
 import Button from "@/components/ui/Button";
-import { Lock, ShieldCheck, Trash2 } from "lucide-react";
+import Input from "@/components/ui/Input";
 import Switch from "@/components/ui/Switch";
+import Modal from "@/components/ui/Modal";
+import ConfirmDialog from "@/components/feedback/ConfirmDialog";
+import { Lock, ShieldCheck, Trash2, KeyRound } from "lucide-react";
+import toast from "react-hot-toast";
 
 export interface SecurityTabProps {
   twoFactorEnabled?: boolean;
   onToggleTwoFactor?: (checked: boolean) => void;
-  onUpdatePassword?: () => void;
-  onDeleteAccount?: () => void;
+  onUpdatePassword?: (data: ChangePasswordFormData) => Promise<boolean>;
+  onDeleteAccount?: () => Promise<void>;
+  userEmail?: string;
 }
 
 const SecurityTab: React.FC<SecurityTabProps> = ({
-  twoFactorEnabled = true,
+  twoFactorEnabled = false,
   onToggleTwoFactor,
   onUpdatePassword,
   onDeleteAccount,
+  userEmail = "aygen@financefocus.com",
 }) => {
+  // Modal States
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [isFirstConfirmOpen, setIsFirstConfirmOpen] = useState(false);
+  const [isSecondConfirmOpen, setIsSecondConfirmOpen] = useState(false);
+  const [confirmEmailInput, setConfirmEmailInput] = useState("");
+
+  // Hook Form for Password Change
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: { oldPassword: "", newPassword: "", confirmPassword: "" },
+  });
+
+  const handlePasswordSubmit = async (data: ChangePasswordFormData) => {
+    if (onUpdatePassword) {
+      const success = await onUpdatePassword(data);
+      if (success) {
+        reset();
+        setIsPasswordOpen(false);
+      }
+    }
+  };
+
+  const handleFirstConfirm = () => {
+    setIsFirstConfirmOpen(false);
+    setIsSecondConfirmOpen(true);
+  };
+
+  const handleDeleteSubmit = async () => {
+    if (confirmEmailInput !== userEmail) {
+      toast.error("Girdiğiniz e-posta adresi eşleşmiyor!");
+      return;
+    }
+    if (onDeleteAccount) {
+      await onDeleteAccount();
+      setIsSecondConfirmOpen(false);
+    }
+  };
+
   return (
-    <div className="p-8 space-y-8 text-left">
+    <div className="p-8 space-y-8 text-left select-none">
       <div>
         <h3 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold leading-tight">
-          Security &amp; Privacy
+          Güvenlik &amp; Gizlilik
         </h3>
         <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
           Şifrenizi ve iki faktörlü kimlik doğrulama ayarlarınızı yönetin.
@@ -39,12 +92,12 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
                 Şifre
               </p>
               <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5">
-                En son 3 ay önce değiştirildi
+                Hesap güvenliğinizi korumak için şifrenizi güncelleyin
               </p>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={onUpdatePassword}>
-            Güncelle (Update)
+          <Button variant="outline" size="sm" onClick={() => setIsPasswordOpen(true)}>
+            Şifreyi Değiştir
           </Button>
         </div>
 
@@ -56,14 +109,17 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
             </div>
             <div>
               <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold">
-                İki Faktörlü Doğrulama
+                İki Faktörlü Doğrulama (2FA)
               </p>
               <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5">
                 Hesabınıza ekstra güvenlik katmanı ekler
               </p>
             </div>
           </div>
-          <Switch checked={twoFactorEnabled} onChange={onToggleTwoFactor} />
+          <Switch
+            checked={twoFactorEnabled}
+            onChange={(e) => onToggleTwoFactor?.(e.target.checked)}
+          />
         </div>
       </div>
 
@@ -83,13 +139,118 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
           <Button
             variant="outline"
             icon={<Trash2 size={16} />}
-            onClick={onDeleteAccount}
+            onClick={() => setIsFirstConfirmOpen(true)}
             className="border-red-500 text-red-650 hover:bg-red-500/10 font-bold"
           >
             Hesabı Sil
           </Button>
         </div>
       </div>
+
+      {/* Modal 1: Change Password Modal */}
+      <Modal
+        isOpen={isPasswordOpen}
+        onClose={() => setIsPasswordOpen(false)}
+        title="Şifreyi Değiştir"
+        size="sm"
+      >
+        <form onSubmit={handleSubmit(handlePasswordSubmit)} className="space-y-4 text-left">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 mx-auto">
+            <KeyRound size={20} />
+          </div>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold text-center mb-4">
+            Lütfen eski şifrenizi ve yeni belirlemek istediğiniz şifreyi giriniz.
+          </p>
+          <Input
+            label="Mevcut Şifre"
+            type="password"
+            {...register("oldPassword")}
+            error={errors.oldPassword?.message}
+          />
+          <Input
+            label="Yeni Şifre"
+            type="password"
+            {...register("newPassword")}
+            error={errors.newPassword?.message}
+          />
+          <Input
+            label="Yeni Şifre Tekrar"
+            type="password"
+            {...register("confirmPassword")}
+            error={errors.confirmPassword?.message}
+          />
+          <div className="pt-4 flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 font-bold text-xs"
+              onClick={() => setIsPasswordOpen(false)}
+            >
+              İptal
+            </Button>
+            <Button
+              type="submit"
+              variant="brand"
+              className="flex-1 font-bold text-xs"
+              loading={isSubmitting}
+            >
+              Güncelle
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* dialog 1: First Confirm dialog (Danger) */}
+      <ConfirmDialog
+        isOpen={isFirstConfirmOpen}
+        onClose={() => setIsFirstConfirmOpen(false)}
+        onConfirm={handleFirstConfirm}
+        title="Hesabınızı silmek istediğinize emin misiniz?"
+        description="Bu işlem sonucunda tüm bütçe, harcama, hedef ve abonelik verileriniz kalıcı olarak silinecektir. Bu işlem geri alınamaz."
+        confirmLabel="Devam Et"
+        cancelLabel="Vazgeç"
+        variant="danger"
+      />
+
+      {/* Modal 2: Second Confirm Modal with text input */}
+      <Modal
+        isOpen={isSecondConfirmOpen}
+        onClose={() => setIsSecondConfirmOpen(false)}
+        title="Silme İşlemini Onaylayın"
+        size="sm"
+      >
+        <div className="space-y-4 text-left">
+          <p className="text-xs text-slate-650 dark:text-slate-350 leading-relaxed font-semibold">
+            Hesabınızı kalıcı olarak silmek için lütfen onaylamak adına e-posta adresinizi (
+            <span className="font-extrabold text-red-600 select-all">{userEmail}</span>) yazın:
+          </p>
+          <Input
+            label="E-posta Adresi"
+            placeholder="e-posta@adresiniz.com"
+            value={confirmEmailInput}
+            onChange={(e) => setConfirmEmailInput(e.target.value)}
+          />
+          <div className="pt-4 flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 font-bold text-xs"
+              onClick={() => setIsSecondConfirmOpen(false)}
+            >
+              İptal
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              className="flex-1 font-bold text-xs"
+              disabled={confirmEmailInput !== userEmail}
+              onClick={handleDeleteSubmit}
+            >
+              Hesabı Kalıcı Olarak Sil
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

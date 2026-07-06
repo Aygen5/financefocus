@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
+import { selectThemeMode } from "@/store/themeSlice";
 import { fetchTransactions } from "@/features/transactions/transactionsSlice";
 import { fetchPortfolio } from "@/features/portfolio/portfolioSlice";
 import { fetchBudgets } from "@/features/budget/budgetSlice";
@@ -35,7 +36,6 @@ import {
   Sliders,
   CalendarDays,
   TrendingUp,
-  DollarSign,
 } from "lucide-react";
 import { addActivityLog } from "@/features/activity/activitySlice";
 import { addNotification } from "@/features/notifications/notificationsSlice";
@@ -45,6 +45,24 @@ import toast from "react-hot-toast";
 
 export const Forecast: React.FC = () => {
   const dispatch = useAppDispatch();
+  const themeMode = useAppSelector(selectThemeMode);
+
+  // Resolve dark condition dynamically
+  const isDark = React.useMemo(() => {
+    if (themeMode === "dark") return true;
+    if (themeMode === "system") {
+      return (
+        typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    }
+    return false;
+  }, [themeMode]);
+
+  const gridColor = isDark ? "#1e293b" : "#f1f5f9";
+  const textColor = isDark ? "#94a3b8" : "#64748b";
+  const tooltipBg = isDark ? "#0f172a" : "#ffffff";
+  const tooltipColor = isDark ? "#f8fafc" : "#0f172a";
+  const tooltipBorder = isDark ? "#1e293b" : "#e2e8f0";
 
   // Redux States
   const {
@@ -214,7 +232,7 @@ export const Forecast: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-            Forecast Engine
+            Tahmin Motoru
           </h2>
           <p className="font-body-md text-body-md text-slate-500 dark:text-slate-400 font-medium mt-1">
             Geçmiş finansal hareketlerinize dayanarak kümülatif gelecek projeksiyonlarınızı analiz
@@ -347,8 +365,7 @@ export const Forecast: React.FC = () => {
         {/* Graph 1: Income Forecast */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <TrendingUp size={14} className="text-emerald-500" /> Gelir Projeksiyonu (Income
-            Forecast)
+            <TrendingUp size={14} className="text-emerald-500" /> Gelir Projeksiyonu
           </h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -356,15 +373,22 @@ export const Forecast: React.FC = () => {
                 data={incomeForecastData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#1e293b"
-                  className="hidden dark:block"
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="month" tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }} />
+                <YAxis
+                  tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }}
+                  tickFormatter={(v) => `₺${v.toLocaleString()}`}
                 />
-                <XAxis dataKey="month" tick={{ fontSize: 9, fontWeight: 700 }} />
-                <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
-                <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                <Tooltip
+                  formatter={(value) => [`₺${Number(value).toLocaleString()}`, "Gelir Tahmini"]}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    color: tooltipColor,
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                  }}
+                />
                 <Line
                   type="monotone"
                   dataKey="value"
@@ -382,7 +406,7 @@ export const Forecast: React.FC = () => {
         {/* Graph 2: Expense Forecast */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <AlertCircle size={14} className="text-red-500" /> Gider Projeksiyonu (Expense Forecast)
+            <AlertCircle size={14} className="text-red-500" /> Gider Projeksiyonu
           </h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -390,15 +414,22 @@ export const Forecast: React.FC = () => {
                 data={expenseForecastData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#1e293b"
-                  className="hidden dark:block"
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="month" tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }} />
+                <YAxis
+                  tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }}
+                  tickFormatter={(v) => `₺${v.toLocaleString()}`}
                 />
-                <XAxis dataKey="month" tick={{ fontSize: 9, fontWeight: 700 }} />
-                <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
-                <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                <Tooltip
+                  formatter={(value) => [`₺${Number(value).toLocaleString()}`, "Gider Tahmini"]}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    color: tooltipColor,
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                  }}
+                />
                 <Line
                   type="monotone"
                   dataKey="value"
@@ -416,21 +447,30 @@ export const Forecast: React.FC = () => {
         {/* Graph 3: Cash Flow Forecast */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <DollarSign size={14} className="text-primary" /> Gelecek Nakit Akışı (Cash Flow
-            Forecast)
+            <TrendingUp size={14} className="text-primary" /> Gelecek Nakit Akışı
           </h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={cashFlowForecastData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#1e293b"
-                  className="hidden dark:block"
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="month" tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }} />
+                <YAxis
+                  tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }}
+                  tickFormatter={(v) => `₺${v.toLocaleString()}`}
                 />
-                <XAxis dataKey="month" tick={{ fontSize: 9, fontWeight: 700 }} />
-                <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
-                <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                <Tooltip
+                  formatter={(value, name) => [
+                    `₺${Number(value).toLocaleString()}`,
+                    name === "income" ? "Tahmini Gelir" : "Tahmini Gider",
+                  ]}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    color: tooltipColor,
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                  }}
+                />
                 <Legend wrapperStyle={{ fontSize: "11px", fontWeight: "bold" }} />
                 <Bar dataKey="income" name="Tahmini Gelir" fill="#16a34a" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="expense" name="Tahmini Gider" fill="#ef4444" radius={[4, 4, 0, 0]} />
@@ -442,8 +482,7 @@ export const Forecast: React.FC = () => {
         {/* Graph 4: Portfolio Growth Forecast */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <TrendingUp size={14} className="text-primary" /> Portföy Büyüme Projeksiyonu (Portfolio
-            Growth Forecast)
+            <TrendingUp size={14} className="text-primary" /> Portföy Büyüme Projeksiyonu
           </h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -457,15 +496,25 @@ export const Forecast: React.FC = () => {
                     <stop offset="95%" stopColor="#004ac6" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#1e293b"
-                  className="hidden dark:block"
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="month" tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }} />
+                <YAxis
+                  tick={{ fill: textColor, fontSize: 9, fontWeight: 700 }}
+                  tickFormatter={(v) => `₺${v.toLocaleString()}`}
                 />
-                <XAxis dataKey="month" tick={{ fontSize: 9, fontWeight: 700 }} />
-                <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
-                <Tooltip contentStyle={{ fontSize: "11px", fontWeight: "bold" }} />
+                <Tooltip
+                  formatter={(value) => [
+                    `₺${Number(value).toLocaleString()}`,
+                    "Tahmini Portföy Değeri",
+                  ]}
+                  contentStyle={{
+                    background: tooltipBg,
+                    border: `1px solid ${tooltipBorder}`,
+                    color: tooltipColor,
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                  }}
+                />
                 <Area
                   type="monotone"
                   dataKey="value"

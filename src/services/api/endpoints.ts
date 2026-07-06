@@ -1,5 +1,6 @@
 export const ENDPOINTS = {
   AUTH: {
+    // TODO: [Backend Entegrasyonu] Gerçek API'de login ve register endpoint yolları güncellenmelidir (örn. /auth/login, /auth/register)
     LOGIN: "/users", // Mock API'de kullanıcı listesinden doğrulayacağımız için
     REGISTER: "/users",
     LOGOUT: "/auth/logout",

@@ -10,7 +10,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   variant = "rectangular",
   ...props
 }) => {
-  const baseStyles = "animate-pulse bg-slate-200 dark:bg-slate-800";
+  const baseStyles = "animate-pulse bg-slate-200 dark:bg-slate-800 motion-reduce:animate-none";
 
   const variants = {
     text: "h-3 w-full rounded-md",

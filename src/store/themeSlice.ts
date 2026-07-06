@@ -1,14 +1,41 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export type ThemeMode = "light" | "dark";
+export type ThemeMode = "light" | "dark" | "system";
 
 export interface ThemeState {
   mode: ThemeMode;
 }
 
+// Helper to apply classes to the HTML element
+export const applyTheme = (mode: ThemeMode) => {
+  if (typeof window === "undefined") return;
+  const root = window.document.documentElement;
+  root.classList.remove("light", "dark");
+
+  let activeTheme = mode;
+  if (mode === "system") {
+    activeTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  root.classList.add(activeTheme);
+};
+
+const getSavedTheme = (): ThemeMode => {
+  if (typeof window === "undefined") return "system";
+  const saved = localStorage.getItem("theme_mode") as ThemeMode;
+  if (saved === "light" || saved === "dark" || saved === "system") {
+    return saved;
+  }
+  return "system";
+};
+
+const initialMode = getSavedTheme();
+// Apply initial theme immediately on boot to prevent flash of light theme
+applyTheme(initialMode);
+
 const initialState: ThemeState = {
-  mode: "light",
+  mode: initialMode,
 };
 
 export const themeSlice = createSlice({
@@ -16,10 +43,23 @@ export const themeSlice = createSlice({
   initialState,
   reducers: {
     toggleTheme: (state) => {
-      state.mode = state.mode === "light" ? "dark" : "light";
+      // Toggle cycles: light -> dark -> system -> light
+      let nextMode: ThemeMode = "light";
+      if (state.mode === "light") {
+        nextMode = "dark";
+      } else if (state.mode === "dark") {
+        nextMode = "system";
+      } else {
+        nextMode = "light";
+      }
+      state.mode = nextMode;
+      localStorage.setItem("theme_mode", nextMode);
+      applyTheme(nextMode);
     },
     setTheme: (state, action: PayloadAction<ThemeMode>) => {
       state.mode = action.payload;
+      localStorage.setItem("theme_mode", action.payload);
+      applyTheme(action.payload);
     },
   },
 });

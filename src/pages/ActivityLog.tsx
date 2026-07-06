@@ -5,7 +5,7 @@ import type { ActivityLog } from "@/features/activity/activitySlice";
 import DataTable from "@/components/display/DataTable";
 import type { Column } from "@/components/display/DataTable";
 import { formatDistanceToNow, parseISO } from "date-fns";
-import { enUS } from "date-fns/locale";
+import { tr } from "date-fns/locale";
 import * as Icons from "lucide-react";
 import ErrorState from "@/components/feedback/ErrorState";
 import { SkeletonTable } from "@/components/ui/Skeleton";
@@ -73,9 +73,9 @@ const getStatusBadge = (status: ActivityLog["status"]) => {
 const formatTimeAgo = (timestampStr: string) => {
   try {
     const date = parseISO(timestampStr);
-    return formatDistanceToNow(date, { addSuffix: true, locale: enUS });
+    return formatDistanceToNow(date, { addSuffix: true, locale: tr });
   } catch {
-    return "unknown time";
+    return "bilinmeyen zaman";
   }
 };
 
@@ -243,15 +243,20 @@ export const ActivityLogPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-            System Activity Log
+            Sistem Aktivite Günlükleri
           </h2>
           <p className="font-body-md text-body-md text-slate-500 dark:text-slate-400 font-medium mt-1">
             Uygulama genelinde gerçekleşen tüm önemli finansal ve sistemsel değişikliklerin güvenli
             günlüğü.
           </p>
         </div>
-        <Button variant="outline" icon={<Icons.Download size={16} />} onClick={handleExport}>
-          Export Logs
+        <Button
+          variant="outline"
+          icon={<Icons.Download size={16} />}
+          onClick={handleExport}
+          className="w-full sm:w-auto shrink-0 justify-center"
+        >
+          Günlükleri Dışa Aktar
         </Button>
       </div>
 
@@ -276,14 +281,14 @@ export const ActivityLogPage: React.FC = () => {
           </div>
 
           {/* Category Filter */}
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <select
               value={categoryFilter}
               onChange={(e) => {
                 setCategoryFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 pr-8 text-xs font-bold text-slate-500 dark:text-slate-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer"
+              className="w-full appearance-none bg-slate-50 dark:bg-slate-855 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 pr-8 text-xs font-bold text-slate-500 dark:text-slate-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer"
             >
               <option value="All">Tüm Kategoriler</option>
               <option value="Auth">Yetkilendirme</option>
@@ -297,14 +302,14 @@ export const ActivityLogPage: React.FC = () => {
           </div>
 
           {/* Date Filter */}
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <select
               value={dateFilter}
               onChange={(e) => {
                 setDateFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="appearance-none bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 pr-8 text-xs font-bold text-slate-500 dark:text-slate-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer"
+              className="w-full appearance-none bg-slate-50 dark:bg-slate-855 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 pr-8 text-xs font-bold text-slate-500 dark:text-slate-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer"
             >
               <option value="All">Tüm Zamanlar</option>
               <option value="Today">Bugün</option>

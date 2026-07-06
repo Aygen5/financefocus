@@ -100,8 +100,8 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                     S: PDF raporu nasıl alabilirim?
                   </h4>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                    C: Dashboard sayfasında sağ üstteki "Export" butonuna basarak tarayıcınızın PDF
-                    kaydetme özelliğini kullanabilirsiniz. Ekrandaki gereksiz butonlar otomatik
+                    C: Dashboard sayfasında sağ üstteki "Dışa Aktar" butonuna basarak tarayıcınızın
+                    PDF kaydetme özelliğini kullanabilirsiniz. Ekrandaki gereksiz butonlar otomatik
                     gizlenir.
                   </p>
                 </div>
@@ -160,10 +160,10 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-slate-400">Destek E-postası:</span>
                   <a
-                    href="mailto:support@financefocus.com"
+                    href="mailto:destek@financefocus.com"
                     className="text-primary hover:underline font-bold"
                   >
-                    support@financefocus.com
+                    destek@financefocus.com
                   </a>
                 </div>
                 <div className="flex justify-between text-xs font-semibold">

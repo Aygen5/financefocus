@@ -128,14 +128,14 @@ export const Goals: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-            Financial Goals
+            Finansal Hedefler
           </h2>
           <p className="font-body-md text-body-md text-slate-500 dark:text-slate-400 font-medium mt-1">
             Geleceğinizi planlayın, tasarruflarınızı ve stratejik finansal hedeflerinizi yönetin.
           </p>
         </div>
         <Button variant="primary" icon={<Plus size={18} />} onClick={() => setIsAddModalOpen(true)}>
-          Add Goal
+          Yeni Hedef Ekle
         </Button>
       </div>
 

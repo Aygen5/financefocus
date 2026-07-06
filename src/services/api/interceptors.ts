@@ -133,6 +133,7 @@ export const setupInterceptors = (client: AxiosInstance): AxiosInstance => {
   // Request Interceptor
   client.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
+      // TODO: [Backend Entegrasyonu] Gerçek API ve production ortamına geçerken isServerOffline ve handleLocalFallback (LocalStorage simulation) tamamen devre dışı bırakılabilir veya isteğe göre hibrit yapıda tutulabilir.
       // If we already know the server is offline, bypass request and return fallback data immediately
       if (isServerOffline) {
         const fallbackResponse = handleLocalFallback(config);

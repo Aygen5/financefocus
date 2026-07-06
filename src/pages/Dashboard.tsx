@@ -82,6 +82,13 @@ const Dashboard: React.FC = () => {
   // İşlemler listesinden dinamik aylık nakit akışı verisi
   const cashFlowData = useMemo(() => calculateMonthlyCashFlow(transactions), [transactions]);
 
+  // Son işlemleri tarihe göre azalan sırada sıralayıp ilk 3'ünü al
+  const sortedRecentTransactions = useMemo(() => {
+    return [...transactions]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 3);
+  }, [transactions]);
+
   // Reaktif Genel Finansal Sağlık Skoru
   const healthScore = useMemo(() => {
     const scores = calculateFinancialHealthScore(
@@ -165,7 +172,7 @@ const Dashboard: React.FC = () => {
         <EmptyState
           title="Finansal Kayıt Bulunamadı"
           description="Sistemde henüz hesap veya işlem kaydı bulunmamaktadır. İlk finansal hareketlerinizi Transactions sayfasından ekleyebilirsiniz."
-          primaryActionLabel="Transactions Sayfasına Git"
+          primaryActionLabel="İşlem Geçmişi Sayfasına Git"
           onPrimaryActionClick={loadDashboardData}
         />
       </div>
@@ -201,7 +208,7 @@ const Dashboard: React.FC = () => {
           <CashFlowAnalysis data={cashFlowData} loading={false} />
 
           {/* Son İşlemler Tablosu */}
-          <RecentTransactions transactions={transactions.slice(0, 3)} loading={false} />
+          <RecentTransactions transactions={sortedRecentTransactions} loading={false} />
         </div>
 
         {/* Outer column (Right) */}

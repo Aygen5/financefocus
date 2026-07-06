@@ -49,7 +49,7 @@ const ActiveGoals: React.FC<ActiveGoalsProps> = ({ goals, loading = false }) => 
                   variant={getProgressVariant(goal.currentAmount, goal.targetAmount)}
                 />
                 <p className="text-[11px] text-slate-400 dark:text-slate-500 text-right font-medium">
-                  ${goal.currentAmount.toLocaleString()} / ${goal.targetAmount.toLocaleString()}
+                  ₺{goal.currentAmount.toLocaleString()} / ₺{goal.targetAmount.toLocaleString()}
                 </p>
               </div>
             );

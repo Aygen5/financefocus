@@ -26,6 +26,31 @@ export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     localStorage.setItem("sidebar_collapsed", String(isCollapsed));
   }, [isCollapsed]);
 
+  // Ekran boyutunu izleyen ve otomatik collapse/drawer yöneten efekt
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 1024) {
+        // Mobil veya Tablet
+        if (width >= 640 && width < 1024) {
+          // Tablet -> Otomatik daralt
+          setCollapsed(true);
+        }
+      } else {
+        // Desktop -> Kayıtlı durumu geri yükle
+        const saved = localStorage.getItem("sidebar_collapsed") === "true";
+        setCollapsed(saved);
+        setMobileOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <LayoutContext.Provider
       value={{
