@@ -41,7 +41,7 @@ const BudgetSummaryCards: React.FC<BudgetSummaryCardsProps> = ({
         </div>
         <div>
           <p className="font-display-lg text-display-lg text-slate-800 dark:text-white leading-none">
-            {formatCurrency(totalBudget, "USD", "en-US")}
+            {formatCurrency(totalBudget, "TRY", "tr-TR")}
           </p>
           <p className="font-body-sm text-body-sm text-slate-400 mt-2 font-medium">Aylık Limit</p>
         </div>
@@ -59,7 +59,7 @@ const BudgetSummaryCards: React.FC<BudgetSummaryCardsProps> = ({
         </div>
         <div>
           <p className="font-display-lg text-display-lg text-slate-800 dark:text-white leading-none">
-            {formatCurrency(spent, "USD", "en-US")}
+            {formatCurrency(spent, "TRY", "tr-TR")}
           </p>
           <div className="flex items-center gap-2 mt-2 font-semibold text-xs">
             <span className="bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
@@ -84,7 +84,7 @@ const BudgetSummaryCards: React.FC<BudgetSummaryCardsProps> = ({
         </div>
         <div>
           <p className="font-display-lg text-display-lg text-primary dark:text-brand-400 leading-none">
-            {formatCurrency(remaining, "USD", "en-US")}
+            {formatCurrency(remaining, "TRY", "tr-TR")}
           </p>
           <p className="font-body-sm text-body-sm text-slate-400 mt-2 font-medium">
             Harcanabilir Tutar

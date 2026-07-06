@@ -1,15 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import api from "@/services/api";
+import PortfolioService from "@/services/modules/portfolio.service";
 
 export interface AssetAllocation {
-  type: "cash" | "gold" | "usd" | "eur" | "stocks";
+  id: string;
+  userId: string;
+  name: string;
+  symbol: string;
+  type: "stocks" | "gold" | "silver" | "crypto" | "fund" | "etf" | "cash";
   amount: number;
-  valueInBaseCurrency: number;
+  avgCost: number;
+  currentPrice: number;
+  lastUpdated: string;
+  sector: string;
+  currency: string;
 }
 
-interface PortfolioState {
+export interface PortfolioState {
   assets: AssetAllocation[];
   loading: boolean;
   error: string | null;
@@ -26,10 +33,12 @@ export const fetchPortfolio = createAsyncThunk(
   "portfolio/fetchPortfolio",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/portfolio");
-      return response.data as AssetAllocation[];
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Portföy yüklenemedi");
+      return (await PortfolioService.getAll()) as AssetAllocation[];
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Portföy yüklenemedi.");
     }
   },
 );
@@ -37,7 +46,11 @@ export const fetchPortfolio = createAsyncThunk(
 export const portfolioSlice = createSlice({
   name: "portfolio",
   initialState,
-  reducers: {},
+  reducers: {
+    clearPortfolio: (state) => {
+      state.assets = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchPortfolio.pending, (state) => {
@@ -51,9 +64,16 @@ export const portfolioSlice = createSlice({
       })
       .addCase(fetchPortfolio.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = (action.payload as string) || action.error.message || "Portföy yüklenemedi";
       });
   },
 });
 
+// Selectors
+export const selectPortfolio = (state: { portfolio: PortfolioState }) => state.portfolio.assets;
+export const selectPortfolioLoading = (state: { portfolio: PortfolioState }) =>
+  state.portfolio.loading;
+export const selectPortfolioError = (state: { portfolio: PortfolioState }) => state.portfolio.error;
+
+export const { clearPortfolio } = portfolioSlice.actions;
 export default portfolioSlice.reducer;

@@ -99,11 +99,11 @@ const CategoryBudgets: React.FC<CategoryBudgetsProps> = ({ budgets, loading = fa
             <div className="mb-4">
               <div className="flex justify-between text-sm font-semibold mb-2">
                 <span className={isOver ? "text-red-500" : "text-slate-800 dark:text-slate-200"}>
-                  {formatCurrency(spent, "USD", "en-US")}{" "}
+                  {formatCurrency(spent, "TRY", "tr-TR")}{" "}
                   <span className="text-slate-400 dark:text-slate-500 font-normal">harcanan</span>
                 </span>
                 <span className="text-slate-455">
-                  Limit: {formatCurrency(limit, "USD", "en-US")}
+                  Limit: {formatCurrency(limit, "TRY", "tr-TR")}
                 </span>
               </div>
 
@@ -123,8 +123,8 @@ const CategoryBudgets: React.FC<CategoryBudgetsProps> = ({ budgets, loading = fa
             <div className="flex justify-between items-center text-xs font-semibold">
               <span className={isOver ? "text-red-500" : "text-slate-500"}>
                 {isOver
-                  ? `-${formatCurrency(overAmount, "USD", "en-US")} limit aşımı`
-                  : `${formatCurrency(remaining, "USD", "en-US")} kaldı`}
+                  ? `-${formatCurrency(overAmount, "TRY", "tr-TR")} limit aşımı`
+                  : `${formatCurrency(remaining, "TRY", "tr-TR")} kaldı`}
               </span>
               <span
                 className={`px-2 py-1 rounded text-[11px] font-bold ${

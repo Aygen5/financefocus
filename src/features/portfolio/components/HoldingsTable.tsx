@@ -89,7 +89,7 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({ assets, loading = false, 
       className: "text-right",
       render: (row) => (
         <span className="font-semibold text-slate-800 dark:text-slate-200">
-          {formatCurrency(row.value, "USD", "en-US")}
+          {formatCurrency(row.value, "TRY", "tr-TR")}
         </span>
       ),
     },

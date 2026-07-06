@@ -110,7 +110,7 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
             Total Income
           </p>
           <p className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-extrabold">
-            {formatCurrency(284500, "USD", "en-US")}
+            {formatCurrency(510000, "TRY", "tr-TR")}
           </p>
         </div>
         <div>
@@ -118,7 +118,7 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
             Avg. Monthly
           </p>
           <p className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-extrabold">
-            {formatCurrency(47416, "USD", "en-US")}
+            {formatCurrency(85000, "TRY", "tr-TR")}
           </p>
         </div>
         <div>

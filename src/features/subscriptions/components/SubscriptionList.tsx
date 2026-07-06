@@ -129,10 +129,10 @@ const SubscriptionList: React.FC<SubscriptionListProps> = ({
               {/* Price */}
               <div className="col-span-1 lg:col-span-2 text-left lg:text-right">
                 <span className="font-headline-sm text-lg text-slate-800 dark:text-white font-extrabold leading-none">
-                  {formatCurrency(sub.cost, "USD", "en-US")}
+                  {formatCurrency(sub.cost, "TRY", "tr-TR")}
                 </span>
                 <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase">
-                  USD
+                  TRY
                 </p>
               </div>
 

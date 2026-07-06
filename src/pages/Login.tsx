@@ -6,6 +6,8 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import { loginUser, clearError } from "@/features/auth/authSlice";
 import { loginSchema } from "@/features/auth/auth.types";
 import type { LoginFormData } from "@/features/auth/auth.types";
+import { addActivityLog } from "@/features/activity/activitySlice";
+import { addNotification } from "@/features/notifications/notificationsSlice";
 import { Mail, Lock, Landmark, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -31,9 +33,27 @@ const Login: React.FC = () => {
   // Giriş durumunu izle ve yönlendir
   useEffect(() => {
     if (isAuthenticated) {
+      dispatch(
+        addActivityLog({
+          action: "Login",
+          category: "Auth",
+          description: "Kullanıcı sisteme başarıyla giriş yaptı.",
+          user: "Aygen",
+          icon: "LogIn",
+          status: "success",
+        }),
+      );
+      dispatch(
+        addNotification({
+          title: "Login başarılı",
+          message: "FinanceFocus hesabınıza başarıyla giriş yaptınız.",
+          type: "success",
+          icon: "LogIn",
+        }),
+      );
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, dispatch]);
 
   // Hata durumunu toast ile göster
   useEffect(() => {

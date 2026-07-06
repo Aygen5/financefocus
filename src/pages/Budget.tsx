@@ -11,6 +11,8 @@ import Modal from "@/components/overlay/Modal";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import { addActivityLog } from "@/features/activity/activitySlice";
+import { addNotification } from "@/features/notifications/notificationsSlice";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -52,6 +54,24 @@ const Budget: React.FC = () => {
       );
 
       if (addBudget.fulfilled.match(resultAction)) {
+        dispatch(
+          addActivityLog({
+            action: "Budget Updated",
+            category: "Budget",
+            description: `"${data.category}" kategorisi için ${data.limit} TRY bütçe limiti tanımlandı.`,
+            user: "Aygen",
+            icon: "Sliders",
+            status: "success",
+          }),
+        );
+        dispatch(
+          addNotification({
+            title: "Budget Updated",
+            message: `"${data.category}" kategorisi için ${data.limit} TRY bütçe limiti başarıyla tanımlandı.`,
+            type: "success",
+            icon: "Sliders",
+          }),
+        );
         toast.success("Bütçe limiti başarıyla tanımlandı!");
         reset();
         setIsModalOpen(false);

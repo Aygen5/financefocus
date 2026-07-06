@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import api from "@/services/api";
+import BudgetService from "@/services/modules/budget.service";
 
 export interface Budget {
   id: string;
@@ -13,7 +12,7 @@ export interface Budget {
   description?: string;
 }
 
-interface BudgetState {
+export interface BudgetState {
   items: Budget[];
   loading: boolean;
   error: string | null;
@@ -30,10 +29,12 @@ export const fetchBudgets = createAsyncThunk(
   "budget/fetchBudgets",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/budgets");
-      return response.data as Budget[];
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Bütçeler yüklenemedi");
+      return await BudgetService.getAll();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Bütçeler yüklenemedi.");
     }
   },
 );
@@ -42,14 +43,12 @@ export const addBudget = createAsyncThunk(
   "budget/addBudget",
   async (data: Omit<Budget, "id" | "userId" | "spentAmount">, { rejectWithValue }) => {
     try {
-      const response = await api.post("/budgets", {
-        ...data,
-        spentAmount: 0,
-        userId: "1",
-      });
-      return response.data as Budget;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Bütçe oluşturulamadı");
+      return await BudgetService.create(data);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Bütçe eklenemedi.");
     }
   },
 );
@@ -57,7 +56,11 @@ export const addBudget = createAsyncThunk(
 export const budgetSlice = createSlice({
   name: "budget",
   initialState,
-  reducers: {},
+  reducers: {
+    clearBudgets: (state) => {
+      state.items = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBudgets.pending, (state) => {
@@ -71,7 +74,7 @@ export const budgetSlice = createSlice({
       })
       .addCase(fetchBudgets.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = (action.payload as string) || action.error.message || "Bütçeler yüklenemedi";
       })
       .addCase(addBudget.fulfilled, (state, action: PayloadAction<Budget>) => {
         state.items.push(action.payload);
@@ -79,4 +82,10 @@ export const budgetSlice = createSlice({
   },
 });
 
+// Selectors
+export const selectBudgets = (state: { budget: BudgetState }) => state.budget.items;
+export const selectBudgetLoading = (state: { budget: BudgetState }) => state.budget.loading;
+export const selectBudgetError = (state: { budget: BudgetState }) => state.budget.error;
+
+export const { clearBudgets } = budgetSlice.actions;
 export default budgetSlice.reducer;

@@ -1,251 +1,331 @@
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useAppDispatch, useAppSelector } from "@/store";
-import { fetchSubscriptions, addSubscription } from "@/features/subscriptions/subscriptionsSlice";
-import { subscriptionFormSchema } from "@/features/subscriptions/subscriptions.types";
-import type { SubscriptionFormData } from "@/features/subscriptions/subscriptions.types";
+import React, { useState, useMemo } from "react";
+import useSubscriptions from "@/features/subscriptions/hooks/useSubscriptions";
+import SubscriptionCard from "@/features/subscriptions/components/SubscriptionCard";
+import SubscriptionForm from "@/features/subscriptions/components/SubscriptionForm";
+import SubscriptionDetailModal from "@/features/subscriptions/components/SubscriptionDetailModal";
 import SubscriptionSummary from "@/features/subscriptions/components/SubscriptionSummary";
-import SubscriptionList from "@/features/subscriptions/components/SubscriptionList";
-import Modal from "@/components/overlay/Modal";
+import ConfirmDialog from "@/components/feedback/ConfirmDialog";
+import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
-import Select from "@/components/ui/Select";
-import { Plus, ListFilter } from "lucide-react";
-import toast from "react-hot-toast";
+import EmptyState from "@/components/feedback/EmptyState";
+import ErrorState from "@/components/feedback/ErrorState";
+import { SkeletonCard } from "@/components/ui/Skeleton";
+import {
+  calculateMonthlySubscriptionTotal,
+  calculateYearlySubscriptionTotal,
+  calculateAverageSubscriptionCost,
+  calculateMostExpensiveSubscription,
+  calculateUpcomingPayments,
+} from "@/utils/financial";
+import { Plus, RotateCcw, CreditCard, ListFilter } from "lucide-react";
+import type { Subscription } from "@/features/subscriptions/subscriptionsSlice";
+import type { SubscriptionFormData } from "@/features/subscriptions/components/SubscriptionForm";
 
-const Subscriptions: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { items: subscriptions, loading } = useAppSelector((state) => state.subscriptions);
+export const Subscriptions: React.FC = () => {
+  const {
+    subscriptions,
+    loading,
+    error,
+    handleRetry,
+    handleAddSubscription,
+    handleUpdateSubscription,
+    handleDeleteSubscription,
+  } = useSubscriptions();
 
-  // States
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Modals & States
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedSub, setSelectedSub] = useState<Subscription | null>(null);
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
-  // Form
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<SubscriptionFormData>({
-    resolver: zodResolver(subscriptionFormSchema),
-    defaultValues: {
-      name: "",
-      price: undefined,
-      cycle: "monthly",
-      category: "Software",
-      nextPayment: "",
-      billingType: "auto-renew",
-    },
-  });
+  const handleOpenEdit = (sub: Subscription) => {
+    setSelectedSub(sub);
+    setIsEditModalOpen(true);
+  };
 
-  useEffect(() => {
-    dispatch(fetchSubscriptions());
-  }, [dispatch]);
+  const handleOpenDelete = (sub: Subscription) => {
+    setSelectedSub(sub);
+    setIsDeleteOpen(true);
+  };
 
-  const handleFormSubmit = async (data: SubscriptionFormData) => {
-    try {
-      const resultAction = await dispatch(
-        addSubscription({
-          name: data.name,
-          cost: data.price,
-          billingCycle: data.cycle,
-          category: data.category,
-          nextBillingDate: data.nextPayment,
-          billingType: data.billingType,
-        }),
-      );
+  const handleOpenView = (sub: Subscription) => {
+    setSelectedSub(sub);
+    setIsDetailModalOpen(true);
+  };
 
-      if (addSubscription.fulfilled.match(resultAction)) {
-        toast.success("Abonelik başarıyla eklendi!");
-        reset();
-        setIsModalOpen(false);
-      }
-    } catch {
-      toast.error("Abonelik eklenirken hata oluştu");
+  const onAddSubmit = async (data: SubscriptionFormData) => {
+    setIsSubmitLoading(true);
+    const success = await handleAddSubscription(data);
+    setIsSubmitLoading(false);
+    if (success) {
+      setIsAddModalOpen(false);
     }
   };
 
-  const handleManage = (id: string) => {
-    toast.success(`Abonelik yönetiliyor: ${id}`);
+  const onEditSubmit = async (data: SubscriptionFormData) => {
+    if (!selectedSub) return;
+    setIsSubmitLoading(true);
+    const success = await handleUpdateSubscription(selectedSub.id, data);
+    setIsSubmitLoading(false);
+    if (success) {
+      setIsEditModalOpen(false);
+      setSelectedSub(null);
+    }
   };
 
-  const handleLinkAccount = () => {
-    toast.success("Banka/Hesap bağlama akışı başlatıldı.");
+  const onDeleteConfirm = async () => {
+    if (!selectedSub) return;
+    setIsSubmitLoading(true);
+    const success = await handleDeleteSubscription(selectedSub.id);
+    setIsSubmitLoading(false);
+    if (success) {
+      setIsDeleteOpen(false);
+      setSelectedSub(null);
+    }
   };
 
-  // Filtreleme Mantığı
-  const filteredSubscriptions = subscriptions.filter((sub) => {
-    const matchesCategory =
-      categoryFilter === "All" || sub.category.toLowerCase().includes(categoryFilter.toLowerCase());
-    const matchesStatus =
-      statusFilter === "All" ||
-      (statusFilter === "Active" &&
-        (sub.billingType === "auto-renew" || sub.billingType === "scheduled")) ||
-      (statusFilter === "Paused" && sub.billingType === "manual");
-    return matchesCategory && matchesStatus;
-  });
+  // 1. Dinamik Hesaplamalar
+  const monthlyTotal = useMemo(
+    () => calculateMonthlySubscriptionTotal(subscriptions),
+    [subscriptions],
+  );
+  const yearlyTotal = useMemo(
+    () => calculateYearlySubscriptionTotal(subscriptions),
+    [subscriptions],
+  );
+  const averageCost = useMemo(
+    () => calculateAverageSubscriptionCost(subscriptions),
+    [subscriptions],
+  );
+  const mostExpensive = useMemo(
+    () => calculateMostExpensiveSubscription(subscriptions),
+    [subscriptions],
+  );
+  const upcomingPayments = useMemo(() => calculateUpcomingPayments(subscriptions), [subscriptions]);
 
-  // Metrik Hesaplamaları
-  const totalCost = filteredSubscriptions.reduce((sum, sub) => sum + sub.cost, 0);
-  const activeCount = filteredSubscriptions.filter(
-    (sub) => sub.billingType === "auto-renew" || sub.billingType === "scheduled",
-  ).length;
-  const dueSoonCount =
-    filteredSubscriptions.length > 0 ? Math.min(filteredSubscriptions.length, 4) : 0;
-  const autoRenewCount = filteredSubscriptions.filter(
-    (sub) => sub.billingType === "auto-renew",
-  ).length;
+  const mostExpensiveName = mostExpensive ? mostExpensive.name : "Yok";
+  const mostExpensiveCost = mostExpensive
+    ? mostExpensive.billingCycle === "yearly"
+      ? mostExpensive.cost / 12
+      : mostExpensive.cost
+    : 0;
+
+  // 2. Filtreleme ve Sıralama
+  const filteredSubscriptions = useMemo(() => {
+    return upcomingPayments.filter((sub) => {
+      const matchesCategory =
+        categoryFilter === "All" || sub.category.toLowerCase() === categoryFilter.toLowerCase();
+      const matchesStatus = statusFilter === "All" || sub.status === statusFilter.toLowerCase();
+      return matchesCategory && matchesStatus;
+    });
+  }, [upcomingPayments, categoryFilter, statusFilter]);
+
+  // Render loading state
+  if (loading) {
+    return (
+      <div className="w-full max-w-container-max mx-auto text-left space-y-8 select-none">
+        <div className="space-y-2">
+          <div className="h-8 w-1/4 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+          <div className="h-4 w-1/3 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="h-28 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+          <div className="h-28 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+          <div className="h-28 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+          <div className="h-28 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <SkeletonCard hasAvatar={false} lines={3} className="h-56" />
+          <SkeletonCard hasAvatar={false} lines={3} className="h-56" />
+          <SkeletonCard hasAvatar={false} lines={3} className="h-56" />
+        </div>
+      </div>
+    );
+  }
+
+  // Render error state
+  if (error) {
+    return (
+      <div className="w-full max-w-container-max mx-auto text-left py-12">
+        <ErrorState
+          title="Abonelikler Yüklenemedi"
+          description="Abonelik listesi mock sunucudan çekilirken bir problem yaşandı. Lütfen tekrar deneyiniz."
+          onRetry={handleRetry}
+          retryLabel="Yeniden Dene"
+          retryIcon={<RotateCcw size={16} />}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
       {/* Page Header */}
-      <div className="mb-stack-lg flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 select-none">
         <div>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">
+          <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
             Subscription Tracker
           </h2>
-          <p className="font-body-md text-on-surface-variant mt-1">
-            Monitor your recurring expenses and optimize your financial commitments.
+          <p className="font-body-md text-body-md text-slate-500 dark:text-slate-400 font-medium mt-1">
+            Tekrarlayan giderlerinizi izleyin, gereksiz abonelikleri tespit edin ve bütçenizi
+            optimize edin.
           </p>
         </div>
-        <Button variant="primary" icon={<Plus size={18} />} onClick={() => setIsModalOpen(true)}>
+        <Button variant="primary" icon={<Plus size={18} />} onClick={() => setIsAddModalOpen(true)}>
           Add Subscription
         </Button>
       </div>
 
-      {/* Summary Bento boxes */}
+      {/* Summary metrics bento cards */}
       <SubscriptionSummary
-        totalCost={totalCost || 482.5}
-        activeCount={activeCount || 18}
-        dueSoonCount={dueSoonCount || 4}
-        autoRenewCount={autoRenewCount || 12}
-        loading={loading}
+        monthlyTotal={monthlyTotal}
+        yearlyTotal={yearlyTotal}
+        averageCost={averageCost}
+        mostExpensiveName={mostExpensiveName}
+        mostExpensiveCost={mostExpensiveCost}
+        loading={false}
       />
 
-      {/* Filters bar breakdown */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800/80 mb-stack-md flex flex-wrap items-center justify-between gap-4 shadow-soft-sm">
-        <div className="flex gap-stack-md">
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="appearance-none bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-label-md text-slate-500 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer"
-          >
-            <option value="All">Tüm Kategoriler</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Software">Software</option>
-            <option value="Utilities">Utilities</option>
-            <option value="Lifestyle">Lifestyle</option>
-          </select>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="appearance-none bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-label-md text-slate-500 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer"
-          >
-            <option value="All">Tüm Durumlar</option>
-            <option value="Active">Active (Auto / Scheduled)</option>
-            <option value="Paused">Paused (Manual)</option>
-          </select>
-        </div>
-        <div className="flex items-center gap-1 font-bold text-xs text-slate-400">
-          <ListFilter size={16} /> Sırala: Yaklaşan Ödeme
-        </div>
-      </div>
-
-      {/* Subscription List table */}
-      <SubscriptionList
-        subscriptions={filteredSubscriptions}
-        loading={loading}
-        onManage={handleManage}
-      />
-
-      {/* Empty State / Bank Connection promotion card */}
-      <div className="mt-stack-lg flex flex-col items-center justify-center py-12 bg-slate-50 dark:bg-slate-900 rounded-2xl border-2 border-dashed border-slate-200/80 dark:border-slate-800">
-        <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-850 flex items-center justify-center mb-4 text-slate-400">
-          <Plus size={32} />
-        </div>
-        <h5 className="font-headline-sm text-slate-850 dark:text-white font-bold">
-          Daha fazla servis mi takip ediyorsunuz?
-        </h5>
-        <p className="font-body-md text-slate-500 mt-1 mb-6 font-medium">
-          Mükerrer ve gereksiz harcamaları yakalamak için tüm hesaplarınızı tek bir yere bağlayın.
-        </p>
-        <Button variant="primary" onClick={handleLinkAccount}>
-          Yeni Hesap Bağla (Link New Account)
-        </Button>
-      </div>
-
-      {/* Modal - Yeni Abonelik Ekleme */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add Subscription">
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-          <Input
-            label="Hizmet Adı"
-            placeholder="Örn. Netflix, Spotify, Figma"
-            error={errors.name?.message}
-            {...register("name")}
-          />
-
-          <Input
-            label="Fiyat (USD)"
-            type="number"
-            placeholder="0.00"
-            error={errors.price?.message}
-            {...register("price", { valueAsNumber: true })}
-          />
-
-          <Select
-            label="Ödeme Döngüsü"
-            options={[
-              { value: "monthly", label: "Monthly (Aylık)" },
-              { value: "yearly", label: "Yearly (Yıllık)" },
-            ]}
-            error={errors.cycle?.message}
-            {...register("cycle")}
-          />
-
-          <Select
-            label="Kategori"
-            options={[
-              { value: "Software", label: "Software & SaaS" },
-              { value: "Entertainment", label: "Entertainment & Media" },
-              { value: "Utilities", label: "Utilities & Bills" },
-              { value: "Lifestyle", label: "Lifestyle & Health" },
-            ]}
-            error={errors.category?.message}
-            {...register("category")}
-          />
-
-          <Input
-            label="Sonraki Ödeme Tarihi"
-            type="date"
-            error={errors.nextPayment?.message}
-            {...register("nextPayment")}
-          />
-
-          <Select
-            label="Fatura Ödeme Türü"
-            options={[
-              { value: "auto-renew", label: "Auto-renew (Otomatik)" },
-              { value: "manual", label: "Manual Pay (Manuel)" },
-              { value: "scheduled", label: "Scheduled (Planlı)" },
-            ]}
-            error={errors.billingType?.message}
-            {...register("billingType")}
-          />
-
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-            <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
-              İptal
-            </Button>
-            <Button variant="primary" type="submit" loading={isSubmitting}>
-              Kaydet
-            </Button>
+      {/* Filters bar */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 mb-6 flex flex-wrap items-center justify-between gap-4 shadow-soft-sm select-none">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative">
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="appearance-none bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 pr-8 text-xs font-bold text-slate-500 dark:text-slate-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer"
+            >
+              <option value="All">Tüm Kategoriler</option>
+              <option value="Video">Video</option>
+              <option value="Music">Müzik</option>
+              <option value="Cloud">Bulut</option>
+              <option value="AI">AI / Yapay Zeka</option>
+              <option value="Software">Yazılım</option>
+              <option value="Education">Eğitim</option>
+              <option value="Gaming">Oyun</option>
+              <option value="Finance">Finans</option>
+              <option value="Other">Diğer</option>
+            </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-slate-400 pointer-events-none" />
           </div>
-        </form>
+
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="appearance-none bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 pr-8 text-xs font-bold text-slate-500 dark:text-slate-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer"
+            >
+              <option value="All">Tüm Durumlar</option>
+              <option value="Active">Aktif</option>
+              <option value="Paused">Duraklatıldı</option>
+              <option value="Cancelled">İptal Edildi</option>
+            </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-slate-400 pointer-events-none" />
+          </div>
+        </div>
+        <div className="flex items-center gap-1 font-bold text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+          <ListFilter size={14} /> Sıralama: Yaklaşan Ödeme
+        </div>
+      </div>
+
+      {/* Subscription Cards Grid / Empty State */}
+      {filteredSubscriptions.length === 0 ? (
+        <EmptyState
+          title="Abonelik Bulunamadı"
+          description="Uygulanan filtrelere uygun veya kayıtlı herhangi bir abonelik bulunmamaktadır."
+          icon={<CreditCard size={24} />}
+          primaryActionLabel="Filtreleri Temizle"
+          onPrimaryActionClick={() => {
+            setCategoryFilter("All");
+            setStatusFilter("All");
+          }}
+          primaryActionIcon={<RotateCcw size={16} />}
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredSubscriptions.map((sub) => (
+            <SubscriptionCard
+              key={sub.id}
+              subscription={sub}
+              onEdit={handleOpenEdit}
+              onDelete={handleOpenDelete}
+              onView={handleOpenView}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Add Subscription Modal */}
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Yeni Abonelik Ekle"
+        size="md"
+      >
+        <SubscriptionForm onSubmit={onAddSubmit} loading={isSubmitLoading} submitLabel="Ekle" />
       </Modal>
+
+      {/* Edit Subscription Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedSub(null);
+        }}
+        title="Aboneliği Düzenle"
+        size="md"
+      >
+        {selectedSub && (
+          <SubscriptionForm
+            onSubmit={onEditSubmit}
+            loading={isSubmitLoading}
+            defaultValues={{
+              name: selectedSub.name,
+              cost: selectedSub.cost,
+              billingCycle: selectedSub.billingCycle,
+              nextBillingDate: selectedSub.nextBillingDate,
+              category: selectedSub.category,
+              billingType: selectedSub.billingType || "Kredi Kartı",
+              autoRenew: selectedSub.autoRenew !== undefined ? selectedSub.autoRenew : true,
+              startDate: selectedSub.startDate,
+              status: selectedSub.status || "active",
+              notes: selectedSub.notes || "",
+              color: selectedSub.color || "#004ac6",
+            }}
+            submitLabel="Güncelle"
+          />
+        )}
+      </Modal>
+
+      {/* Detail Subscription Modal */}
+      <SubscriptionDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedSub(null);
+        }}
+        subscription={selectedSub}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteOpen}
+        onClose={() => {
+          setIsDeleteOpen(false);
+          setSelectedSub(null);
+        }}
+        onConfirm={onDeleteConfirm}
+        loading={isSubmitLoading}
+        title="Aboneliği Silmek İstediğinize Emin misiniz?"
+        description="Bu işlem seçilen abonelik kaydını kalıcı olarak silecektir ve işlem geri alınamaz."
+        confirmLabel="Sil"
+        cancelLabel="Vazgeç"
+        variant="danger"
+      />
     </div>
   );
 };

@@ -6,6 +6,8 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import { registerUser, clearError } from "@/features/auth/authSlice";
 import { registerSchema } from "@/features/auth/auth.types";
 import type { RegisterFormData } from "@/features/auth/auth.types";
+import { addActivityLog } from "@/features/activity/activitySlice";
+import { addNotification } from "@/features/notifications/notificationsSlice";
 import { User as UserIcon, Mail, Lock, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -47,6 +49,24 @@ const Register: React.FC = () => {
       );
 
       if (registerUser.fulfilled.match(resultAction)) {
+        dispatch(
+          addActivityLog({
+            action: "Register",
+            category: "Auth",
+            description: "Yeni kullanıcı hesabı başarıyla oluşturuldu.",
+            user: data.fullName,
+            icon: "UserPlus",
+            status: "success",
+          }),
+        );
+        dispatch(
+          addNotification({
+            title: "Register başarılı",
+            message: "FinanceFocus hesabınız başarıyla oluşturuldu. Giriş yapabilirsiniz.",
+            type: "success",
+            icon: "UserPlus",
+          }),
+        );
         toast.success("Kayıt işleminiz başarıyla tamamlandı. Giriş yapabilirsiniz.");
         navigate("/login");
       }

@@ -1,20 +1,25 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import api from "@/services/api";
+import SubscriptionsService from "@/services/modules/subscriptions.service";
 
 export interface Subscription {
   id: string;
   userId: string;
   name: string;
   cost: number;
-  billingCycle: string;
+  billingCycle: "monthly" | "yearly";
   nextBillingDate: string;
   category: string;
-  billingType?: string;
+  billingType?: string; // paymentMethod/billingType
+  autoRenew?: boolean;
+  startDate?: string;
+  color?: string;
+  icon?: string;
+  notes?: string;
+  status?: "active" | "paused" | "cancelled";
 }
 
-interface SubscriptionsState {
+export interface SubscriptionsState {
   items: Subscription[];
   loading: boolean;
   error: string | null;
@@ -31,10 +36,12 @@ export const fetchSubscriptions = createAsyncThunk(
   "subscriptions/fetchSubscriptions",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/subscriptions");
-      return response.data as Subscription[];
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Abonelikler yüklenemedi");
+      return (await SubscriptionsService.getAll()) as Subscription[];
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Abonelikler yüklenemedi.");
     }
   },
 );
@@ -43,13 +50,41 @@ export const addSubscription = createAsyncThunk(
   "subscriptions/addSubscription",
   async (data: Omit<Subscription, "id" | "userId">, { rejectWithValue }) => {
     try {
-      const response = await api.post("/subscriptions", {
-        ...data,
-        userId: "1",
-      });
-      return response.data as Subscription;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Abonelik eklenemedi");
+      return (await SubscriptionsService.create(data)) as Subscription;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Abonelik eklenemedi.");
+    }
+  },
+);
+
+export const updateSubscription = createAsyncThunk(
+  "subscriptions/updateSubscription",
+  async ({ id, data }: { id: string; data: Partial<Subscription> }, { rejectWithValue }) => {
+    try {
+      return (await SubscriptionsService.update(id, data)) as Subscription;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Abonelik güncellenemedi.");
+    }
+  },
+);
+
+export const deleteSubscription = createAsyncThunk(
+  "subscriptions/deleteSubscription",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await SubscriptionsService.delete(id);
+      return id;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Abonelik silinemedi.");
     }
   },
 );
@@ -57,7 +92,11 @@ export const addSubscription = createAsyncThunk(
 export const subscriptionsSlice = createSlice({
   name: "subscriptions",
   initialState,
-  reducers: {},
+  reducers: {
+    clearSubscriptions: (state) => {
+      state.items = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSubscriptions.pending, (state) => {
@@ -71,12 +110,31 @@ export const subscriptionsSlice = createSlice({
       })
       .addCase(fetchSubscriptions.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error =
+          (action.payload as string) || action.error.message || "Abonelikler yüklenemedi";
       })
       .addCase(addSubscription.fulfilled, (state, action: PayloadAction<Subscription>) => {
-        state.items.push(action.payload);
+        state.items.unshift(action.payload);
+      })
+      .addCase(updateSubscription.fulfilled, (state, action: PayloadAction<Subscription>) => {
+        const index = state.items.findIndex((item) => item.id === action.payload.id);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+      })
+      .addCase(deleteSubscription.fulfilled, (state, action: PayloadAction<string>) => {
+        state.items = state.items.filter((item) => item.id !== action.payload);
       });
   },
 });
 
+// Selectors
+export const selectSubscriptions = (state: { subscriptions: SubscriptionsState }) =>
+  state.subscriptions.items;
+export const selectSubscriptionsLoading = (state: { subscriptions: SubscriptionsState }) =>
+  state.subscriptions.loading;
+export const selectSubscriptionsError = (state: { subscriptions: SubscriptionsState }) =>
+  state.subscriptions.error;
+
+export const { clearSubscriptions } = subscriptionsSlice.actions;
 export default subscriptionsSlice.reducer;

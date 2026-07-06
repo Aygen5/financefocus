@@ -47,7 +47,7 @@ const AllocationChart: React.FC<AllocationChartProps> = ({ data, totalValue, loa
             Toplam Varlık
           </div>
           <div className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-extrabold mt-0.5">
-            ${(totalValue / 1000).toFixed(0)}k
+            {formatCurrency(totalValue, "TRY", "tr-TR")}
           </div>
         </div>
       </div>
@@ -68,9 +68,9 @@ const AllocationChart: React.FC<AllocationChartProps> = ({ data, totalValue, loa
               </div>
               <div className="flex items-center gap-4">
                 <span className="font-label-md text-label-md text-slate-800 dark:text-slate-200">
-                  {formatCurrency(item.value, "USD", "en-US")}
+                  {formatCurrency(item.value, "TRY", "tr-TR")}
                 </span>
-                <span className="font-label-sm text-label-sm bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded text-slate-500 dark:text-slate-400 w-12 text-center">
+                <span className="font-label-sm text-label-sm bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded text-slate-500 dark:text-slate-400 w-12 text-center font-bold">
                   %{item.percentage}
                 </span>
               </div>

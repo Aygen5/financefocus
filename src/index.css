@@ -37,3 +37,33 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+@media print {
+  aside,
+  header,
+  .quick-actions-panel,
+  .no-print,
+  button {
+    display: none !important;
+  }
+
+  body,
+  main,
+  .max-w-container-max {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  .grid {
+    display: block !important;
+  }
+
+  .grid > * {
+    margin-bottom: 2rem !important;
+    page-break-inside: avoid !important;
+  }
+}

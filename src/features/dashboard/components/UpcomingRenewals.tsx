@@ -59,7 +59,7 @@ const UpcomingRenewals: React.FC<UpcomingRenewalsProps> = ({ subscriptions, load
                   </div>
                 </div>
                 <span className="font-label-md text-label-md text-slate-800 dark:text-slate-200">
-                  {formatCurrency(-sub.cost, "USD", "en-US")}
+                  {formatCurrency(sub.cost, "TRY", "tr-TR")}
                 </span>
               </div>
             );

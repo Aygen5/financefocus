@@ -43,7 +43,7 @@ const ReportsSummary: React.FC<ReportsSummaryProps> = ({
           Total Net Worth
         </p>
         <h3 className="font-headline-md text-headline-md text-slate-800 dark:text-white font-extrabold">
-          {formatCurrency(netWorth, "USD", "en-US")}
+          {formatCurrency(netWorth, "TRY", "tr-TR")}
         </h3>
       </div>
 
@@ -61,7 +61,7 @@ const ReportsSummary: React.FC<ReportsSummaryProps> = ({
           Monthly Expenses
         </p>
         <h3 className="font-headline-md text-headline-md text-slate-800 dark:text-white font-extrabold">
-          {formatCurrency(expenses, "USD", "en-US")}
+          {formatCurrency(expenses, "TRY", "tr-TR")}
         </h3>
       </div>
 

@@ -1,0 +1,9 @@
+- [x] utils/financialHealth.ts dosyasına 7 kriterli calculateFinancialHealth ve getHealthStatus skorlama algoritmalarının yazılması
+- [x] selectors.ts selector'ının yazılması ve component içi hesaplamaların engellenmesi
+- [x] FinancialHealth.tsx sayfasının Redux store'dan reaktif selector aracılığıyla beslenmesi
+- [x] SVG Circular Progress dairesel genel sağlık skoru halkasının (Excellent, Good, Fair, Warning, Critical) dinamikleştirilmesi
+- [x] Sağ tarafta 6 metrik kartının (Savings Rate, Debt Ratio, Monthly Burn Rate, Emergency Fund, Investment Ratio, Budget Discipline) listelenmesi
+- [x] Harcama oranına, abonelik yüklerine ve bütçe aşımlarına göre dinamik yapay zeka finansal önerilerinin (AI Insights) entegre edilmesi
+- [x] Dashboard.tsx üzerindeki genel sağlık skoru kartının reaktif bağlanması ve anında senkronizasyon
+- [x] FinancialHealth.tsx sayfasına Loading Skeleton, ErrorState ve EmptyState sarmallarının eklenmesi
+- [x] TypeScript Strict Mode & build testleri (0 hata)

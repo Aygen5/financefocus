@@ -1,0 +1,270 @@
+{
+  "transactions": [
+    {
+      "id": "tx-1",
+      "userId": "1",
+      "title": "Aylık Maaş Ödemesi",
+      "description": "Şirket Temmuz ayı maaşı",
+      "amount": 85000,
+      "transactionType": "income",
+      "category": "Salary",
+      "paymentMethod": "Banka Transferi",
+      "date": "2026-07-05",
+      "status": "completed",
+      "account": "Garanti BBVA",
+      "currency": "TRY",
+      "createdAt": "2026-07-05T09:00:00Z",
+      "updatedAt": "2026-07-05T09:00:00Z"
+    },
+    {
+      "id": "tx-2",
+      "userId": "1",
+      "title": "Ev Kirası",
+      "description": "Temmuz ayı ev kirası",
+      "amount": 25000,
+      "transactionType": "expense",
+      "category": "Bills",
+      "paymentMethod": "EFT",
+      "date": "2026-07-05",
+      "status": "completed",
+      "account": "Garanti BBVA",
+      "currency": "TRY",
+      "createdAt": "2026-07-05T10:15:00Z",
+      "updatedAt": "2026-07-05T10:15:00Z"
+    },
+    {
+      "id": "tx-3",
+      "userId": "1",
+      "title": "Market Alışverişi",
+      "description": "Haftalık mutfak gıda alışverişi",
+      "amount": 6500,
+      "transactionType": "expense",
+      "category": "Food",
+      "paymentMethod": "Kredi Kartı",
+      "date": "2026-07-04",
+      "status": "completed",
+      "account": "Yapı Kredi Kartı",
+      "currency": "TRY",
+      "createdAt": "2026-07-04T17:30:00Z",
+      "updatedAt": "2026-07-04T17:30:00Z"
+    },
+    {
+      "id": "tx-4",
+      "userId": "1",
+      "title": "Freelance Proje",
+      "description": "Mobil uygulama arayüz tasarımı",
+      "amount": 35000,
+      "transactionType": "income",
+      "category": "Freelance",
+      "paymentMethod": "Havale",
+      "date": "2026-07-03",
+      "status": "completed",
+      "account": "Garanti BBVA",
+      "currency": "TRY",
+      "createdAt": "2026-07-03T14:00:00Z",
+      "updatedAt": "2026-07-03T14:00:00Z"
+    },
+    {
+      "id": "tx-5",
+      "userId": "1",
+      "title": "Elektrik Faturası",
+      "description": "Enerjisa Haziran dönemi elektrik faturası",
+      "amount": 1800,
+      "transactionType": "expense",
+      "category": "Bills",
+      "paymentMethod": "Otomatik Ödeme",
+      "date": "2026-07-02",
+      "status": "completed",
+      "account": "Garanti BBVA",
+      "currency": "TRY",
+      "createdAt": "2026-07-02T08:30:00Z",
+      "updatedAt": "2026-07-02T08:30:00Z"
+    }
+  ],
+  "budget": [
+    {
+      "id": "bdg-1",
+      "userId": "1",
+      "category": "Food",
+      "limitAmount": 15000,
+      "spentAmount": 6500,
+      "period": "monthly",
+      "alertThreshold": 80,
+      "isActive": true
+    },
+    {
+      "id": "bdg-2",
+      "userId": "1",
+      "category": "Bills",
+      "limitAmount": 40000,
+      "spentAmount": 26800,
+      "period": "monthly",
+      "alertThreshold": 80,
+      "isActive": true
+    },
+    {
+      "id": "bdg-3",
+      "userId": "1",
+      "category": "Entertainment",
+      "limitAmount": 10000,
+      "spentAmount": 0,
+      "period": "monthly",
+      "alertThreshold": 80,
+      "isActive": true
+    }
+  ],
+  "portfolio": [
+    {
+      "id": "port-1",
+      "userId": "1",
+      "name": "Ereğli Demir Çelik",
+      "symbol": "EREGL",
+      "type": "stocks",
+      "amount": 500,
+      "avgCost": 42.5,
+      "currentPrice": 48.2,
+      "lastUpdated": "2026-07-05T18:00:00Z",
+      "sector": "Sanayi",
+      "currency": "TRY"
+    },
+    {
+      "id": "port-2",
+      "userId": "1",
+      "name": "Gram Altın",
+      "symbol": "GOLD",
+      "type": "gold",
+      "amount": 10,
+      "avgCost": 3100,
+      "currentPrice": 3450,
+      "lastUpdated": "2026-07-05T18:00:00Z",
+      "sector": "Emtia",
+      "currency": "TRY"
+    },
+    {
+      "id": "port-3",
+      "userId": "1",
+      "name": "Apple Inc (TL Bazında)",
+      "symbol": "AAPL",
+      "type": "stocks",
+      "amount": 20,
+      "avgCost": 5800,
+      "currentPrice": 6450,
+      "lastUpdated": "2026-07-05T18:00:00Z",
+      "sector": "Teknoloji",
+      "currency": "TRY"
+    }
+  ],
+  "goals": [
+    {
+      "id": "goal-1",
+      "userId": "1",
+      "title": "Acil Durum Fonu",
+      "category": "Emergency Fund",
+      "targetAmount": 150000,
+      "currentAmount": 85000,
+      "targetDate": "2026-12-31",
+      "status": "in_progress",
+      "notes": "6 aylık zorunlu gider tamponu.",
+      "createdAt": "2026-07-01T10:00:00Z",
+      "updatedAt": "2026-07-05T12:00:00Z"
+    },
+    {
+      "id": "goal-2",
+      "userId": "1",
+      "title": "Yeni Bilgisayar",
+      "category": "Investment",
+      "targetAmount": 80000,
+      "currentAmount": 30000,
+      "targetDate": "2026-10-31",
+      "status": "in_progress",
+      "notes": "İş istasyonumu yenilemek için.",
+      "createdAt": "2026-07-02T11:00:00Z",
+      "updatedAt": "2026-07-04T09:00:00Z"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub-1",
+      "userId": "1",
+      "name": "Netflix",
+      "cost": 230,
+      "billingCycle": "monthly",
+      "nextBillingDate": "2026-07-15",
+      "category": "Video",
+      "status": "active",
+      "autoRenew": true,
+      "startDate": "2026-01-15",
+      "color": "#ef4444",
+      "icon": "Video",
+      "notes": "UHD Plan"
+    },
+    {
+      "id": "sub-2",
+      "userId": "1",
+      "name": "Spotify Premium",
+      "cost": 95,
+      "billingCycle": "monthly",
+      "nextBillingDate": "2026-07-22",
+      "category": "Music",
+      "status": "active",
+      "autoRenew": true,
+      "startDate": "2026-02-22",
+      "color": "#16a34a",
+      "icon": "Music",
+      "notes": "Duo Plan"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif-1",
+      "title": "Giriş Başarılı",
+      "message": "FinanceFocus hesabınıza başarıyla giriş yaptınız.",
+      "type": "success",
+      "isRead": false,
+      "createdAt": "2026-07-05T16:00:00Z",
+      "icon": "LogIn"
+    },
+    {
+      "id": "notif-2",
+      "title": "Bütçe Uyarısı",
+      "message": "Fatura bütçeniz %80 sınırını aşmıştır.",
+      "type": "warning",
+      "isRead": false,
+      "createdAt": "2026-07-05T11:15:00Z",
+      "icon": "Sliders"
+    }
+  ],
+  "activities": [
+    {
+      "id": "act-1",
+      "action": "Login",
+      "category": "Auth",
+      "description": "Kullanıcı sisteme başarıyla giriş yaptı.",
+      "user": "Aygen",
+      "date": "2026-07-05",
+      "time": "16:00:00",
+      "icon": "LogIn",
+      "status": "success",
+      "timestamp": "2026-07-05T16:00:00Z"
+    },
+    {
+      "id": "act-2",
+      "action": "Transaction Added",
+      "category": "Transactions",
+      "description": "Kira ödemesi (Gider) kaydı eklendi.",
+      "user": "Aygen",
+      "date": "2026-07-05",
+      "time": "14:20:00",
+      "icon": "PlusCircle",
+      "status": "success",
+      "timestamp": "2026-07-05T14:20:00Z"
+    }
+  ],
+  "settings": {
+    "currency": "TRY",
+    "theme": "dark",
+    "language": "tr",
+    "emailNotifications": true,
+    "pushNotifications": true
+  }
+}

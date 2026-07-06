@@ -69,7 +69,7 @@ const ExpenseBreakdown: React.FC<ExpenseBreakdownProps> = ({ data, loading = fal
                 </span>
               </div>
               <span className="font-label-md text-label-md text-slate-800 dark:text-slate-200">
-                {formatCurrency(item.value, "USD", "en-US")} ({Math.round(ratio)}%)
+                {formatCurrency(item.value, "TRY", "tr-TR")} ({Math.round(ratio)}%)
               </span>
             </div>
           );

@@ -23,7 +23,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
       {/* Net Worth */}
       <StatCard
         title="Toplam Varlık (Net Worth)"
-        value={formatCurrency(netWorth, "USD", "en-US")}
+        value={formatCurrency(netWorth, "TRY", "tr-TR")}
         loading={loading}
         change={2.4}
         changeLabel="geçen aya göre"
@@ -33,7 +33,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
       {/* Income */}
       <StatCard
         title="Aylık Gelir"
-        value={formatCurrency(income, "USD", "en-US")}
+        value={formatCurrency(income, "TRY", "tr-TR")}
         loading={loading}
         icon={<Banknote size={18} className="text-emerald-500" />}
       />
@@ -41,7 +41,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
       {/* Expenses */}
       <StatCard
         title="Aylık Giderler"
-        value={formatCurrency(expenses, "USD", "en-US")}
+        value={formatCurrency(expenses, "TRY", "tr-TR")}
         loading={loading}
         icon={<CreditCard size={18} className="text-red-550" />}
       />
@@ -49,7 +49,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
       {/* Savings */}
       <StatCard
         title="Toplam Tasarruf"
-        value={formatCurrency(savings, "USD", "en-US")}
+        value={formatCurrency(savings, "TRY", "tr-TR")}
         loading={loading}
         icon={<Wallet size={18} className="text-brand-500" />}
       />

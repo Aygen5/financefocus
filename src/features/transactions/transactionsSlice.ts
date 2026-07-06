@@ -1,26 +1,41 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createSelector, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import api from "@/services/api";
+import TransactionsService from "./services/transactions.service";
+import type { Transaction, TransactionFilters } from "./types/transactions.types";
+import {
+  parseISO,
+  isAfter,
+  isBefore,
+  isSameDay,
+  subDays,
+  startOfDay,
+  endOfDay,
+  startOfMonth,
+  startOfYear,
+} from "date-fns";
 
-export interface Transaction {
-  id: string;
-  userId: string;
-  amount: number;
-  type: "income" | "expense";
-  category: string;
-  date: string;
-  description: string;
-}
-
-interface TransactionsState {
+export interface TransactionsState {
   items: Transaction[];
+  filters: TransactionFilters;
   loading: boolean;
   error: string | null;
 }
 
+const defaultFilters: TransactionFilters = {
+  search: "",
+  transactionType: "all",
+  category: "all",
+  dateRange: "all",
+  customMinDate: "",
+  customMaxDate: "",
+  minAmount: undefined,
+  maxAmount: undefined,
+  status: "all",
+};
+
 const initialState: TransactionsState = {
   items: [],
+  filters: defaultFilters,
   loading: false,
   error: null,
 };
@@ -30,10 +45,12 @@ export const fetchTransactions = createAsyncThunk(
   "transactions/fetchTransactions",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/transactions");
-      return response.data as Transaction[];
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "İşlemler yüklenemedi");
+      return await TransactionsService.getAll();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("İşlemler yüklenemedi.");
     }
   },
 );
@@ -42,13 +59,41 @@ export const addTransaction = createAsyncThunk(
   "transactions/addTransaction",
   async (data: Omit<Transaction, "id" | "userId">, { rejectWithValue }) => {
     try {
-      const response = await api.post("/transactions", {
-        ...data,
-        userId: "1",
-      });
-      return response.data as Transaction;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "İşlem eklenemedi");
+      return await TransactionsService.create(data);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("İşlem eklenemedi.");
+    }
+  },
+);
+
+export const updateTransaction = createAsyncThunk(
+  "transactions/updateTransaction",
+  async ({ id, data }: { id: string; data: Partial<Transaction> }, { rejectWithValue }) => {
+    try {
+      return await TransactionsService.update(id, data);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("İşlem güncellenemedi.");
+    }
+  },
+);
+
+export const deleteTransaction = createAsyncThunk(
+  "transactions/deleteTransaction",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await TransactionsService.delete(id);
+      return id;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("İşlem silinemedi.");
     }
   },
 );
@@ -56,7 +101,20 @@ export const addTransaction = createAsyncThunk(
 export const transactionsSlice = createSlice({
   name: "transactions",
   initialState,
-  reducers: {},
+  reducers: {
+    clearTransactions: (state) => {
+      state.items = [];
+    },
+    setFilters: (state, action: PayloadAction<Partial<TransactionFilters>>) => {
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    setSearch: (state, action: PayloadAction<string>) => {
+      state.filters.search = action.payload;
+    },
+    resetFilters: (state) => {
+      state.filters = { ...defaultFilters, search: state.filters.search };
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchTransactions.pending, (state) => {
@@ -70,12 +128,133 @@ export const transactionsSlice = createSlice({
       })
       .addCase(fetchTransactions.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = (action.payload as string) || action.error.message || "İşlemler yüklenemedi";
       })
       .addCase(addTransaction.fulfilled, (state, action: PayloadAction<Transaction>) => {
         state.items.unshift(action.payload);
+      })
+      .addCase(updateTransaction.fulfilled, (state, action: PayloadAction<Transaction>) => {
+        const index = state.items.findIndex((item) => item.id === action.payload.id);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+      })
+      .addCase(deleteTransaction.fulfilled, (state, action: PayloadAction<string>) => {
+        state.items = state.items.filter((item) => item.id !== action.payload);
       });
   },
 });
 
+// Selectors
+export const selectTransactions = (state: { transactions: TransactionsState }) =>
+  state.transactions.items;
+export const selectFilters = (state: { transactions: TransactionsState }) =>
+  state.transactions.filters;
+export const selectTransactionsLoading = (state: { transactions: TransactionsState }) =>
+  state.transactions.loading;
+export const selectTransactionsError = (state: { transactions: TransactionsState }) =>
+  state.transactions.error;
+
+// Memoized Filtered Selector
+export const selectFilteredTransactions = createSelector(
+  [selectTransactions, selectFilters],
+  (items, filters) => {
+    return items.filter((item) => {
+      // 1. Search Query Filter
+      if (filters.search.trim()) {
+        const query = filters.search.toLowerCase();
+        const descMatch = item.description?.toLowerCase().includes(query);
+        const catMatch = item.category?.toLowerCase().includes(query);
+        const accMatch = item.account?.toLowerCase().includes(query);
+        if (!descMatch && !catMatch && !accMatch) return false;
+      }
+
+      // 2. Transaction Type Filter
+      if (filters.transactionType !== "all" && item.transactionType !== filters.transactionType) {
+        return false;
+      }
+
+      // 3. Category Filter
+      if (
+        filters.category !== "all" &&
+        item.category.toLowerCase() !== filters.category.toLowerCase()
+      ) {
+        return false;
+      }
+
+      // 4. Status Filter
+      if (filters.status !== "all" && item.status !== filters.status) {
+        return false;
+      }
+
+      // 5. Amount Range Filter
+      if (filters.minAmount !== undefined && item.amount < filters.minAmount) {
+        return false;
+      }
+      if (filters.maxAmount !== undefined && item.amount > filters.maxAmount) {
+        return false;
+      }
+
+      // 6. Date Range Filter
+      if (filters.dateRange !== "all") {
+        const itemDate = parseISO(item.date);
+        const today = new Date();
+
+        switch (filters.dateRange) {
+          case "today":
+            if (!isSameDay(itemDate, today)) return false;
+            break;
+          case "last7days": {
+            const startOf7Days = startOfDay(subDays(today, 7));
+            if (isBefore(itemDate, startOf7Days)) return false;
+            break;
+          }
+          case "thismonth": {
+            const startOfCurrentMonth = startOfMonth(today);
+            if (isBefore(itemDate, startOfCurrentMonth)) return false;
+            break;
+          }
+          case "last3months": {
+            const startOf3Months = startOfMonth(subDays(today, 90));
+            if (isBefore(itemDate, startOf3Months)) return false;
+            break;
+          }
+          case "thisyear": {
+            const startOfCurrentYear = startOfYear(today);
+            if (isBefore(itemDate, startOfCurrentYear)) return false;
+            break;
+          }
+          case "custom": {
+            if (filters.customMinDate) {
+              const minDate = startOfDay(parseISO(filters.customMinDate));
+              if (isBefore(itemDate, minDate)) return false;
+            }
+            if (filters.customMaxDate) {
+              const maxDate = endOfDay(parseISO(filters.customMaxDate));
+              if (isAfter(itemDate, maxDate)) return false;
+            }
+            break;
+          }
+        }
+      }
+
+      return true;
+    });
+  },
+);
+
+// Active Filters Count Selector
+export const selectActiveFiltersCount = createSelector([selectFilters], (filters) => {
+  let count = 0;
+  if (filters.transactionType !== "all") count++;
+  if (filters.category !== "all") count++;
+  if (filters.status !== "all") count++;
+  if (filters.dateRange !== "all") count++;
+  if (filters.minAmount !== undefined) count++;
+  if (filters.maxAmount !== undefined) count++;
+  return count;
+});
+
+export const { clearTransactions, setFilters, setSearch, resetFilters } = transactionsSlice.actions;
 export default transactionsSlice.reducer;
+export type { Transaction };

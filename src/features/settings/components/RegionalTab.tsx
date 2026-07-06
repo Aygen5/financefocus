@@ -9,16 +9,16 @@ export interface RegionalTabProps {
 }
 
 const RegionalTab: React.FC<RegionalTabProps> = ({
-  language = "English",
-  currency = "USD",
-  timezone = "Pacific Time",
+  language = "Turkish",
+  currency = "TRY",
+  timezone = "Europe/Istanbul",
   onChangeRegional,
 }) => {
   return (
     <div className="p-8 space-y-8 text-left">
       <div>
         <h3 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold leading-tight">
-          Regional Settings
+          Bölgesel Ayarlar
         </h3>
         <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
           Tercih ettiğiniz dili ve para birimi formatlarını yapılandırın.
@@ -31,11 +31,8 @@ const RegionalTab: React.FC<RegionalTabProps> = ({
           value={language}
           onChange={(e) => onChangeRegional?.("language", e.target.value)}
           options={[
+            { value: "Turkish", label: "Türkçe (TR)" },
             { value: "English", label: "English (United States)" },
-            { value: "Spanish", label: "Spanish (ES)" },
-            { value: "French", label: "French (FR)" },
-            { value: "German", label: "German (DE)" },
-            { value: "Japanese", label: "Japanese (JP)" },
           ]}
         />
 
@@ -43,12 +40,7 @@ const RegionalTab: React.FC<RegionalTabProps> = ({
           label="Para Birimi (Currency)"
           value={currency}
           onChange={(e) => onChangeRegional?.("currency", e.target.value)}
-          options={[
-            { value: "USD", label: "USD ($) - United States Dollar" },
-            { value: "EUR", label: "EUR (€) - Euro" },
-            { value: "GBP", label: "GBP (£) - British Pound" },
-            { value: "JPY", label: "JPY (¥) - Japanese Yen" },
-          ]}
+          options={[{ value: "TRY", label: "TRY (₺) - Türk Lirası" }]}
         />
 
         <div className="col-span-2">
@@ -56,12 +48,7 @@ const RegionalTab: React.FC<RegionalTabProps> = ({
             label="Saat Dilimi (Timezone)"
             value={timezone}
             onChange={(e) => onChangeRegional?.("timezone", e.target.value)}
-            options={[
-              { value: "Pacific Time", label: "(GMT-08:00) Pacific Time (US & Canada)" },
-              { value: "Eastern Time", label: "(GMT-05:00) Eastern Time (US & Canada)" },
-              { value: "London", label: "(GMT+00:00) London" },
-              { value: "Paris", label: "(GMT+01:00) Paris" },
-            ]}
+            options={[{ value: "Europe/Istanbul", label: "(GMT+03:00) Europe/Istanbul" }]}
           />
         </div>
       </div>

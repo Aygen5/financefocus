@@ -7,6 +7,9 @@ import AppearanceTab from "@/features/settings/components/AppearanceTab";
 import NotificationsTab from "@/features/settings/components/NotificationsTab";
 import RegionalTab from "@/features/settings/components/RegionalTab";
 import { User, Lock, Palette, Bell, Globe, HelpCircle, ChevronRight } from "lucide-react";
+import { addActivityLog } from "@/features/activity/activitySlice";
+import { addNotification } from "@/features/notifications/notificationsSlice";
+import { HelpModal } from "@/layouts/components/HelpModal";
 import toast from "react-hot-toast";
 
 import type { ProfileFormData } from "@/features/settings/settings.types";
@@ -15,24 +18,71 @@ type TabType = "profile" | "security" | "appearance" | "notifications" | "region
 
 const Settings: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { settings } = useAppSelector((state) => state.settings);
+  const { settings } = useAppSelector((state) => state.settings || {});
 
   // States
   const [activeTab, setActiveTab] = useState<TabType>("profile");
   const [themeMode, setThemeMode] = useState<"light" | "dark" | "system">("light");
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchSettings());
   }, [dispatch]);
 
   const handleProfileSave = async (data: ProfileFormData) => {
-    console.log("Profile save triggered:", data);
-    toast.success("Profil bilgileri kaydedildi!");
+    const resultAction = await dispatch(updateSettings(data));
+    if (updateSettings.fulfilled.match(resultAction)) {
+      dispatch(
+        addActivityLog({
+          action: "Settings Updated",
+          category: "Settings",
+          description: "Profil bilgileri başarıyla güncellendi.",
+          user: "Aygen",
+          icon: "Settings",
+          status: "success",
+        }),
+      );
+      dispatch(
+        addNotification({
+          title: "Settings güncellendi",
+          message: "Profil ayarlarınız başarıyla kaydedildi.",
+          type: "success",
+          icon: "Settings",
+        }),
+      );
+      toast.success("Profil bilgileri kaydedildi!");
+    }
   };
 
-  const handleToggleTwoFactor = (checked: boolean) => {
-    dispatch(updateSettings({ twoFactorEnabled: checked }));
-    toast.success(checked ? "İki faktörlü doğrulama açıldı!" : "İki faktörlü doğrulama kapatıldı!");
+  const handleToggleTwoFactor = async (checked: boolean) => {
+    const resultAction = await dispatch(updateSettings({ twoFactorEnabled: checked }));
+    if (updateSettings.fulfilled.match(resultAction)) {
+      dispatch(
+        addActivityLog({
+          action: "Settings Updated",
+          category: "Settings",
+          description: checked
+            ? "İki faktörlü doğrulama aktif edildi."
+            : "İki faktörlü doğrulama deaktif edildi.",
+          user: "Aygen",
+          icon: "Lock",
+          status: "success",
+        }),
+      );
+      dispatch(
+        addNotification({
+          title: "Settings güncellendi",
+          message: checked
+            ? "İki faktörlü güvenlik doğrulaması açıldı."
+            : "İki faktörlü güvenlik doğrulaması kapatıldı.",
+          type: "info",
+          icon: "Lock",
+        }),
+      );
+      toast.success(
+        checked ? "İki faktörlü doğrulama açıldı!" : "İki faktörlü doğrulama kapatıldı!",
+      );
+    }
   };
 
   const handleUpdatePassword = () => {
@@ -45,34 +95,94 @@ const Settings: React.FC = () => {
 
   const handleChangeTheme = (mode: "light" | "dark" | "system") => {
     setThemeMode(mode);
+    dispatch(
+      addActivityLog({
+        action: "Theme Changed",
+        category: "Settings",
+        description: `Tema tercihi "${mode}" olarak güncellendi.`,
+        user: "Aygen",
+        icon: "Palette",
+        status: "success",
+      }),
+    );
+    dispatch(
+      addNotification({
+        title: "Settings güncellendi",
+        message: `Uygulama görünümü "${mode}" olarak değiştirildi.`,
+        type: "success",
+        icon: "Palette",
+      }),
+    );
     toast.success(`Tema tercihi güncellendi: ${mode}`);
   };
 
-  const handleToggleNotification = (key: string, checked: boolean) => {
-    dispatch(updateSettings({ [key]: checked }));
-    toast.success("Bildirim tercihi güncellendi.");
+  const handleToggleNotification = async (key: string, checked: boolean) => {
+    const resultAction = await dispatch(updateSettings({ [key]: checked }));
+    if (updateSettings.fulfilled.match(resultAction)) {
+      dispatch(
+        addActivityLog({
+          action: "Settings Updated",
+          category: "Settings",
+          description: `Bildirim tercihi "${key}" güncellendi.`,
+          user: "Aygen",
+          icon: "Bell",
+          status: "success",
+        }),
+      );
+      dispatch(
+        addNotification({
+          title: "Settings güncellendi",
+          message: `Bildirim tercihleri güncellendi.`,
+          type: "success",
+          icon: "Bell",
+        }),
+      );
+      toast.success("Bildirim tercihi güncellendi.");
+    }
   };
 
-  const handleChangeRegional = (key: string, value: string) => {
-    dispatch(updateSettings({ [key]: value }));
-    toast.success(`Bölgesel ayar güncellendi: ${value}`);
+  const handleChangeRegional = async (key: string, value: string) => {
+    const resultAction = await dispatch(updateSettings({ [key]: value }));
+    if (updateSettings.fulfilled.match(resultAction)) {
+      dispatch(
+        addActivityLog({
+          action: "Settings Updated",
+          category: "Settings",
+          description: `Bölgesel ayar "${key}" değeri "${value}" olarak değiştirildi.`,
+          user: "Aygen",
+          icon: "Globe",
+          status: "success",
+        }),
+      );
+      dispatch(
+        addNotification({
+          title: "Settings güncellendi",
+          message: `Bölgesel tercihleriniz güncellendi.`,
+          type: "success",
+          icon: "Globe",
+        }),
+      );
+      toast.success(`Bölgesel ayar güncellendi: ${value}`);
+    }
   };
 
   const tabs = [
-    { id: "profile" as TabType, label: "Profile", icon: <User size={20} /> },
-    { id: "security" as TabType, label: "Security", icon: <Lock size={20} /> },
-    { id: "appearance" as TabType, label: "Appearance", icon: <Palette size={20} /> },
-    { id: "notifications" as TabType, label: "Notifications", icon: <Bell size={20} /> },
-    { id: "regional" as TabType, label: "Regional", icon: <Globe size={20} /> },
+    { id: "profile" as TabType, label: "Profil", icon: <User size={20} /> },
+    { id: "security" as TabType, label: "Güvenlik", icon: <Lock size={20} /> },
+    { id: "appearance" as TabType, label: "Görünüm", icon: <Palette size={20} /> },
+    { id: "notifications" as TabType, label: "Bildirimler", icon: <Bell size={20} /> },
+    { id: "regional" as TabType, label: "Bölgesel Ayarlar", icon: <Globe size={20} /> },
   ];
+
+  if (!settings) return null;
 
   return (
     <div className="w-full max-w-container-max mx-auto text-left relative">
       {/* Page Header */}
-      <header className="mb-stack-lg">
-        <h2 className="font-headline-md text-headline-md text-on-surface">Account Settings</h2>
+      <header className="mb-stack-lg select-none">
+        <h2 className="font-headline-md text-headline-md text-on-surface">Hesap Ayarları</h2>
         <p className="font-body-md text-body-md text-slate-500 font-medium mt-1">
-          Manage your profile, security, and application preferences.
+          Profilinizi, güvenlik ve uygulama tercihlerinizi yönetin.
         </p>
       </header>
 
@@ -105,7 +215,17 @@ const Settings: React.FC = () => {
 
         {/* Sağ İçerik Alanı (Canvas container) */}
         <div className="col-span-12 md:col-span-9 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-soft-sm">
-          {activeTab === "profile" && <ProfileTab onSave={handleProfileSave} />}
+          {activeTab === "profile" && (
+            <ProfileTab
+              initialData={{
+                fullName: settings.fullName || "",
+                email: settings.email || "",
+                bio: settings.bio || "",
+                profilePicture: settings.profilePicture || "",
+              }}
+              onSave={handleProfileSave}
+            />
+          )}
 
           {activeTab === "security" && (
             <SecurityTab
@@ -141,11 +261,14 @@ const Settings: React.FC = () => {
 
       {/* Floating help button bottom corner */}
       <button
-        onClick={() => toast.success("Yardım & Destek modülü açılıyor...")}
+        onClick={() => setIsHelpOpen(true)}
         className="fixed bottom-8 right-8 w-14 h-14 bg-primary dark:bg-brand-500 text-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-50 cursor-pointer"
+        aria-label="Yardım Paneli"
       >
         <HelpCircle size={24} />
       </button>
+
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
 };

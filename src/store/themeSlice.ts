@@ -3,12 +3,12 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 
 export type ThemeMode = "light" | "dark";
 
-interface ThemeState {
+export interface ThemeState {
   mode: ThemeMode;
 }
 
 const initialState: ThemeState = {
-  mode: (localStorage.getItem("theme") as ThemeMode) || "dark",
+  mode: "light",
 };
 
 export const themeSlice = createSlice({
@@ -17,14 +17,15 @@ export const themeSlice = createSlice({
   reducers: {
     toggleTheme: (state) => {
       state.mode = state.mode === "light" ? "dark" : "light";
-      localStorage.setItem("theme", state.mode);
     },
     setTheme: (state, action: PayloadAction<ThemeMode>) => {
       state.mode = action.payload;
-      localStorage.setItem("theme", state.mode);
     },
   },
 });
+
+// Selectors
+export const selectThemeMode = (state: { theme: ThemeState }) => state.theme.mode;
 
 export const { toggleTheme, setTheme } = themeSlice.actions;
 export default themeSlice.reducer;

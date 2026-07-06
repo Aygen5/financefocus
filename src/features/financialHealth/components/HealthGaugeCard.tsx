@@ -70,7 +70,7 @@ const HealthGaugeCard: React.FC<HealthGaugeCardProps> = ({ score, loading = fals
               Monthly Surplus
             </span>
             <span className="font-headline-sm text-headline-sm text-primary dark:text-brand-400 font-extrabold">
-              {formatCurrency(4290, "USD", "en-US")}
+              {formatCurrency(25000, "TRY", "tr-TR")}
             </span>
           </div>
           <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-lg border border-slate-200/50 dark:border-slate-800/80">

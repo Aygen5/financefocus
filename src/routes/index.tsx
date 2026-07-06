@@ -1,8 +1,10 @@
-import React, { Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import React from "react";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import AuthRoute from "./AuthRoute";
 import MainLayout from "@/layouts/MainLayout";
+import AuthLayout from "@/layouts/AuthLayout";
+import ROUTES from "@/constants/routes";
 
 // Lazy Loading Sayfaları
 const Login = React.lazy(() => import("@/pages/Login"));
@@ -17,50 +19,97 @@ const Subscriptions = React.lazy(() => import("@/pages/Subscriptions"));
 const Reports = React.lazy(() => import("@/pages/Reports"));
 const FinancialHealth = React.lazy(() => import("@/pages/FinancialHealth"));
 const Notifications = React.lazy(() => import("@/pages/Notifications"));
-const Activity = React.lazy(() => import("@/pages/Activity"));
+const Activity = React.lazy(() => import("@/pages/ActivityLog"));
 const Settings = React.lazy(() => import("@/pages/Settings"));
 const NotFound = React.lazy(() => import("@/pages/NotFound"));
 
-const LoadingFallback = () => (
-  <div className="flex h-screen w-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
-    <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-500 border-t-transparent"></div>
-  </div>
-);
+export const router = createBrowserRouter([
+  {
+    // Giriş Yapmamış Kullanıcı Rotaları (AuthRoute Koruması)
+    element: <AuthRoute />,
+    children: [
+      {
+        element: <AuthLayout />,
+        children: [
+          {
+            path: ROUTES.LOGIN,
+            element: <Login />,
+          },
+          {
+            path: ROUTES.REGISTER,
+            element: <Register />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    // Giriş Yapmış Kullanıcı Rotaları (ProtectedRoute & MainLayout Koruması)
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <MainLayout />,
+        children: [
+          {
+            path: "/",
+            element: <Navigate to={ROUTES.DASHBOARD} replace />,
+          },
+          {
+            path: ROUTES.DASHBOARD,
+            element: <Dashboard />,
+          },
+          {
+            path: ROUTES.TRANSACTIONS,
+            element: <Transactions />,
+          },
+          {
+            path: ROUTES.BUDGET,
+            element: <Budget />,
+          },
+          {
+            path: ROUTES.GOALS,
+            element: <Goals />,
+          },
+          {
+            path: ROUTES.FORECAST,
+            element: <Forecast />,
+          },
+          {
+            path: ROUTES.PORTFOLIO,
+            element: <Portfolio />,
+          },
+          {
+            path: ROUTES.SUBSCRIPTIONS,
+            element: <Subscriptions />,
+          },
+          {
+            path: ROUTES.REPORTS,
+            element: <Reports />,
+          },
+          {
+            path: ROUTES.FINANCIAL_HEALTH,
+            element: <FinancialHealth />,
+          },
+          {
+            path: ROUTES.NOTIFICATIONS,
+            element: <Notifications />,
+          },
+          {
+            path: ROUTES.ACTIVITY,
+            element: <Activity />,
+          },
+          {
+            path: ROUTES.SETTINGS,
+            element: <Settings />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
+  },
+]);
 
-const AppRoutes: React.FC = () => {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <Routes>
-        {/* Giriş Yapmamış Kullanıcı Rotaları */}
-        <Route element={<AuthRoute />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Route>
-
-        {/* Giriş Yapmış Kullanıcı Rotaları (Korumalı) */}
-        <Route element={<ProtectedRoute />}>
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/budget" element={<Budget />} />
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/forecast" element={<Forecast />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/subscriptions" element={<Subscriptions />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/financial-health" element={<FinancialHealth />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/activity" element={<Activity />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
-        </Route>
-
-        {/* 404 Sayfası */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
-  );
-};
-
-export default AppRoutes;
+export default router;
