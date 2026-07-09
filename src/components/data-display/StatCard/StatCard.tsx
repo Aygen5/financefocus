@@ -8,8 +8,8 @@ export interface StatCardProps {
   title: string;
   value: React.ReactNode;
   icon?: React.ReactNode;
-  change?: number; // e.g. 12.5 for +12.5%, -3.4 for -3.4%
-  changeLabel?: string; // e.g. "geçen aya göre"
+  change?: number;
+  changeLabel?: string;
   loading?: boolean;
 }
 

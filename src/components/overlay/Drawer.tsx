@@ -16,7 +16,6 @@ const Drawer: React.FC<DrawerProps> = ({
   children,
   placement = "right",
 }) => {
-  // ESC tuşuna basıldığında kapat
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isOpen) {
@@ -27,7 +26,6 @@ const Drawer: React.FC<DrawerProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Sayfa kaydırmasını engelle (drawer açıkken)
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -46,7 +44,6 @@ const Drawer: React.FC<DrawerProps> = ({
 
   return (
     <>
-      {/* Backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 z-40 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm"
@@ -54,14 +51,12 @@ const Drawer: React.FC<DrawerProps> = ({
         />
       )}
 
-      {/* Drawer Panel */}
       <div
         className={`fixed top-0 z-50 flex w-80 max-w-[90vw] flex-col bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800/80 shadow-soft-xl transition-transform duration-300 ${placements[placement]}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="drawer-title"
       >
-        {/* Header */}
         <div className="flex h-20 items-center justify-between px-6 border-b border-slate-200/60 dark:border-slate-800/60 shrink-0">
           <h3
             id="drawer-title"

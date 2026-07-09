@@ -22,7 +22,6 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
       {...props}
     >
       <table className="w-full text-left border-collapse">
-        {/* Table Header Skeleton */}
         <thead>
           <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
             {Array.from({ length: columns }).map((_, i) => (
@@ -33,7 +32,6 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
           </tr>
         </thead>
 
-        {/* Table Body Skeleton */}
         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
           {Array.from({ length: rows }).map((_, rowIndex) => (
             <tr key={rowIndex} className="hover:bg-slate-50/40 dark:hover:bg-slate-850/20">

@@ -34,7 +34,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               )}
               {...props}
             />
-            {/* Custom Checkmark Icon */}
+
             <svg
               className="absolute pointer-events-none opacity-0 peer-checked:opacity-100 h-3.5 w-3.5 text-white stroke-current stroke-2 fill-none transition-opacity"
               viewBox="0 0 24 24"

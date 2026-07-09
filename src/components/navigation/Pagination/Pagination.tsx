@@ -18,7 +18,6 @@ export const Pagination: React.FC<PaginationProps> = ({
 }) => {
   if (totalPages <= 1) return null;
 
-  // Sayfa numarası üretme mantığı
   const getPages = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5;
@@ -28,7 +27,6 @@ export const Pagination: React.FC<PaginationProps> = ({
         pages.push(i);
       }
     } else {
-      // Karmaşık sayfalama (örn. 1, 2, ..., 10, 11)
       if (currentPage <= 3) {
         pages.push(1, 2, 3, "...", totalPages);
       } else if (currentPage >= totalPages - 2) {
@@ -45,7 +43,6 @@ export const Pagination: React.FC<PaginationProps> = ({
       className={cn("flex items-center gap-1 select-none text-left", className)}
       aria-label="Pagination Navigation"
     >
-      {/* Previous Button */}
       <Button
         variant="ghost"
         size="sm"
@@ -57,7 +54,6 @@ export const Pagination: React.FC<PaginationProps> = ({
         <ChevronLeft size={16} />
       </Button>
 
-      {/* Pages list buttons */}
       <div className="flex items-center gap-1.5">
         {getPages().map((page, index) => {
           if (typeof page === "string") {
@@ -91,7 +87,6 @@ export const Pagination: React.FC<PaginationProps> = ({
         })}
       </div>
 
-      {/* Next Button */}
       <Button
         variant="ghost"
         size="sm"

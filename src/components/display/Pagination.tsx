@@ -17,7 +17,6 @@ const Pagination: React.FC<PaginationProps> = ({
 }) => {
   if (totalPages <= 1) return null;
 
-  // Sayfa butonlarının hesaplanması
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;

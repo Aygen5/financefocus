@@ -7,7 +7,7 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   description?: string;
   icon?: React.ReactNode;
-  action?: React.ReactNode; // Geriye dönük uyumluluk için
+  action?: React.ReactNode;
   primaryActionLabel?: string;
   onPrimaryActionClick?: () => void;
   primaryActionIcon?: React.ReactNode;
@@ -38,12 +38,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       )}
       {...props}
     >
-      {/* Icon Area */}
       <div className="w-14 h-14 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 mb-4 shrink-0 shadow-soft-sm">
         {icon || <FolderOpen size={24} />}
       </div>
 
-      {/* Text Area */}
       <h3 className="text-base font-extrabold text-slate-800 dark:text-slate-100 tracking-tight mb-1">
         {title}
       </h3>
@@ -51,7 +49,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         {description}
       </p>
 
-      {/* Actions Area */}
       {(action || primaryActionLabel || secondaryActionLabel) && (
         <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
           {secondaryActionLabel && onSecondaryActionClick && (

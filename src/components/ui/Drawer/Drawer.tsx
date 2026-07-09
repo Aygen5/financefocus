@@ -21,7 +21,6 @@ export const Drawer: React.FC<DrawerProps> = ({
 }) => {
   const drawerRef = useRef<HTMLDivElement>(null);
 
-  // ESC tuşuna basıldığında drawer'ı kapat
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isOpen) {
@@ -32,7 +31,6 @@ export const Drawer: React.FC<DrawerProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Sayfa kaydırmasını engelle (drawer açıkken)
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";

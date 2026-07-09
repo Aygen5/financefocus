@@ -23,7 +23,6 @@ export const Modal: React.FC<ModalProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // ESC tuşuna basıldığında modalı kapat
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isOpen) {
@@ -34,7 +33,6 @@ export const Modal: React.FC<ModalProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Sayfa kaydırmasını engelle (modal açıkken)
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -57,10 +55,8 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm select-none animate-fadeIn">
-      {/* Backdrop area click-handler */}
       <div className="fixed inset-0" onClick={onClose} />
 
-      {/* Modal Dialog */}
       <div
         ref={modalRef}
         className={cn(
@@ -72,7 +68,6 @@ export const Modal: React.FC<ModalProps> = ({
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/50 px-6 py-4">
           <h3
             id="modal-title"
@@ -89,10 +84,8 @@ export const Modal: React.FC<ModalProps> = ({
           </button>
         </div>
 
-        {/* Content Body */}
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">{children}</div>
 
-        {/* Footer */}
         {footer && (
           <div className="border-t border-slate-100 dark:border-slate-800/50 px-6 py-4 bg-slate-50/40 dark:bg-slate-900/40 flex justify-end gap-3">
             {footer}

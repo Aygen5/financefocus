@@ -46,7 +46,6 @@ const Tooltip: React.FC<TooltipProps> = ({
           role="tooltip"
         >
           {content}
-          {/* Arrow */}
           <div className={`absolute border-4 ${arrowPlacements[placement]}`} aria-hidden="true" />
         </div>
       )}

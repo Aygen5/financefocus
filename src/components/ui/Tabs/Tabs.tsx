@@ -50,7 +50,6 @@ export const Tabs: React.FC<TabsProps> = ({
 
   return (
     <div className={cn("w-full space-y-6 text-left", className)}>
-      {/* Tabs Header trigger buttons */}
       <div className={cn("flex select-none", headerVariants[variant])}>
         {tabs.map((tab) => {
           const isActive = tab.id === activeTabId;
@@ -67,7 +66,6 @@ export const Tabs: React.FC<TabsProps> = ({
         })}
       </div>
 
-      {/* Tabs content render block */}
       <div className="w-full">{activeContent}</div>
     </div>
   );
