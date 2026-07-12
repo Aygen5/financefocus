@@ -1,169 +1,158 @@
 # 📊 FinanceFocus
 
-[![React Version](https://img.shields.io/badge/react-19.2.7-blue.svg?style=flat-red)](https://react.dev)
-[![TypeScript Version](https://img.shields.io/badge/typescript-6.0.2-blue.svg)](https://www.typescriptlang.org)
-[![Vite Version](https://img.shields.io/badge/vite-8.1.1-green.svg)](https://vite.dev)
-[![TailwindCSS](https://img.shields.io/badge/tailwindcss-3.4.17-orange.svg)](https://tailwindcss.com)
-[![Vitest](https://img.shields.io/badge/testing-vitest-brightgreen.svg)](https://vitest.dev)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+<p align="center">
+  <strong>AI-Powered Personal Finance & Wealth Management Platform</strong>
+</p>
 
-FinanceFocus, modern web teknolojileri ile geliştirilmiş, kullanıcıların gelir-gider takibi yapmasını, portföylerini yönetmesini, bütçe limitleri koymasını ve finansal hedeflerini izlemesini sağlayan kapsamlı ve kullanıcı dostu bir kişisel finans yönetim uygulamasıdır.
+<p align="center">
+  FinanceFocus, bireysel gelir-gider dengesini kontrol altında tutmak, bütçe disiplini sağlamak ve varlıkların TRY/USD değerlerini tek bir merkezden izlemek için geliştirilmiş kurumsal kalitede bir servet yönetimi platformudur.
+</p>
 
----
-
-## 🚀 Özellikler
-
-*   **Detaylı Kontrol Paneli (Dashboard):** Net varlık, aylık gelir, aylık gider ve tasarruf miktarlarının anlık gösterimi, PDF olarak dışa aktarım desteği.
-*   **İşlem Geçmişi (Transactions):** Gelir ve gider kalemlerini ekleme, güncelleme, silme ve gelişmiş filtreleme/arama motoru.
-*   **Bütçe Yönetimi (Budget):** Kategorilere özel bütçe limitleri tanımlama, harcamaların bütçe oranına göre aşım uyarıları.
-*   **Varlık & Portföy Takibi (Portfolio):** Hisse senedi, altın, kripto para ve nakit varlıkların TRY/USD kuru üzerinden anlık güncel değer hesaplaması.
-*   **Finansal Hedefler (Goals):** Birikim hedefleri oluşturma, tamamlanma yüzdeleri ve hedefe ulaşmak için gereken aylık tasarruf tahminleri.
-*   **Raporlar & Analiz (Reports):** Nakit akışı ve kategori bazlı gider dağılımlarını görselleştiren grafikler.
-*   **Yapay Zeka Destekli Tahmin Motoru (Forecast Engine):** SMA (Simple Moving Average) algoritması kullanarak son 3 ayın gelir-gider trendlerine göre gelecek dönem tahmini.
-*   **Aktivite Günlüğü & Bildirimler:** Gerçekleştirilen tüm işlemlerin loglanması ve limit aşımlarında bildirim popover paneli.
-*   **Dil & Tema Uyumluluğu:** 100% Türkçe arayüz desteği, Açık/Koyu (Dark Mode) ve Sistem temalarını dinamik takip eden tema entegrasyonu.
-*   **Duyarlı Tasarım (Responsive):** Mobil (hamburger çekmece menü), tablet ve desktop çözünürlüklerine 100% uyumlu arayüz.
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19.2.7-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-6.0.2-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Redux_Toolkit-2.2.1-764ABC?style=flat-square&logo=redux&logoColor=white" alt="Redux Toolkit" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3.4.17-06B6D4?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Vite-8.1.1-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Vitest-3.0.0-7E9B2F?style=flat-square&logo=vitest&logoColor=white" alt="Vitest" />
+  <img src="https://img.shields.io/badge/React_Router-6.22-CA4245?style=flat-square&logo=react-router&logoColor=white" alt="React Router" />
+  <img src="https://img.shields.io/badge/Axios-1.6-5A29E4?style=flat-square&logo=axios&logoColor=white" alt="Axios" />
+  <img src="https://img.shields.io/badge/React_Hook_Form-7.50-EC5990?style=flat-square&logo=react-hook-form&logoColor=white" alt="React Hook Form" />
+  <img src="https://img.shields.io/badge/Zod-3.22-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod" />
+</p>
 
 ---
 
-## 🛠️ Teknolojiler
+## 🎯 Features
 
-FinanceFocus aşağıdaki modern teknoloji yığını ile inşa edilmiştir:
-
-*   **Core:** React 19, TypeScript, Vite
-*   **State Management:** Redux Toolkit (Slices & Async Thunks)
-*   **Form & Validation:** React Hook Form + Zod
-*   **Styling:** Tailwind CSS (Fluid Grid, Dark Mode class, Custom Micro-animations)
-*   **Graphics & Visualization:** Recharts
-*   **Date Formatting:** date-fns (Türkçe Yerelleştirilmiş)
-*   **Testing Framework:** Vitest, React Testing Library, jsdom
-*   **Utility & Alerts:** Axios, React Hot Toast, uuid, Lucide React
+*   **Dashboard & Analytics:** Net varlık durumu, aylık nakit akışı ve özet kartların reaktif takibi, tek tıkla PDF formatında rapor alma desteği.
+*   **Transaction Management:** Gelir ve gider işlemlerinin kategoriler, ödeme yöntemleri ve hesaplar bazında tam CRUD yönetimi ve gelişmiş filtreleme motoru.
+*   **Budget Planning:** Kategori bazlı aylık bütçe limitleri tanımlama, harcama aşım kontrolleri ve otomatik bildirim paneli.
+*   **Portfolio Tracking:** Hisse senedi, altın, kripto para ve nakit varlıkların TRY/USD pariteleri üzerinden anlık değerleme ve ağırlıklı maliyet takibi.
+*   **Goal Management:** Birikim hedefleri oluşturma, tamamlanma oranları ve hedefe ulaşmak için gereken aylık tasarruf projeksiyonları.
+*   **Financial Reports:** Recharts entegrasyonu ile aylık ve yıllık nakit akışı ve gider dağılımı görselleştirmeleri.
+*   **Forecast Engine:** SMA (Simple Moving Average) algoritmasıyla geçmiş trendlere dayalı reaktif nakit akış ve bütçe tahminlemesi.
+*   **Notifications & Activity Logs:** Bütçe aşımlarında devreye giren sistem bildirimleri ve kullanıcı eylemlerini izleyen detaylı aktivite günlüğü.
+*   **Responsive Design & Dark/Light Theme:** Mobil, tablet ve masaüstü çözünürlüklere tam uyumluluk ve sistem tercihine duyarlı dinamik karanlık mod desteği.
 
 ---
 
-## 📁 Klasör Yapısı
+## 🛠️ Tech Stack
 
-Proje dosyaları bileşen bazlı ve özellik bazlı (feature-based) bir mimari ile organize edilmiştir:
+| Katman | Teknoloji | Kullanım Amacı |
+| :--- | :--- | :--- |
+| **Frontend** | React 19 | Bileşen tabanlı kullanıcı arayüzü |
+| **State Management** | Redux Toolkit | Merkezi global durum yönetimi ve Async Thunks |
+| **Styling** | Tailwind CSS | Executive Precision tasarım sistemi ve modern animasyonlar |
+| **Forms & Validation** | React Hook Form + Zod | Şema doğrulama tabanlı güvenli form yönetimi |
+| **Charts** | Recharts | Performanslı ve responsive finansal grafikler |
+| **Testing** | Vitest + RTL + JSDOM | Unit ve entegrasyon testlerinin yürütülmesi |
+| **Utilities** | Axios / date-fns / uuid | HTTP istekleri, yerelleştirilmiş tarih formatlama ve ID üretimi |
+
+---
+
+## 🏗️ Project Architecture
+
+Uygulama, ölçeklenebilirliği yüksek ve takımlar arası bağımsız geliştirmeye uygun olan **Feature-Based (Özellik Tabanlı) Mimari** ile organize edilmiştir:
 
 ```text
 src/
-├── assets/             # Görseller, logolar ve statik varlıklar
-├── components/         # Ortak UI, veri gösterim ve geribildirim bileşenleri
-│   ├── data-display/   # DataTable, CurrencyDisplay, StatCard
-│   ├── feedback/       # ConfirmDialog, EmptyState, Spinner
-│   └── ui/             # Button, Input, Modal, Badge, Skeleton
-├── constants/          # Rota ve global ayar sabitleri
-├── features/           # Özellik bazlı modüller
-│   ├── activity/       # Aktivite Günlüğü
-│   ├── auth/           # Giriş ve Kayıt İşlemleri
-│   ├── budget/         # Bütçe Yönetimi
-│   ├── dashboard/      # Kontrol Paneli
-│   ├── notifications/  # Bildirimler
-│   ├── portfolio/      # Varlık Yönetimi
-│   └── transactions/   # İşlem Geçmişi
+├── components/         # Ortak paylaşılan UI ve Feedback bileşenleri
+├── features/           # Özellik bazlı izole modüller (auth, budget, portfolio, transactions...)
+│   ├── components/     # Özelliğe özel alt bileşenler
+│   ├── services/       # Özelliğe özel HTTP istekleri
+│   └── slice/          # Özelliğe özel Redux Slice durumları
 ├── layouts/            # Ana şablonlar (Sidebar, Topbar, MainLayout)
 ├── pages/              # Rota sayfaları (FinancialHealth, Settings, vb.)
-├── routes/             # React Router yapılandırmaları
-├── services/           # Axios API istemcisi ve endpoints tanımları
-├── store/              # Redux Store konfigürasyonu ve global slice'lar
-├── test/               # Vitest test ayarları, mock'lar ve test dosyaları
-├── utils/              # Finansal formüller ve local storage yöneticileri
-└── App.tsx             # Ana uygulama giriş bileşeni
+├── store/              # Merkezi Redux Store konfigürasyonu
+└── utils/              # Finansal formüller ve local storage yöneticileri
 ```
 
 ---
 
-## ⚙️ Kurulum ve Çalıştırma
+## 📸 Screenshots
+
+Project screenshots will be added after backend integration and production deployment.
+
+---
+
+## 🌐 Live Demo
+
+Coming Soon
+
+---
+
+## ⚙️ Installation
 
 ### Gereksinimler
-
-*   [Node.js](https://nodejs.org/) (v18.0.0 veya üzeri önerilir)
-*   [npm](https://www.npmjs.com/) veya [yarn](https://yarnpkg.com/)
+*   **Node.js:** v18.0.0 veya üzeri
+*   **npm:** v9.0.0 veya üzeri
 
 ### Adımlar
 
-1.  **Projeyi Klonlayın veya İndirin:**
+1.  **Projeyi klonlayın:**
     ```bash
     git clone https://github.com/aygen/financefocus.git
     cd financefocus
     ```
 
-2.  **Bağımlılıkları Yükleyin:**
+2.  **Bağımlılıkları yükleyin:**
     ```bash
     npm install
     ```
 
-3.  **Mock Sunucuyu (JSON Server) Çalıştırın:**
-    Uygulama mock API verilerini kullanmaktadır. Arka plan servislerinin çalışması için json-server veya db.json verilerini kullanan lokal mock sunucunuzu ayağa kaldırın:
+3.  **Mock REST API Sunucusunu (JSON Server) çalıştırın:**
+    Finansal verilerin dinamik işlenmesi için mock API sunucusunu başlatın:
     ```bash
     npx json-server --watch db.json --port 3001
     ```
 
-4.  **Uygulamayı Geliştirme Ortamında Çalıştırın:**
+4.  **Uygulamayı geliştirme modunda çalıştırın:**
     ```bash
     npm run dev
     ```
-    Tarayıcınızda `http://localhost:3000` adresine giderek uygulamayı görüntüleyebilirsiniz.
+    Uygulama tarayıcıda otomatik olarak `http://localhost:3000` adresinde açılacaktır.
 
 ---
 
-## 🧪 Test ve Derleme
+## 💻 Available Scripts
 
-### Testleri Çalıştırma
+Proje dizininde aşağıdaki komutları çalıştırabilirsiniz:
 
-Yazılan 31 adet unit ve entegrasyon testini Vitest ile koşturmak için:
-```bash
-npm run test
-```
-
-### Kod Kapsama (Coverage) Raporu Üretme
-
-```bash
-npm run test:coverage
-```
-
-### Projeyi Yayına Hazırlama (Build)
-
-```bash
-npm run build
-```
-Derlenmiş statik dosyalar `dist/` klasörüne çıkacaktır.
+*   `npm run dev`: Uygulamayı yerel geliştirme sunucusunda başlatır.
+*   `npm run build`: Production ortamı için optimize edilmiş statik dosyaları derler (`dist/`).
+*   `npm run test`: Vitest ile yazılmış olan 31 adet unit ve entegrasyon testini çalıştırır.
+*   `npm run test:coverage`: Kod kapsama (coverage) raporunu oluşturur.
 
 ---
 
-## 🖼️ Ekran Görüntüleri
+## 🚦 Current Project Status
 
-| Kontrol Paneli (Gündüz Modu) | Kontrol Paneli (Gece Modu) |
-| :---: | :---: |
-| ![Dashboard Light Mode Placeholder](https://via.placeholder.com/600x350/ffffff/000000?text=Dashboard+Light+Mode) | ![Dashboard Dark Mode Placeholder](https://via.placeholder.com/600x350/0f172a/ffffff?text=Dashboard+Dark+Mode) |
-
----
-
-## 🌐 Canlı Demo
-
-Uygulamanın çalışan en güncel sürümüne aşağıdaki bağlantı üzerinden erişebilirsiniz:
-👉 [FinanceFocus Canlı Demo Bağlantısı](https://financefocus-demo.example.com) *(Demo adresi temsilidir)*
+*   **Frontend:** Tamamlandı. Zengin arayüz özellikleri, Redux global durum yönetimi, mock servis bağlantıları ve test kapsama süreçleri hazır durumdadır.
+*   **Backend:** Geliştirme aşamasında (In Progress). Yakın zamanda **ASP.NET Core + PostgreSQL** entegrasyonu ile gerçek veritabanı ve API katmanına geçiş yapılacaktır.
 
 ---
 
-## 🔮 Gelecek Geliştirmeler
+## 🗺️ Roadmap
 
-*   **Gerçek Zamanlı Piyasa Entegrasyonu:** Hisse senetleri ve kripto varlıklar için canlı API veri entegrasyonu.
-*   **Fatura Hatırlatıcıları:** Yaklaşan abonelik faturaları için takvim görünümü ve e-posta/SMS entegrasyonları.
-*   **Gelişmiş Rapor Dışa Aktarımları:** CSV, Excel formatlarında detaylı işlem dökümleri.
+- [x] React 19 Frontend Mimari Kurulumu
+- [x] Redux Toolkit Merkezi Store Konfigürasyonu
+- [x] Feature-Based Klasör Mimarisi ve Clean Code
+- [x] Zod ile Form Doğrulamaları ve Hata Yönetimi
+- [x] Responsive Tasarım & Dark/Light Tema Desteği
+- [x] Vitest & React Testing Library Entegrasyonu
+- [ ] ASP.NET Core API Backend Katmanı
+- [ ] PostgreSQL İlişkisel Veri Modeli
+- [ ] JWT & Refresh Token Tabanlı Authentication Flow
+- [ ] Docker Konteynerizasyonu
+- [ ] AWS / Azure Deployment Pipeline (CI/CD)
+- [ ] Real-time Stock & Crypto Market API Entegrasyonu
+- [ ] AI Financial Recommendation Engine
 
 ---
 
-## 📄 Lisans
+## ✍️ Author
 
-Bu proje **MIT Lisansı** altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasını inceleyebilirsiniz.
-
----
-
-## 🤝 Katkıda Bulunma
-
-1. Projeyi forklayın.
-2. Yeni bir özellik dalı (feature branch) oluşturun: `git checkout -b feature/yeni-ozellik`
-3. Değişikliklerinizi commitleyin: `git commit -m 'Yeni özellik eklendi'`
-4. Dalınızı pushlayın: `git push origin feature/yeni-ozellik`
-5. Pull Request açın.
+*   **Aygen** - *Lead Frontend / Full Stack Engineer*
+*   GitHub: [@aygen5](https://github.com/aygen5)
+*   LinkedIn: [aygen-profil]
