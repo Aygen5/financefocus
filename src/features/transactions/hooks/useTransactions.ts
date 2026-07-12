@@ -61,18 +61,13 @@ export const useTransactions = () => {
   const handleAddTransaction = useCallback(
     async (data: Omit<Transaction, "id" | "userId" | "createdAt" | "updatedAt">) => {
       try {
-        const resultAction = await dispatch(
-          addTransaction({
-            ...data,
-            userId: "1",
-          }),
-        );
+        const resultAction = await dispatch(addTransaction(data));
         if (addTransaction.fulfilled.match(resultAction)) {
           dispatch(
             addActivityLog({
               action: "İşlem Eklendi",
               category: "Transactions",
-              description: `"${data.title}" isimli yeni işlem başarıyla eklendi.`,
+              description: `"${data.description}" isimli yeni işlem başarıyla eklendi.`,
               user: "Aygen",
               icon: "PlusCircle",
               status: "success",
@@ -81,7 +76,7 @@ export const useTransactions = () => {
           dispatch(
             addNotification({
               title: "İşlem Eklendi",
-              message: `"${data.title}" işlemi başarıyla hesabınıza eklendi.`,
+              message: `"${data.description}" işlemi başarıyla hesabınıza eklendi.`,
               type: "success",
               icon: "PlusCircle",
             }),

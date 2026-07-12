@@ -17,7 +17,6 @@ export const Goals: React.FC = () => {
   const { goals, loading, error, handleRetry, handleAddGoal, handleUpdateGoal, handleDeleteGoal } =
     useGoals();
 
-  // Modals & States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -74,7 +73,6 @@ export const Goals: React.FC = () => {
     }
   };
 
-  // Render loading state
   if (loading) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left space-y-8 select-none">
@@ -91,7 +89,6 @@ export const Goals: React.FC = () => {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -106,7 +103,6 @@ export const Goals: React.FC = () => {
     );
   }
 
-  // Render empty state
   if (goals.length === 0) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -139,7 +135,6 @@ export const Goals: React.FC = () => {
         </Button>
       </div>
 
-      {/* Goals Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {goals.map((goal) => (
           <GoalCard
@@ -152,7 +147,6 @@ export const Goals: React.FC = () => {
         ))}
       </div>
 
-      {/* Add Goal Modal */}
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
@@ -162,7 +156,6 @@ export const Goals: React.FC = () => {
         <GoalForm onSubmit={onAddSubmit} loading={isSubmitLoading} submitLabel="Ekle" />
       </Modal>
 
-      {/* Edit Goal Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => {
@@ -193,7 +186,6 @@ export const Goals: React.FC = () => {
         )}
       </Modal>
 
-      {/* Detail Goal Modal */}
       <GoalDetailModal
         isOpen={isDetailModalOpen}
         onClose={() => {
@@ -203,7 +195,6 @@ export const Goals: React.FC = () => {
         goal={selectedGoal}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={isDeleteOpen}
         onClose={() => {

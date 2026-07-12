@@ -105,7 +105,7 @@ export const TransactionFiltersPanel: React.FC<TransactionFiltersPanelProps> = (
         </div>
         {activeFiltersCount > 0 && (
           <Button
-            variant="text"
+            variant="ghost"
             icon={<RotateCcw size={13} />}
             onClick={onReset}
             className="text-[11px] h-auto p-1 font-bold text-red-500 hover:text-red-600 dark:text-red-400"

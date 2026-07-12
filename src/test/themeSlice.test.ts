@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import themeReducer, { setTheme, toggleTheme, ThemeState } from "../store/themeSlice";
+import themeReducer, { setTheme, toggleTheme } from "../store/themeSlice";
+import type { ThemeState } from "../store/themeSlice";
 
 describe("themeSlice Redux Tests", () => {
   const initialState: ThemeState = {

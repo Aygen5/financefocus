@@ -36,7 +36,6 @@ const NotificationFeed: React.FC<NotificationFeedProps> = ({
     );
   }
 
-  // İkon ve stil eşleştirme helper'ı
   const getCategoryStyles = (category: string) => {
     switch (category.toLowerCase()) {
       case "payment":
@@ -85,7 +84,6 @@ const NotificationFeed: React.FC<NotificationFeedProps> = ({
               styles.borderLeft
             } ${!notif.read ? "bg-slate-50/50 dark:bg-slate-850/20" : ""}`}
           >
-            {/* Category Icon */}
             <div className="flex-shrink-0">
               <div
                 className={`w-12 h-12 rounded-xl flex items-center justify-center ${styles.badgeColor}`}
@@ -94,7 +92,6 @@ const NotificationFeed: React.FC<NotificationFeedProps> = ({
               </div>
             </div>
 
-            {/* Content Details */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-1">
                 <span
@@ -110,7 +107,6 @@ const NotificationFeed: React.FC<NotificationFeedProps> = ({
                 {notif.title}
               </h3>
 
-              {/* Bütçe aşımı için ilerleme barı detayı */}
               {isBudget && notif.threshold && (
                 <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mb-3 overflow-hidden">
                   <div
@@ -124,7 +120,6 @@ const NotificationFeed: React.FC<NotificationFeedProps> = ({
                 {notif.message}
               </p>
 
-              {/* Action buttons (Örn. Ödemeyi yetkilendir) */}
               {showActions && (
                 <div className="flex gap-3 mt-4">
                   <Button variant="primary" size="sm" onClick={() => onAuthorize?.(notif.id)}>
@@ -137,7 +132,6 @@ const NotificationFeed: React.FC<NotificationFeedProps> = ({
               )}
             </div>
 
-            {/* Unread Alert blue circle Dot */}
             {!notif.read && (
               <div className="absolute right-6 top-6 w-2.5 h-2.5 bg-primary dark:bg-brand-500 rounded-full" />
             )}

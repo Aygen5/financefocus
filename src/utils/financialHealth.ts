@@ -56,27 +56,18 @@ export interface FinancialHealthBreakdown {
   incomeExpenseRatio: number;
 }
 
-/**
- * Toplam Geliri hesaplar.
- */
 export const calculateTotalIncome = (transactions: HealthTransaction[]): number => {
   return transactions
     .filter((t) => t.transactionType === "income")
     .reduce((sum, t) => sum + t.amount, 0);
 };
 
-/**
- * Toplam Gideri hesaplar.
- */
 export const calculateTotalExpenses = (transactions: HealthTransaction[]): number => {
   return transactions
     .filter((t) => t.transactionType === "expense")
     .reduce((sum, t) => sum + t.amount, 0);
 };
 
-/**
- * Aylık Toplam Abonelik Maliyetini hesaplar.
- */
 export const calculateMonthlySubscriptionTotal = (subscriptions: HealthSubscription[]): number => {
   return subscriptions.reduce((sum, sub) => {
     if (sub.billingCycle === "yearly") {
@@ -86,9 +77,6 @@ export const calculateMonthlySubscriptionTotal = (subscriptions: HealthSubscript
   }, 0);
 };
 
-/**
- * Genel finansal sağlık skorunu ve alt bileşen analizini hesaplar (calculateFinancialHealthScore).
- */
 export const calculateFinancialHealth = (
   transactions: HealthTransaction[],
   budgets: HealthBudget[],
@@ -99,7 +87,6 @@ export const calculateFinancialHealth = (
   const totalIncome = calculateTotalIncome(transactions);
   const totalExpense = calculateTotalExpenses(transactions);
 
-  // 1. Income / Expense Ratio & Savings Rate
   const incomeExpenseRatio = totalIncome > 0 ? Math.round((totalExpense / totalIncome) * 100) : 100;
   const savingsRate =
     totalIncome > 0
@@ -112,8 +99,6 @@ export const calculateFinancialHealth = (
   else if (savingsRate >= 15) savingsRateScore = 65;
   else if (savingsRate >= 5) savingsRateScore = 45;
 
-  // 2. Debt Ratio
-  // Borç / Gelir Oranı: Borç veya Kredi Ödeme işlemlerini (Debt/Loan) veya Bills kategorisinin bir bölümünü varsayabiliriz.
   const debtTxSum = transactions
     .filter(
       (t) =>
@@ -124,15 +109,13 @@ export const calculateFinancialHealth = (
     )
     .reduce((s, t) => s + t.amount, 0);
 
-  const debtRatio = totalIncome > 0 ? Math.round((debtTxSum / totalIncome) * 100) : 5; // Default low if none
+  const debtRatio = totalIncome > 0 ? Math.round((debtTxSum / totalIncome) * 100) : 5;
   let debtRatioScore = 100;
   if (debtRatio > 40) debtRatioScore = 30;
   else if (debtRatio > 25) debtRatioScore = 55;
   else if (debtRatio > 15) debtRatioScore = 75;
   else if (debtRatio > 5) debtRatioScore = 90;
 
-  // 3. Monthly Burn Rate (Aylık Harcama Hızı)
-  // Son 3 ayın ortalama harcaması
   const today = new Date();
   const threeMonthsAgo = startOfMonth(subMonths(today, 2));
   const recentExpenses = transactions.filter((t) => {
@@ -148,7 +131,6 @@ export const calculateFinancialHealth = (
       ? Math.min(Math.round((totalIncome / monthlyBurnRate) * 25), 100)
       : 70;
 
-  // 4. Emergency Fund Status
   const emergencyGoal = goals.find(
     (g) => g.title.toLowerCase().includes("acil") || g.category.toLowerCase().includes("acil"),
   );
@@ -158,8 +140,6 @@ export const calculateFinancialHealth = (
 
   const emergencyFundScore = emergencyFundProgress;
 
-  // 5. Investment Allocation / Ratio
-  // Portföyün toplam değeri / Toplam Gelir (Yıllık bazda tasarrufa katkısı)
   const portfolioTotalVal = assets.reduce((s, a) => {
     const assetVal = a.amount * a.currentPrice;
     return s + (a.currency === "USD" ? assetVal * 34.0 : assetVal);
@@ -173,7 +153,6 @@ export const calculateFinancialHealth = (
   else if (investmentRatio >= 25) investmentRatioScore = 65;
   else if (investmentRatio >= 10) investmentRatioScore = 50;
 
-  // 6. Budget Discipline
   let budgetDisciplineScore = 80;
   let totalBudgetSpent = 0;
   let totalBudgetLimit = 0;
@@ -192,7 +171,6 @@ export const calculateFinancialHealth = (
   const budgetUsage =
     totalBudgetLimit > 0 ? Math.round((totalBudgetSpent / totalBudgetLimit) * 100) : 0;
 
-  // 7. Subscription Load
   const monthlySubs = calculateMonthlySubscriptionTotal(subscriptions);
   const subscriptionLoad = totalIncome > 0 ? Math.round((monthlySubs / totalIncome) * 100) : 2;
 
@@ -202,7 +180,6 @@ export const calculateFinancialHealth = (
   else if (subscriptionLoad > 5) subscriptionLoadScore = 75;
   else if (subscriptionLoad > 2) subscriptionLoadScore = 90;
 
-  // Ağırlıklı genel sağlık skoru (0-100)
   const overallScore = Math.round(
     savingsRateScore * 0.25 +
       debtRatioScore * 0.15 +
@@ -232,9 +209,6 @@ export const calculateFinancialHealth = (
   };
 };
 
-/**
- * Puan dilimine göre durum etiketi ve renk şeması üretir.
- */
 export const getHealthStatus = (score: number) => {
   if (score >= 90)
     return {

@@ -23,7 +23,6 @@ export const dashboardSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectDashboardLoading = (state: { dashboard: DashboardState }) =>
   state.dashboard.loading;
 export const selectDashboardError = (state: { dashboard: DashboardState }) => state.dashboard.error;

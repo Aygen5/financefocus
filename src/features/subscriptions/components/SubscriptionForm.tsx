@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import Input from "@/components/ui/Input";
@@ -47,7 +47,7 @@ export const SubscriptionForm: React.FC<SubscriptionFormProps> = ({
     watch,
     formState: { errors },
   } = useForm<SubscriptionFormData>({
-    resolver: zodResolver(subscriptionFormSchema),
+    resolver: zodResolver(subscriptionFormSchema) as unknown as Resolver<SubscriptionFormData>,
     defaultValues: {
       name: defaultValues?.name || "",
       cost: defaultValues?.cost,

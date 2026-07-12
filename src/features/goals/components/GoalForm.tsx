@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 import Input from "@/components/ui/Input";
@@ -54,7 +54,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     handleSubmit,
     formState: { errors },
   } = useForm<GoalFormData>({
-    resolver: zodResolver(goalFormSchema),
+    resolver: zodResolver(goalFormSchema) as unknown as Resolver<GoalFormData>,
     defaultValues: {
       name: defaultValues?.name || "",
       category: defaultValues?.category || "Yatırım Hedefi",

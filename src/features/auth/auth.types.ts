@@ -1,8 +1,4 @@
 import { z } from "zod";
-
-/**
- * Giriş (Login) Formu Validasyon Şeması
- */
 export const loginSchema = z.object({
   email: z.string().min(1, "E-posta adresi zorunludur").email("Geçerli bir e-posta adresi giriniz"),
   password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
@@ -11,9 +7,6 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 
-/**
- * Kayıt (Register) Formu Validasyon Şeması
- */
 export const registerSchema = z
   .object({
     fullName: z.string().min(2, "Ad Soyad en az 2 karakter olmalıdır").trim(),

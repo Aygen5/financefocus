@@ -6,7 +6,6 @@ import MainLayout from "@/layouts/MainLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import ROUTES from "@/constants/routes";
 
-// Lazy Loading Sayfaları
 const Login = React.lazy(() => import("@/pages/Login"));
 const Register = React.lazy(() => import("@/pages/Register"));
 const Dashboard = React.lazy(() => import("@/pages/Dashboard"));
@@ -26,7 +25,6 @@ import ErrorPage from "@/pages/ErrorPage";
 
 export const router = createBrowserRouter([
   {
-    // Giriş Yapmamış Kullanıcı Rotaları (AuthRoute Koruması)
     element: <AuthRoute />,
     errorElement: <ErrorPage />,
     children: [
@@ -46,7 +44,6 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    // Giriş Yapmış Kullanıcı Rotaları (ProtectedRoute & MainLayout Koruması)
     element: <ProtectedRoute />,
     errorElement: <ErrorPage />,
     children: [

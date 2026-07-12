@@ -17,9 +17,7 @@ const ErrorPage: React.FC = () => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    // Development ortamında console.error ile loglayalım
     if (isDev) {
-      // eslint-disable-next-line no-console
       console.error("[Global Error Boundary Catch]:", error);
     }
   }, [error, isDev]);
@@ -28,19 +26,16 @@ const ErrorPage: React.FC = () => {
     navigate(0);
   };
 
-  // Hata kodunu belirle
   const errorCode = error?.status || error?.code || "ERROR_RUNTIME";
   const errorTime = format(new Date(), "dd.MM.yyyy HH:mm:ss");
 
   return (
     <div className="min-h-screen w-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 px-6 py-12 text-center select-none font-sans">
       <div className="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 p-8 md:p-12 rounded-3xl shadow-soft-xl flex flex-col items-center animate-zoomIn">
-        {/* İkon */}
         <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mb-6">
           <AlertOctagon size={40} />
         </div>
 
-        {/* Hata Mesajı */}
         <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">
           Beklenmeyen bir hata oluştu.
         </h2>
@@ -49,14 +44,12 @@ const ErrorPage: React.FC = () => {
             "Finansal veriler işlenirken sistemsel bir hata meydana geldi. Teknik ekibimiz durumdan haberdar edildi."}
         </p>
 
-        {/* Stack Trace (Yalnızca Development Ortamında Göster) */}
         {isDev && error?.stack && (
           <div className="w-full text-left bg-slate-100 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-[10px] font-mono text-slate-600 dark:text-slate-400 overflow-auto max-h-40 mb-6 select-text custom-scrollbar">
             {error.stack}
           </div>
         )}
 
-        {/* Hata Bilgileri */}
         <div className="w-full bg-slate-50 dark:bg-slate-900/60 p-4 rounded-xl border border-slate-200/40 dark:border-slate-800/40 text-[11px] font-semibold text-slate-450 dark:text-slate-500 space-y-1 mb-8 text-left">
           <div className="flex justify-between">
             <span>Hata Kodu:</span>
@@ -68,7 +61,6 @@ const ErrorPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Butonlar */}
         <div className="w-full flex flex-col gap-3">
           <button
             onClick={handleRetry}

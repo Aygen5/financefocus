@@ -26,7 +26,6 @@ const SavingsAnalysis: React.FC<SavingsAnalysisProps> = ({
           Savings Analysis
         </h4>
         <div className="space-y-6">
-          {/* Retirement Fund */}
           <div>
             <div className="flex justify-between text-sm font-semibold mb-2">
               <span className="text-slate-500">Retirement Fund</span>
@@ -35,7 +34,6 @@ const SavingsAnalysis: React.FC<SavingsAnalysisProps> = ({
             <ProgressBar value={retirement} max={100} variant="brand" />
           </div>
 
-          {/* Emergency Savings */}
           <div>
             <div className="flex justify-between text-sm font-semibold mb-2">
               <span className="text-slate-500">Emergency Savings</span>
@@ -44,7 +42,6 @@ const SavingsAnalysis: React.FC<SavingsAnalysisProps> = ({
             <ProgressBar value={emergency} max={100} variant="success" />
           </div>
 
-          {/* Real Estate Investment */}
           <div>
             <div className="flex justify-between text-sm font-semibold mb-2">
               <span className="text-slate-500">Real Estate Investment</span>
@@ -55,7 +52,6 @@ const SavingsAnalysis: React.FC<SavingsAnalysisProps> = ({
         </div>
       </div>
 
-      {/* Smart Tip box info */}
       <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-lg border border-slate-200/50 dark:border-slate-800 border-dashed mt-8 flex items-start gap-3">
         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
           <Lightbulb size={20} />

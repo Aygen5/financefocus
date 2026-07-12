@@ -87,12 +87,10 @@ export const ActivityLogPage: React.FC = () => {
     error = null,
   } = useAppSelector((state) => state.activity || {});
 
-  // Filters State
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [dateFilter, setDateFilter] = useState("All");
 
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -104,7 +102,6 @@ export const ActivityLogPage: React.FC = () => {
     dispatch(fetchActivities());
   };
 
-  // Filter logs logic
   const filteredLogs = useMemo(() => {
     if (!Array.isArray(logs)) return [];
     return logs.filter((log) => {
@@ -130,7 +127,6 @@ export const ActivityLogPage: React.FC = () => {
     });
   }, [logs, search, categoryFilter, dateFilter]);
 
-  // Paginated logs
   const paginatedLogs = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredLogs.slice(startIndex, startIndex + itemsPerPage);
@@ -239,7 +235,6 @@ export const ActivityLogPage: React.FC = () => {
 
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
@@ -260,7 +255,6 @@ export const ActivityLogPage: React.FC = () => {
         </Button>
       </div>
 
-      {/* Filter Options Bar */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 mb-6 flex flex-wrap items-center justify-between gap-4 shadow-soft-sm select-none">
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           {/* Search Box */}
@@ -280,7 +274,6 @@ export const ActivityLogPage: React.FC = () => {
             />
           </div>
 
-          {/* Category Filter */}
           <div className="relative w-full sm:w-auto">
             <select
               value={categoryFilter}
@@ -301,7 +294,6 @@ export const ActivityLogPage: React.FC = () => {
             <span className="absolute right-3 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-slate-400 pointer-events-none" />
           </div>
 
-          {/* Date Filter */}
           <div className="relative w-full sm:w-auto">
             <select
               value={dateFilter}
@@ -320,7 +312,6 @@ export const ActivityLogPage: React.FC = () => {
         </div>
       </div>
 
-      {/* DataTable Display */}
       <DataTable
         columns={columns}
         data={paginatedLogs}
@@ -328,7 +319,6 @@ export const ActivityLogPage: React.FC = () => {
         emptyDescription="Aradığınız kriterlere uygun herhangi bir sistem günlüğü kaydı bulunmamaktadır."
       />
 
-      {/* Simple Pagination Footer */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-6 px-4 select-none">
           <span className="text-xs font-bold text-slate-400 dark:text-slate-500">

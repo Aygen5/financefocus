@@ -42,7 +42,6 @@ const Sidebar: React.FC = () => {
     navigate(ROUTES.LOGIN);
   };
 
-  // Active/Inactive menu items classes
   const activeStyle =
     "flex items-center gap-3 px-4 py-3 text-primary dark:text-brand-400 bg-secondary-container dark:bg-slate-800 rounded-xl border-l-4 border-primary dark:border-brand-500 transition-all duration-200 select-none font-bold";
   const inactiveStyle =
@@ -53,7 +52,6 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* Mobile Sidebar Backdrop */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden animate-fadeIn"
@@ -61,7 +59,6 @@ const Sidebar: React.FC = () => {
         />
       )}
 
-      {/* Sidebar Panel */}
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col bg-white dark:bg-slate-900 border-r border-outline-variant transition-all duration-300 lg:static lg:translate-x-0 text-left shrink-0 select-none",
@@ -69,7 +66,6 @@ const Sidebar: React.FC = () => {
           isMobileOpen ? "translate-x-0 w-[280px]" : "-translate-x-full lg:translate-x-0",
         )}
       >
-        {/* Brand Header */}
         <div className="flex items-center justify-between px-6 h-20 border-b border-outline-variant shrink-0">
           <Link
             to="/"
@@ -91,7 +87,6 @@ const Sidebar: React.FC = () => {
             )}
           </Link>
 
-          {/* Desktop Collapse Toggle Button */}
           {!isMobileOpen && (
             <button
               onClick={toggleCollapsed}
@@ -103,7 +98,6 @@ const Sidebar: React.FC = () => {
           )}
         </div>
 
-        {/* Navigation Menu */}
         <nav className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-1 px-4 py-6">
           {navigationConfig.map((item) => {
             const Icon = item.icon;
@@ -127,7 +121,6 @@ const Sidebar: React.FC = () => {
           })}
         </nav>
 
-        {/* User Profile Card */}
         <div className="border-t border-outline-variant p-4">
           <div
             className={cn(
@@ -151,9 +144,7 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="p-4 pt-0 space-y-1">
-          {/* Theme Toggle */}
           <button
             onClick={() => dispatch(toggleTheme())}
             className={cn(
@@ -175,7 +166,6 @@ const Sidebar: React.FC = () => {
             )}
           </button>
 
-          {/* Logout Button */}
           <button
             onClick={handleLogout}
             className={cn(

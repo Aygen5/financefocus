@@ -4,13 +4,13 @@ import SubscriptionsService from "@/services/modules/subscriptions.service";
 
 export interface Subscription {
   id: string;
-  userId: string;
+  userId?: string;
   name: string;
   cost: number;
   billingCycle: "monthly" | "yearly";
   nextBillingDate: string;
   category: string;
-  billingType?: string; // paymentMethod/billingType
+  billingType?: string;
   autoRenew?: boolean;
   startDate?: string;
   color?: string;
@@ -31,7 +31,6 @@ const initialState: SubscriptionsState = {
   error: null,
 };
 
-// Async Thunks
 export const fetchSubscriptions = createAsyncThunk(
   "subscriptions/fetchSubscriptions",
   async (_, { rejectWithValue }) => {
@@ -128,7 +127,6 @@ export const subscriptionsSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectSubscriptions = (state: { subscriptions: SubscriptionsState }) =>
   state.subscriptions.items;
 export const selectSubscriptionsLoading = (state: { subscriptions: SubscriptionsState }) =>

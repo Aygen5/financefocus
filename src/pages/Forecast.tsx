@@ -47,7 +47,6 @@ export const Forecast: React.FC = () => {
   const dispatch = useAppDispatch();
   const themeMode = useAppSelector(selectThemeMode);
 
-  // Resolve dark condition dynamically
   const isDark = React.useMemo(() => {
     if (themeMode === "dark") return true;
     if (themeMode === "system") {
@@ -64,7 +63,6 @@ export const Forecast: React.FC = () => {
   const tooltipColor = isDark ? "#f8fafc" : "#0f172a";
   const tooltipBorder = isDark ? "#1e293b" : "#e2e8f0";
 
-  // Redux States
   const {
     items: transactions,
     loading: transLoading,
@@ -77,7 +75,6 @@ export const Forecast: React.FC = () => {
   } = useAppSelector((state) => state.portfolio);
   const { loading: budgetsLoading, error: budgetsError } = useAppSelector((state) => state.budget);
 
-  // Forecast Timeframe State
   const [months, setMonths] = useState<number>(6); // Default 6 Months Forecast
 
   const loadAllData = React.useCallback(() => {
@@ -90,7 +87,6 @@ export const Forecast: React.FC = () => {
     loadAllData();
   }, [loadAllData]);
 
-  // Dispatch Forecast Warning alert once metrics are loaded
   useEffect(() => {
     if (!transLoading && transactions.length > 0) {
       const avgInc = forecastIncome(transactions, 1)[0]?.value || 12000;
@@ -122,9 +118,7 @@ export const Forecast: React.FC = () => {
     }
   }, [transLoading, transactions, dispatch]);
 
-  // 1. Tahmin Hesaplamaları (useMemo ile SMA yöntemiyle)
   const forecastMetrics = useMemo(() => {
-    // Son 3 ayın ortalama gelir/gider bazlarını çıkaralım
     const histIncomes = forecastIncome(transactions, 1);
     const histExpenses = forecastExpenses(transactions, 1);
 
@@ -136,7 +130,6 @@ export const Forecast: React.FC = () => {
     const expectedSavings = forecastSavings(avgIncome, avgExpense, months);
     const expectedCashFlow = avgIncome - avgExpense;
 
-    // Beklenen Portföy Değeri (Son ayın kümülatif değeri)
     const growthArray = forecastPortfolioGrowth(assets, transactions, months);
     const expectedPortfolioVal =
       growthArray[growthArray.length - 1]?.value || calculateNetWorth(assets);
@@ -152,7 +145,6 @@ export const Forecast: React.FC = () => {
     };
   }, [transactions, assets, months]);
 
-  // 2. Projeksiyon Grafik Veri Setleri
   const incomeForecastData = useMemo(
     () => forecastIncome(transactions, months),
     [transactions, months],
@@ -193,7 +185,6 @@ export const Forecast: React.FC = () => {
   const loading = transLoading || portLoading || budgetsLoading;
   const error = transError || portError || budgetsError;
 
-  // Render loading state
   if (loading) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left space-y-8 select-none">
@@ -211,7 +202,6 @@ export const Forecast: React.FC = () => {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -249,7 +239,6 @@ export const Forecast: React.FC = () => {
         </div>
       </div>
 
-      {/* Model explanation banner */}
       <div className="bg-blue-500/10 border border-blue-500/20 text-slate-750 dark:text-brand-300 p-4 rounded-2xl flex items-start gap-3 mb-6 select-none">
         <Info size={20} className="text-primary dark:text-brand-400 shrink-0 mt-0.5" />
         <div>
@@ -265,7 +254,6 @@ export const Forecast: React.FC = () => {
         </div>
       </div>
 
-      {/* Timeframe selector panel */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 mb-6 flex flex-wrap items-center justify-between gap-4 shadow-soft-sm select-none">
         <div className="flex flex-wrap items-center gap-2">
           {[
@@ -292,9 +280,7 @@ export const Forecast: React.FC = () => {
         </div>
       </div>
 
-      {/* Forecast metric cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8 select-none">
-        {/* Beklenen Gelir */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             Beklenen Gelir
@@ -307,7 +293,6 @@ export const Forecast: React.FC = () => {
           </span>
         </div>
 
-        {/* Beklenen Gider */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             Beklenen Gider
@@ -320,7 +305,6 @@ export const Forecast: React.FC = () => {
           </span>
         </div>
 
-        {/* Beklenen Tasarruf */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             Beklenen Tasarruf
@@ -333,7 +317,6 @@ export const Forecast: React.FC = () => {
           </span>
         </div>
 
-        {/* Beklenen Nakit Akışı */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             Beklenen Net Akış
@@ -346,7 +329,6 @@ export const Forecast: React.FC = () => {
           </span>
         </div>
 
-        {/* Beklenen Portföy Değeri */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             Beklenen Portföy
@@ -360,7 +342,6 @@ export const Forecast: React.FC = () => {
         </div>
       </div>
 
-      {/* Forecast Recharts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter select-none">
         {/* Graph 1: Income Forecast */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
@@ -403,7 +384,6 @@ export const Forecast: React.FC = () => {
           </div>
         </div>
 
-        {/* Graph 2: Expense Forecast */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
             <AlertCircle size={14} className="text-red-500" /> Gider Projeksiyonu
@@ -444,7 +424,6 @@ export const Forecast: React.FC = () => {
           </div>
         </div>
 
-        {/* Graph 3: Cash Flow Forecast */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
             <TrendingUp size={14} className="text-primary" /> Gelecek Nakit Akışı
@@ -479,7 +458,6 @@ export const Forecast: React.FC = () => {
           </div>
         </div>
 
-        {/* Graph 4: Portfolio Growth Forecast */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
             <TrendingUp size={14} className="text-primary" /> Portföy Büyüme Projeksiyonu

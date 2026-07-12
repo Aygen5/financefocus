@@ -24,7 +24,6 @@ const SubscriptionList: React.FC<SubscriptionListProps> = ({
     );
   }
 
-  // Logo/İkon seçme helper'ı
   const getServiceIcon = (name: string) => {
     const lower = name.toLowerCase();
     if (lower.includes("netflix")) {
@@ -79,7 +78,6 @@ const SubscriptionList: React.FC<SubscriptionListProps> = ({
           sub.billingType?.toLowerCase() === "auto";
         const isScheduled = sub.billingType?.toLowerCase() === "scheduled";
 
-        // Kalan gün formatı hesaplama
         const getRemainingDaysLabel = (dateStr: string) => {
           try {
             const today = new Date();

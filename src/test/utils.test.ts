@@ -5,14 +5,13 @@ import {
   calculateTrend,
   calculateNetWorth,
   calculateSavingsRate,
-  FinancialAsset,
 } from "../utils/financial";
+import type { FinancialAsset } from "../utils/financial";
 
 describe("Financial Utility Functions Tests", () => {
   describe("formatCurrency", () => {
     it("should format correctly as TRY currency with Turkish symbol", () => {
       const result = formatCurrency(1250.5);
-      // It should produce formatted currency with ₺ symbol
       expect(result).toContain("₺");
       expect(result).toContain("1.250,50");
     });
@@ -72,7 +71,6 @@ describe("Financial Utility Functions Tests", () => {
           sector: "Precious Metals",
         },
       ];
-      // 10000 + 5 * 2200 = 10000 + 11000 = 21000
       expect(calculateNetWorth(mockAssets)).toBe(21000);
     });
 
@@ -89,7 +87,6 @@ describe("Financial Utility Functions Tests", () => {
           sector: "Technology",
         },
       ];
-      // 10 * 180 = 1800 USD. Rate 34.0 -> 1800 * 34.0 = 61200
       expect(calculateNetWorth(mockAssets, 34.0)).toBe(61200);
     });
   });

@@ -28,7 +28,6 @@ const initialState: PortfolioState = {
   error: null,
 };
 
-// Async Thunks
 export const fetchPortfolio = createAsyncThunk(
   "portfolio/fetchPortfolio",
   async (_, { rejectWithValue }) => {
@@ -69,7 +68,6 @@ export const portfolioSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectPortfolio = (state: { portfolio: PortfolioState }) => state.portfolio.assets;
 export const selectPortfolioLoading = (state: { portfolio: PortfolioState }) =>
   state.portfolio.loading;

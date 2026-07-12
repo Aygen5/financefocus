@@ -22,7 +22,6 @@ export interface QuickActionModalProps {
 
 type TabType = "transaction" | "budget" | "goal" | "subscription";
 
-// Form Validation Schemas
 const transactionSchema = z.object({
   title: z.string().min(2, "Açıklama en az 2 karakter olmalıdır"),
   amount: z.coerce.number().positive("Tutar sıfırdan büyük olmalıdır"),
@@ -56,7 +55,6 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<TabType>("transaction");
 
-  // Forms initialization
   const txForm = useForm({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
@@ -94,11 +92,15 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
     try {
       const resultAction = await dispatch(
         addTransaction({
-          ...data,
-          userId: "1",
+          amount: data.amount,
+          transactionType: data.transactionType,
+          category: data.category,
+          date: data.date,
+          account: data.account,
+          description: data.title,
+          currency: "TRY",
           status: "completed",
           paymentMethod: "Kredi Kartı",
-          currency: "TRY",
         }),
       );
       if (addTransaction.fulfilled.match(resultAction)) {
@@ -163,7 +165,16 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
   const handleGoalSubmit = async (data: z.infer<typeof goalSchema>) => {
     try {
       const resultAction = await dispatch(
-        addGoal({ ...data, currentAmount: 0, status: "in_progress" }),
+        addGoal({
+          name: data.title,
+          targetAmount: data.targetAmount,
+          deadline: data.targetDate,
+          notes: data.notes,
+          currentAmount: 0,
+          status: "active",
+          category: "Yatırım Hedefi",
+          monthlyContribution: 0,
+        }),
       );
       if (addGoal.fulfilled.match(resultAction)) {
         dispatch(
@@ -240,7 +251,6 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Hızlı İşlem Ekle" size="md">
-      {/* Modal Tab header */}
       <div className="flex border-b border-slate-100 dark:border-slate-800 mb-6 select-none">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -260,7 +270,6 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
         })}
       </div>
 
-      {/* Tab Contents */}
       <div className="text-left">
         {activeTab === "transaction" && (
           <form onSubmit={txForm.handleSubmit(handleTxSubmit)} className="space-y-4">
@@ -311,7 +320,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
               </Button>
               <Button
                 type="submit"
-                variant="brand"
+                variant="primary"
                 className="flex-1"
                 loading={txForm.formState.isSubmitting}
               >
@@ -344,7 +353,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
               </Button>
               <Button
                 type="submit"
-                variant="brand"
+                variant="primary"
                 className="flex-1"
                 loading={budgetForm.formState.isSubmitting}
               >
@@ -382,7 +391,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
               </Button>
               <Button
                 type="submit"
-                variant="brand"
+                variant="primary"
                 className="flex-1"
                 loading={goalForm.formState.isSubmitting}
               >
@@ -438,7 +447,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
               </Button>
               <Button
                 type="submit"
-                variant="brand"
+                variant="primary"
                 className="flex-1"
                 loading={subForm.formState.isSubmitting}
               >

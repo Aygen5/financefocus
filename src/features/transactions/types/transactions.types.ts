@@ -28,7 +28,6 @@ export interface TransactionFilters {
   status: "completed" | "pending" | "failed" | "all";
 }
 
-// Zod Validation Schema for Transactions form
 export const transactionFormSchema = z.object({
   amount: z
     .number({ invalid_type_error: "Tutar sayısal bir değer olmalıdır." })

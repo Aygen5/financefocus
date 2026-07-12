@@ -1,16 +1,11 @@
-/* eslint-disable no-console */
 import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { getLocalData, saveLocalData } from "@/utils/localStorageDb";
 import toast from "react-hot-toast";
 
-/**
- * local database helper to intercept and handle connections when the api server is offline
- */
 const handleLocalFallback = (config: InternalAxiosRequestConfig): AxiosResponse | null => {
   const method = config.method?.toUpperCase();
   const url = config.url || "";
 
-  // Clean endpoint
   let endpoint = url.replace(/^\//, "").split("?")[0];
   if (endpoint.startsWith("transactions")) endpoint = "transactions";
   if (endpoint.startsWith("budget") || endpoint.startsWith("budgets")) endpoint = "budget";
@@ -36,9 +31,7 @@ const handleLocalFallback = (config: InternalAxiosRequestConfig): AxiosResponse 
 
   const localData = getLocalData(endpoint);
 
-  // GET Request
   if (method === "GET") {
-    // If it's a detail request (e.g. /transactions/tx-1)
     const parts = url.split("/");
     if (parts.length > 2) {
       const id = parts[2];
@@ -63,7 +56,6 @@ const handleLocalFallback = (config: InternalAxiosRequestConfig): AxiosResponse 
     };
   }
 
-  // POST Request (Create)
   if (method === "POST") {
     const payload = typeof config.data === "string" ? JSON.parse(config.data) : config.data;
     const newId = `${endpoint.substring(0, 3)}-${Math.random().toString(36).substr(2, 9)}`;
@@ -83,7 +75,6 @@ const handleLocalFallback = (config: InternalAxiosRequestConfig): AxiosResponse 
     };
   }
 
-  // PUT Request (Update)
   if (method === "PUT") {
     const payload = typeof config.data === "string" ? JSON.parse(config.data) : config.data;
     const parts = url.split("/");
@@ -106,7 +97,6 @@ const handleLocalFallback = (config: InternalAxiosRequestConfig): AxiosResponse 
     }
   }
 
-  // DELETE Request
   if (method === "DELETE") {
     const parts = url.split("/");
     const id = parts[parts.length - 1];
@@ -130,15 +120,11 @@ const handleLocalFallback = (config: InternalAxiosRequestConfig): AxiosResponse 
 let isServerOffline = false;
 
 export const setupInterceptors = (client: AxiosInstance): AxiosInstance => {
-  // Request Interceptor
   client.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      // TODO: [Backend Entegrasyonu] Gerçek API ve production ortamına geçerken isServerOffline ve handleLocalFallback (LocalStorage simulation) tamamen devre dışı bırakılabilir veya isteğe göre hibrit yapıda tutulabilir.
-      // If we already know the server is offline, bypass request and return fallback data immediately
       if (isServerOffline) {
         const fallbackResponse = handleLocalFallback(config);
         if (fallbackResponse) {
-          // Force Axios to resolve early with the fallback response
           config.adapter = () => Promise.resolve(fallbackResponse);
         }
       }
@@ -154,7 +140,6 @@ export const setupInterceptors = (client: AxiosInstance): AxiosInstance => {
     },
   );
 
-  // Response Interceptor
   client.interceptors.response.use(
     (response: AxiosResponse) => {
       return response;
@@ -162,7 +147,6 @@ export const setupInterceptors = (client: AxiosInstance): AxiosInstance => {
     async (error) => {
       const config = error.config;
 
-      // If server is offline or requests timeout, fallback to LocalStorage and mark server as offline
       if (
         !error.response ||
         error.code === "ERR_NETWORK" ||

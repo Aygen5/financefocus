@@ -41,7 +41,6 @@ const AiInsights: React.FC = () => {
         </button>
       </div>
 
-      {/* Insight Card 2 */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-6 border-l-4 border-l-primary dark:border-l-brand-500 shadow-soft-sm relative overflow-hidden group">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-primary dark:text-brand-400">

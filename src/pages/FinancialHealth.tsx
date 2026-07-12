@@ -18,7 +18,6 @@ import toast from "react-hot-toast";
 export const FinancialHealth: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  // Redux States
   const { loading: transLoading = false, error: transError = null } = useAppSelector(
     (state) => state.transactions || {},
   );
@@ -38,7 +37,6 @@ export const FinancialHealth: React.FC = () => {
   const loading = transLoading || budgetsLoading || portLoading || goalsLoading || subsLoading;
   const error = transError || budgetsError || portError || goalsError || subsError;
 
-  // Dynamic calculated health dataset using Redux Selector
   const healthData = useAppSelector(selectFinancialHealthData);
 
   const loadAllData = React.useCallback(() => {
@@ -53,7 +51,6 @@ export const FinancialHealth: React.FC = () => {
     loadAllData();
   }, [loadAllData]);
 
-  // Dispatch health warning notification once score is calculated
   useEffect(() => {
     if (!loading && healthData.overallScore > 0) {
       const isDropped = healthData.overallScore < 75;
@@ -82,7 +79,6 @@ export const FinancialHealth: React.FC = () => {
     }
   }, [loading, healthData.overallScore, dispatch]);
 
-  // AI-like dynamic warnings list
   const insights = useMemo(() => {
     const list: string[] = [];
 
@@ -116,12 +112,10 @@ export const FinancialHealth: React.FC = () => {
 
   const status = getHealthStatus(healthData.overallScore);
 
-  // Circular progress dimensions
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (healthData.overallScore / 100) * circumference;
 
-  // Render loading state
   if (loading) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left space-y-8 select-none">
@@ -134,7 +128,6 @@ export const FinancialHealth: React.FC = () => {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -175,15 +168,12 @@ export const FinancialHealth: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Circular progress and Stats Cards Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-8 select-none">
-        {/* Left Side: Circular Score (5 Columns) */}
         <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-2xl shadow-soft-sm flex flex-col items-center justify-center text-center">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-6">
             Overall Health Score
           </h3>
 
-          {/* SVG Circular Progress */}
           <div className="relative w-44 h-44 flex items-center justify-center">
             <svg className="w-full h-full transform -rotate-90">
               <circle
@@ -231,7 +221,6 @@ export const FinancialHealth: React.FC = () => {
           </p>
         </div>
 
-        {/* Right Side: 6 Metric Cards (7 Columns) */}
         <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Card 1: Savings Rate */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
@@ -248,7 +237,6 @@ export const FinancialHealth: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 2: Debt Ratio */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
@@ -263,7 +251,6 @@ export const FinancialHealth: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 3: Monthly Burn Rate */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
@@ -278,7 +265,6 @@ export const FinancialHealth: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 4: Emergency Fund */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
@@ -293,7 +279,6 @@ export const FinancialHealth: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 5: Investment Ratio */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
@@ -308,7 +293,6 @@ export const FinancialHealth: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 6: Budget Discipline */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
@@ -325,7 +309,6 @@ export const FinancialHealth: React.FC = () => {
         </div>
       </div>
 
-      {/* Actionable Insights Board */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-2xl shadow-soft-sm select-none">
         <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
           <Sparkles size={14} className="text-primary" /> Yapay Zeka Finansal Tavsiyeleri (AI

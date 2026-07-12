@@ -72,7 +72,6 @@ export const SubscriptionDetailModal: React.FC<SubscriptionDetailModalProps> = (
           <div className="shrink-0">{getStatusBadge(subscription.status)}</div>
         </div>
 
-        {/* Pricing breakdown summary */}
         <div className="bg-slate-50 dark:bg-slate-850 p-5 rounded-2xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 block mb-0.5">
@@ -95,7 +94,6 @@ export const SubscriptionDetailModal: React.FC<SubscriptionDetailModalProps> = (
           </div>
         </div>
 
-        {/* Details list grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex items-center gap-3 p-3.5 border border-slate-200/85 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900">
             <div className="w-10 h-10 bg-blue-500/10 text-primary dark:text-brand-400 rounded-lg flex items-center justify-center shrink-0">
@@ -158,7 +156,6 @@ export const SubscriptionDetailModal: React.FC<SubscriptionDetailModalProps> = (
           </div>
         </div>
 
-        {/* Alert for auto renew cancel status */}
         {!subscription.autoRenew && subscription.status === "active" && (
           <div className="bg-amber-500/10 border border-amber-500/20 text-amber-850 dark:text-amber-400 p-3.5 rounded-xl flex items-start gap-2.5">
             <AlertCircle size={16} className="shrink-0 mt-0.5" />
@@ -169,7 +166,6 @@ export const SubscriptionDetailModal: React.FC<SubscriptionDetailModalProps> = (
           </div>
         )}
 
-        {/* Notes */}
         {subscription.notes && (
           <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4">
             <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 mb-1.5 flex items-center gap-1">

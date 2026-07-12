@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface LayoutContextType {
@@ -22,25 +21,20 @@ export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const toggleMobileOpen = () => setMobileOpen((prev) => !prev);
   const toggleCollapsed = () => setCollapsed((prev) => !prev);
 
-  // Collapse durumunu yerel hafızada saklayalım
   useEffect(() => {
     localStorage.setItem("sidebar_collapsed", String(isCollapsed));
   }, [isCollapsed]);
 
-  // Ekran boyutunu izleyen ve otomatik collapse/drawer yöneten efekt
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const handleResize = () => {
       const width = window.innerWidth;
       if (width < 1024) {
-        // Mobil veya Tablet
         if (width >= 640 && width < 1024) {
-          // Tablet -> Otomatik daralt
           setCollapsed(true);
         }
       } else {
-        // Desktop -> Kayıtlı durumu geri yükle
         const saved = localStorage.getItem("sidebar_collapsed") === "true";
         setCollapsed(saved);
         setMobileOpen(false);

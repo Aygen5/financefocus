@@ -22,7 +22,6 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="FinanceFocus Yardım Merkezi" size="lg">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 min-h-[380px] text-left select-none">
-        {/* Left tabs menu */}
         <div className="md:col-span-1 border-r border-slate-100 dark:border-slate-800 pr-4 space-y-2 flex flex-col">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -43,7 +42,6 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           })}
         </div>
 
-        {/* Right tab content pane */}
         <div className="md:col-span-3 overflow-y-auto max-h-[380px] pr-2">
           {activeTab === "guide" && (
             <div className="space-y-4">

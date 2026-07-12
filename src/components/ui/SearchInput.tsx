@@ -1,6 +1,7 @@
-import React, { forwardRef } from "react";
+import { forwardRef } from "react";
 import { Search, X } from "lucide-react";
-import Input, { InputProps } from "./Input";
+import Input from "./Input";
+import type { InputProps } from "./Input";
 
 export interface SearchInputProps extends Omit<InputProps, "leftIcon" | "rightIcon"> {
   onClear?: () => void;

@@ -53,14 +53,12 @@ const AppearanceTab: React.FC<AppearanceTabProps> = ({ theme, onChangeTheme }) =
                   : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700"
               }`}
             >
-              {/* Preview block */}
               <div
                 className={`h-24 rounded-lg border p-3 space-y-1.5 flex flex-col justify-center items-center ${opt.previewClass}`}
               >
                 {opt.icon}
               </div>
 
-              {/* Title selection indicator */}
               <div className="flex items-center justify-between font-bold text-sm text-slate-800 dark:text-white pt-2">
                 <span>{opt.label}</span>
                 {isSelected ? (

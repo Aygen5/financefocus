@@ -28,7 +28,6 @@ export const forecastSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectForecastCashFlow = (state: { forecast: ForecastState }) =>
   state.forecast.cashFlowPredictions;
 export const selectForecastLoading = (state: { forecast: ForecastState }) => state.forecast.loading;

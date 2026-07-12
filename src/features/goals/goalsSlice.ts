@@ -31,7 +31,6 @@ const initialState: GoalsState = {
   error: null,
 };
 
-// Async Thunks
 export const fetchGoals = createAsyncThunk("goals/fetchGoals", async (_, { rejectWithValue }) => {
   try {
     return (await GoalsService.getAll()) as FinancialGoal[];
@@ -124,7 +123,6 @@ export const goalsSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectGoals = (state: { goals: GoalsState }) => state.goals.items;
 export const selectGoalsLoading = (state: { goals: GoalsState }) => state.goals.loading;
 export const selectGoalsError = (state: { goals: GoalsState }) => state.goals.error;

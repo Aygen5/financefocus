@@ -31,7 +31,6 @@ const SubscriptionSummary: React.FC<SubscriptionSummaryProps> = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-stack-lg text-left select-none">
-      {/* Monthly Total Cost */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm hover:shadow-soft-md transition-shadow">
         <div className="flex items-center justify-between mb-4">
           <span className="text-slate-500 font-label-sm uppercase tracking-wider text-[10px]">
@@ -51,7 +50,6 @@ const SubscriptionSummary: React.FC<SubscriptionSummaryProps> = ({
         </p>
       </div>
 
-      {/* Yearly Total Cost */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm hover:shadow-soft-md transition-shadow">
         <div className="flex items-center justify-between mb-4">
           <span className="text-slate-500 font-label-sm uppercase tracking-wider text-[10px]">
@@ -71,7 +69,6 @@ const SubscriptionSummary: React.FC<SubscriptionSummaryProps> = ({
         </p>
       </div>
 
-      {/* Most Expensive Subscription */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm hover:shadow-soft-md transition-shadow">
         <div className="flex items-center justify-between mb-4">
           <span className="text-slate-500 font-label-sm uppercase tracking-wider text-[10px]">
@@ -92,7 +89,6 @@ const SubscriptionSummary: React.FC<SubscriptionSummaryProps> = ({
         </p>
       </div>
 
-      {/* Average Cost */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm hover:shadow-soft-md transition-shadow">
         <div className="flex items-center justify-between mb-4">
           <span className="text-slate-500 font-label-sm uppercase tracking-wider text-[10px]">

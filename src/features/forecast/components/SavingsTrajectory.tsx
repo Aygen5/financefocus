@@ -5,15 +5,11 @@ import { formatCurrency } from "@/utils/financial";
 const SavingsTrajectory: React.FC = () => {
   const [savingsRate, setSavingsRate] = useState(15000);
 
-  // Basit dinamik özgürlük tarihi simülasyonu
-  // ₺15000 -> Ekim 2034. Her +₺5000 artışta tarihi yaklaşık 8 ay öne çekeriz
   const calculateFreedomDate = (rate: number) => {
-    // Değişime göre ay farkı hesapla
     const difference = rate - 15000;
-    const monthsOffset = Math.round((difference / 1000) * -1.5); // Her ₺1000 tasarruf artışı 1.5 ay kazandırır
+    const monthsOffset = Math.round((difference / 1000) * -1.5);
+    const targetDate = new Date(2026, 9, 1);
 
-    const targetDate = new Date(2026, 9, 1); // Bugünden itibaren simülasyon
-    // 2026 Ekim + (2034 Ekim - 2026 Ekim = 96 ay) + monthsOffset
     const totalMonths = 96 + monthsOffset;
     targetDate.setMonth(targetDate.getMonth() + totalMonths);
 
@@ -50,7 +46,6 @@ const SavingsTrajectory: React.FC = () => {
         </div>
       </div>
 
-      {/* Trajectory Insights widget */}
       <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-lg border border-slate-200/50 dark:border-slate-800/80 flex items-start gap-3">
         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
           <TrendingUp size={16} />

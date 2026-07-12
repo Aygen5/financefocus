@@ -40,7 +40,7 @@ export const selectFinancialHealthData = createSelector(
     }));
 
     const healthGoals = goals.map((g) => ({
-      title: g.title,
+      title: g.name,
       category: g.category,
       currentAmount: g.currentAmount,
       targetAmount: g.targetAmount,

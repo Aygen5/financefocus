@@ -42,7 +42,6 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({
           />
         </div>
 
-        {/* Push */}
         <div className="flex items-start justify-between">
           <div>
             <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold">
@@ -58,7 +57,6 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({
           />
         </div>
 
-        {/* SMS */}
         <div className="flex items-start justify-between">
           <div>
             <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold">

@@ -24,7 +24,6 @@ const initialState: BudgetState = {
   error: null,
 };
 
-// Async Thunks
 export const fetchBudgets = createAsyncThunk(
   "budget/fetchBudgets",
   async (_, { rejectWithValue }) => {
@@ -82,7 +81,6 @@ export const budgetSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectBudgets = (state: { budget: BudgetState }) => state.budget.items;
 export const selectBudgetLoading = (state: { budget: BudgetState }) => state.budget.loading;
 export const selectBudgetError = (state: { budget: BudgetState }) => state.budget.error;

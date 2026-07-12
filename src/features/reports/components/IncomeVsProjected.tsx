@@ -28,7 +28,6 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
   const [range, setRange] = useState<"6M" | "1Y" | "ALL">("6M");
   const themeMode = useAppSelector(selectThemeMode);
 
-  // Resolve dark condition dynamically
   const isDark = React.useMemo(() => {
     if (themeMode === "dark") return true;
     if (themeMode === "system") {
@@ -124,7 +123,6 @@ const IncomeVsProjected: React.FC<IncomeVsProjectedProps> = ({ data, loading = f
         </div>
       </div>
 
-      {/* Footer Breakdown */}
       <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-3 gap-4">
         <div>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">

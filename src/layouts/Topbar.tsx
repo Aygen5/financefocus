@@ -65,19 +65,16 @@ const Topbar: React.FC = () => {
   const navigate = useNavigate();
   const { toggleMobileOpen, isCollapsed } = useLayout();
 
-  // States
   const { items: notifications = [] } = useAppSelector((state) => state.notifications || {});
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isQuickActionOpen, setIsQuickActionOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Search-related states and refs
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Redux Selectors for Global Search
   const transactions = useAppSelector((state) => state.transactions?.items) || [];
   const budgets = useAppSelector((state) => state.budget?.items) || [];
   const goals = useAppSelector((state) => state.goals?.items) || [];
@@ -93,7 +90,6 @@ const Topbar: React.FC = () => {
     dispatch(fetchSubscriptions());
   }, [dispatch]);
 
-  // Shortcut keys listener
   useEffect(() => {
     const handleShortcuts = (e: KeyboardEvent) => {
       if (e.altKey && e.key.toLowerCase() === "h") {
@@ -109,7 +105,6 @@ const Topbar: React.FC = () => {
     return () => window.removeEventListener("keydown", handleShortcuts);
   }, []);
 
-  // Click outside to close panels logic
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
@@ -146,27 +141,21 @@ const Topbar: React.FC = () => {
     toast.success("Bildirim silindi.");
   };
 
-  // Dinamik sayfa başlığı çıkarma mantığı
   const currentPath = location.pathname;
   const currentMenu = navigationConfig.find((item) => item.path === currentPath);
   const pageTitle = currentMenu ? currentMenu.label : "FinanceFocus";
 
-  // Global Search Filtering Logic
   const query = searchQuery.toLowerCase().trim();
 
-  // 1. Transactions süzme
   const filteredTransactions = query
     ? transactions
         .filter(
           (t) =>
-            t.title.toLowerCase().includes(query) ||
-            (t.description && t.description.toLowerCase().includes(query)) ||
-            t.category.toLowerCase().includes(query),
+            t.description.toLowerCase().includes(query) || t.category.toLowerCase().includes(query),
         )
         .slice(0, 3)
     : [];
 
-  // 2. Budget süzme
   const filteredBudgets = query
     ? budgets
         .filter(
@@ -176,19 +165,17 @@ const Topbar: React.FC = () => {
         .slice(0, 3)
     : [];
 
-  // 3. Goals süzme
   const filteredGoals = query
     ? goals
         .filter(
           (g) =>
-            g.title.toLowerCase().includes(query) ||
+            g.name.toLowerCase().includes(query) ||
             (g.notes && g.notes.toLowerCase().includes(query)) ||
             g.category.toLowerCase().includes(query),
         )
         .slice(0, 3)
     : [];
 
-  // 4. Subscriptions süzme
   const filteredSubscriptions = query
     ? subscriptions
         .filter(
@@ -197,7 +184,6 @@ const Topbar: React.FC = () => {
         .slice(0, 3)
     : [];
 
-  // 5. Sayfalar / Navigasyon süzme
   const filteredPages = query
     ? navigationConfig
         .filter(
@@ -221,7 +207,6 @@ const Topbar: React.FC = () => {
         isCollapsed ? "w-full lg:w-[calc(100%-80px)]" : "w-full lg:w-[calc(100%-280px)]",
       )}
     >
-      {/* Sol: Hamburger Mobil Butonu & Dinamik Sayfa Başlığı / Breadcrumb */}
       <div className="flex items-center gap-4 flex-1">
         <button
           onClick={toggleMobileOpen}
@@ -231,7 +216,6 @@ const Topbar: React.FC = () => {
           <Menu size={20} />
         </button>
 
-        {/* Dinamik Sayfa Başlığı ve Breadcrumb */}
         <div className="hidden sm:flex flex-col text-left select-none">
           {/* Breadcrumbs */}
           <nav className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
@@ -243,14 +227,13 @@ const Topbar: React.FC = () => {
               Ana Sayfa
             </Link>
           </nav>
-          {/* Sayfa Başlığı */}
+
           <h2 className="text-sm font-extrabold text-slate-800 dark:text-white leading-none tracking-tight">
             {pageTitle}
           </h2>
         </div>
       </div>
 
-      {/* Orta: Search Bar (Global Command Search) */}
       <div className="hidden md:block flex-1 max-w-xs text-left mx-4 relative" ref={searchRef}>
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none select-none">
@@ -270,7 +253,6 @@ const Topbar: React.FC = () => {
           />
         </div>
 
-        {/* Global Live Search Results Dropdown */}
         {isSearchFocused && searchQuery && (
           <div className="absolute top-11 left-0 right-0 w-80 sm:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-soft-lg z-50 overflow-hidden max-h-[380px] overflow-y-auto custom-scrollbar select-none animate-slideDown">
             {!hasResults ? (
@@ -279,7 +261,6 @@ const Topbar: React.FC = () => {
               </div>
             ) : (
               <div className="py-2 divide-y divide-slate-100 dark:divide-slate-850">
-                {/* 1. Sayfalar / Navigasyon */}
                 {filteredPages.length > 0 && (
                   <div className="p-2">
                     <p className="px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
@@ -311,7 +292,6 @@ const Topbar: React.FC = () => {
                   </div>
                 )}
 
-                {/* 2. İşlemler (Transactions) */}
                 {filteredTransactions.length > 0 && (
                   <div className="p-2">
                     <p className="px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
@@ -334,7 +314,7 @@ const Topbar: React.FC = () => {
                         </div>
                         <div className="truncate flex-1">
                           <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold truncate group-hover:text-primary dark:group-hover:text-brand-400 transition-colors">
-                            {tx.title}
+                            {tx.description}
                           </p>
                           <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-500 truncate">
                             {tx.category} • {tx.amount.toLocaleString("tr-TR")} ₺
@@ -345,7 +325,6 @@ const Topbar: React.FC = () => {
                   </div>
                 )}
 
-                {/* 3. Bütçeler (Budgets) */}
                 {filteredBudgets.length > 0 && (
                   <div className="p-2">
                     <p className="px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
@@ -377,7 +356,6 @@ const Topbar: React.FC = () => {
                   </div>
                 )}
 
-                {/* 4. Hedefler (Goals) */}
                 {filteredGoals.length > 0 && (
                   <div className="p-2">
                     <p className="px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
@@ -398,7 +376,7 @@ const Topbar: React.FC = () => {
                         </div>
                         <div className="truncate flex-1">
                           <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold truncate group-hover:text-primary dark:group-hover:text-brand-400 transition-colors">
-                            {g.title}
+                            {g.name}
                           </p>
                           <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-500 truncate">
                             Hedef: {g.targetAmount.toLocaleString("tr-TR")} ₺
@@ -409,7 +387,6 @@ const Topbar: React.FC = () => {
                   </div>
                 )}
 
-                {/* 5. Abonelikler (Subscriptions) */}
                 {filteredSubscriptions.length > 0 && (
                   <div className="p-2">
                     <p className="px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
@@ -446,12 +423,10 @@ const Topbar: React.FC = () => {
         )}
       </div>
 
-      {/* Sağ Eylemler: Artı (+), Yardım (Help), Bildirimler (Bell) ve Profil (CircleUser) */}
       <div
         className="flex items-center gap-1 sm:gap-2 select-none shrink-0 relative"
         ref={panelRef}
       >
-        {/* Artı (+) Butonu */}
         <button
           onClick={handleAddTransactionClick}
           className="text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-full p-1.5 sm:p-2 transition-colors duration-200 flex items-center justify-center"
@@ -460,7 +435,6 @@ const Topbar: React.FC = () => {
           <Plus size={20} />
         </button>
 
-        {/* Yardım Butonu */}
         <button
           onClick={() => setIsHelpOpen(true)}
           className="text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-full p-1.5 sm:p-2 transition-colors duration-200 flex items-center justify-center"
@@ -469,7 +443,6 @@ const Topbar: React.FC = () => {
           <HelpCircle size={20} />
         </button>
 
-        {/* Bildirimler (Bell) Butonu */}
         <button
           onClick={() => setIsPanelOpen(!isPanelOpen)}
           className="text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-full p-1.5 sm:p-2 transition-colors duration-200 relative flex items-center justify-center"
@@ -483,7 +456,6 @@ const Topbar: React.FC = () => {
           )}
         </button>
 
-        {/* Notification Popover Panel */}
         {isPanelOpen && (
           <div className="absolute right-0 top-12 w-80 sm:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-soft-lg z-50 text-left overflow-hidden animate-slideDown">
             {/* Panel Header */}
@@ -501,7 +473,6 @@ const Topbar: React.FC = () => {
               )}
             </div>
 
-            {/* Notification List */}
             <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-850">
               {notifications.length === 0 ? (
                 <div className="p-8 text-center text-xs font-bold text-slate-400 dark:text-slate-500">
@@ -541,7 +512,6 @@ const Topbar: React.FC = () => {
                       </p>
                     </div>
 
-                    {/* Actions Panel */}
                     <div className="absolute right-2 bottom-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-slate-900 rounded-md p-1 shadow-soft-sm">
                       {!notif.isRead && (
                         <button
@@ -565,7 +535,6 @@ const Topbar: React.FC = () => {
               )}
             </div>
 
-            {/* Panel Footer */}
             <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-center">
               <Link
                 to={ROUTES.NOTIFICATIONS}
@@ -578,7 +547,6 @@ const Topbar: React.FC = () => {
           </div>
         )}
 
-        {/* Profil (CircleUser) Butonu */}
         <Link
           to={ROUTES.SETTINGS}
           className="text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-full p-2 transition-colors duration-200 flex items-center justify-center"
@@ -588,7 +556,6 @@ const Topbar: React.FC = () => {
         </Link>
       </div>
 
-      {/* Real modals integration */}
       <QuickActionModal isOpen={isQuickActionOpen} onClose={() => setIsQuickActionOpen(false)} />
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </header>

@@ -5,7 +5,6 @@ import { Landmark } from "lucide-react";
 const AuthLayout: React.FC = () => {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 transition-colors duration-250 select-none overflow-y-auto lg:overflow-hidden">
-      {/* Sol Panel: Premium Image (Sayfanın 50% genişliğini kaplar) */}
       <section className="w-full lg:w-1/2 relative border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 shrink-0 h-72 sm:h-[380px] lg:h-auto overflow-hidden">
         <img
           src="/login_visual.jpg"
@@ -41,7 +40,6 @@ const AuthLayout: React.FC = () => {
         </div>
       </section>
 
-      {/* Sağ Panel: Bütünleşik Form Kartı (Sayfanın 50% genişliğini kaplar) */}
       <section className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-16 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
         <div className="w-full max-w-[460px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-8 rounded-2xl shadow-soft-xl animate-zoomIn">
           <React.Suspense

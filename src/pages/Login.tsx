@@ -28,7 +28,6 @@ const Login: React.FC = () => {
   const [isForgotSuccess, setIsForgotSuccess] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
 
-  // Login Form Hook
   const {
     register,
     handleSubmit,
@@ -43,7 +42,6 @@ const Login: React.FC = () => {
     },
   });
 
-  // Forgot Password Form Hook
   const {
     register: registerForgot,
     handleSubmit: handleSubmitForgot,
@@ -56,7 +54,6 @@ const Login: React.FC = () => {
     },
   });
 
-  // Giriş durumunu izle ve yönlendir
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(
@@ -81,7 +78,6 @@ const Login: React.FC = () => {
     }
   }, [isAuthenticated, navigate, dispatch]);
 
-  // Hata durumunu toast ile göster
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -95,14 +91,12 @@ const Login: React.FC = () => {
 
   const onForgotSubmit = async (data: ForgotPasswordFormData) => {
     setForgotLoading(true);
-    // Mock API simulation
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setForgotLoading(false);
     setIsForgotSuccess(true);
     toast.success(`Şifre sıfırlama bağlantısı ${data.email} adresine gönderildi!`);
   };
 
-  // Demo bilgileri ile hızlı doldurma fonksiyonu
   const handleQuickDemoFill = () => {
     setValue("email", "demo@financefocus.com");
     setValue("password", "123456");
@@ -123,7 +117,6 @@ const Login: React.FC = () => {
         </p>
       </div>
 
-      {/* Şifremi Unuttum Görünümü */}
       {isForgotPassword ? (
         <div className="space-y-6">
           {isForgotSuccess ? (
@@ -207,7 +200,6 @@ const Login: React.FC = () => {
           )}
         </div>
       ) : (
-        /* Giriş Görünümü */
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 text-left">
           {/* E-posta Alanı */}
           <div>
@@ -240,7 +232,6 @@ const Login: React.FC = () => {
             )}
           </div>
 
-          {/* Şifre Alanı */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label
@@ -283,7 +274,6 @@ const Login: React.FC = () => {
             )}
           </div>
 
-          {/* Beni Hatırla */}
           <div className="flex items-center">
             <input
               id="remember-me"
@@ -299,7 +289,6 @@ const Login: React.FC = () => {
             </label>
           </div>
 
-          {/* Eylemler ve Hızlı Demo */}
           <div className="pt-2 space-y-3">
             <button
               type="submit"
@@ -319,7 +308,6 @@ const Login: React.FC = () => {
         </form>
       )}
 
-      {/* Kayıt Ol Linki */}
       <div className="pt-4 text-center">
         <p className="font-body-sm text-body-sm text-slate-500 dark:text-slate-400">
           Hesabınız yok mu?{" "}

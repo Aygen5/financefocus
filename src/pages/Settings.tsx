@@ -25,7 +25,6 @@ const Settings: React.FC = () => {
   const { settings } = useAppSelector((state) => state.settings || {});
   const themeMode = useAppSelector((state) => state.theme.mode);
 
-  // States
   const [activeTab, setActiveTab] = useState<TabType>("profile");
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
@@ -90,7 +89,6 @@ const Settings: React.FC = () => {
   };
 
   const handleUpdatePassword = async (data: ChangePasswordFormData): Promise<boolean> => {
-    // Update password in settings state (persists in LocalStorage)
     const resultAction = await dispatch(updateSettings({ password: data.newPassword }));
     if (updateSettings.fulfilled.match(resultAction)) {
       dispatch(
@@ -118,7 +116,6 @@ const Settings: React.FC = () => {
   };
 
   const handleDeleteAccount = async () => {
-    // Clear LocalStorage mock credentials and tables
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("user_settings");
@@ -247,7 +244,6 @@ const Settings: React.FC = () => {
           })}
         </nav>
 
-        {/* Sağ İçerik Alanı (Canvas container) */}
         <div className="col-span-12 md:col-span-9 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-soft-sm">
           {activeTab === "profile" && (
             <ProfileTab
@@ -297,7 +293,6 @@ const Settings: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating help button bottom corner */}
       <button
         onClick={() => setIsHelpOpen(true)}
         className="fixed bottom-8 right-8 w-14 h-14 bg-primary dark:bg-brand-500 text-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-50 cursor-pointer"

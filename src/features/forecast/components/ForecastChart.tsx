@@ -28,7 +28,6 @@ export interface ForecastChartProps {
 const ForecastChart: React.FC<ForecastChartProps> = ({ data, loading = false }) => {
   const themeMode = useAppSelector(selectThemeMode);
 
-  // Resolve dark condition dynamically
   const isDark = React.useMemo(() => {
     if (themeMode === "dark") return true;
     if (themeMode === "system") {
@@ -75,12 +74,11 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ data, loading = false }) 
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
             <defs>
-              {/* Historical Area Gradient */}
               <linearGradient id="colorHistorical" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#64748b" stopOpacity={0.15} />
                 <stop offset="95%" stopColor="#64748b" stopOpacity={0.0} />
               </linearGradient>
-              {/* Projected Area Gradient */}
+
               <linearGradient id="colorProjected" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#0053db" stopOpacity={0.2} />
                 <stop offset="95%" stopColor="#0053db" stopOpacity={0.0} />
@@ -113,7 +111,7 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ data, loading = false }) 
                 fontSize: "12px",
               }}
             />
-            {/* Today Reference Line */}
+
             <ReferenceLine
               x={2024}
               stroke={referenceLineColor}
@@ -126,7 +124,7 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ data, loading = false }) 
                 fontWeight: "bold",
               }}
             />
-            {/* Historical Series */}
+
             <Area
               type="monotone"
               dataKey="historical"
@@ -135,7 +133,7 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ data, loading = false }) 
               fillOpacity={1}
               fill="url(#colorHistorical)"
             />
-            {/* Projected Series */}
+
             <Area
               type="monotone"
               dataKey="projected"

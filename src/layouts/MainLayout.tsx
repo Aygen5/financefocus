@@ -24,15 +24,11 @@ const ContentFallback: React.FC = () => (
 const MainLayoutContent: React.FC = () => {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 transition-colors duration-250 select-none">
-      {/* Sidebar - 280px or 80px */}
       <Sidebar />
 
-      {/* Main Content Pane */}
       <div className="flex flex-1 flex-col overflow-hidden relative">
-        {/* Topbar */}
         <Topbar />
 
-        {/* Dynamic Page Views Outlet Container */}
         <main
           className={cn(
             "flex-1 overflow-y-auto px-6 py-8 mt-16 custom-scrollbar flex justify-center",

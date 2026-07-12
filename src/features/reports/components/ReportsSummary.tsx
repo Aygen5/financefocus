@@ -47,7 +47,6 @@ const ReportsSummary: React.FC<ReportsSummaryProps> = ({
         </h3>
       </div>
 
-      {/* Expenses */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800/80 hover:shadow-soft-md transition-shadow group">
         <div className="flex justify-between items-start mb-4">
           <div className="p-2 bg-amber-500/10 text-amber-600 rounded-lg">
@@ -65,7 +64,6 @@ const ReportsSummary: React.FC<ReportsSummaryProps> = ({
         </h3>
       </div>
 
-      {/* Savings Progress */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800/80 hover:shadow-soft-md transition-shadow group">
         <div className="flex justify-between items-start mb-4">
           <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-lg">
@@ -83,7 +81,6 @@ const ReportsSummary: React.FC<ReportsSummaryProps> = ({
         </h3>
       </div>
 
-      {/* Risk Score */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800/80 hover:shadow-soft-md transition-shadow group">
         <div className="flex justify-between items-start mb-4">
           <div className="p-2 bg-red-500/10 text-red-600 rounded-lg">

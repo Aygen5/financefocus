@@ -1,4 +1,3 @@
-import React from "react";
 import { describe, it, expect } from "vitest";
 import { screen } from "@testing-library/react";
 import { renderWithProviders } from "./test-utils";
@@ -27,9 +26,7 @@ describe("Dashboard SummaryCards Render Tests", () => {
 
   it("renders loading skeletons when loading prop is true", () => {
     const { container } = renderWithProviders(
-      <SummaryCards netWorth={0} income={0} expenses={0} savings={0} loading={true}>
-        Loading
-      </SummaryCards>,
+      <SummaryCards netWorth={0} income={0} expenses={0} savings={0} loading={true} />,
     );
     expect(container.getElementsByClassName("animate-pulse").length).toBeGreaterThan(0);
   });

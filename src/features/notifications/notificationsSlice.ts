@@ -10,6 +10,10 @@ export interface SystemNotification {
   isRead: boolean;
   createdAt: string;
   icon: string;
+  category?: string;
+  timeAgo?: string;
+  threshold?: number;
+  read?: boolean;
 }
 
 export interface NotificationsState {
@@ -45,7 +49,6 @@ const MOCK_INITIAL_NOTIFS: SystemNotification[] = [
   },
 ];
 
-// Async Thunks
 export const fetchNotifications = createAsyncThunk("notifications/fetchNotifications", async () => {
   try {
     const response = await api.get<SystemNotification[]>("/notifications");

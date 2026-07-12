@@ -36,7 +36,7 @@ export const useGoals = () => {
           addActivityLog({
             action: "Goal Created",
             category: "Goals",
-            description: `"${data.title}" isimli yeni hedef oluşturuldu.`,
+            description: `"${data.name}" isimli yeni hedef oluşturuldu.`,
             user: "Aygen",
             icon: "Award",
             status: "success",
@@ -45,7 +45,7 @@ export const useGoals = () => {
         dispatch(
           addNotification({
             title: "Goal Created",
-            message: `"${data.title}" isimli yeni hedef başarıyla oluşturuldu.`,
+            message: `"${data.name}" isimli yeni hedef başarıyla oluşturuldu.`,
             type: "success",
             icon: "Award",
           }),

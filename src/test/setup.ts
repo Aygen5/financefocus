@@ -1,7 +1,6 @@
 import "@testing-library/jest-dom";
 import { vi } from "vitest";
 
-// Mock matchMedia (for responsive sidebar test cases)
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
@@ -16,7 +15,6 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
-// Mock LocalStorage
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {

@@ -7,7 +7,6 @@ export interface ThemeState {
   mode: ThemeMode;
 }
 
-// Helper to apply classes to the HTML element
 export const applyTheme = (mode: ThemeMode) => {
   if (typeof window === "undefined") return;
   const root = window.document.documentElement;
@@ -31,7 +30,6 @@ const getSavedTheme = (): ThemeMode => {
 };
 
 const initialMode = getSavedTheme();
-// Apply initial theme immediately on boot to prevent flash of light theme
 applyTheme(initialMode);
 
 const initialState: ThemeState = {
@@ -43,7 +41,6 @@ export const themeSlice = createSlice({
   initialState,
   reducers: {
     toggleTheme: (state) => {
-      // Toggle cycles: light -> dark -> system -> light
       let nextMode: ThemeMode = "light";
       if (state.mode === "light") {
         nextMode = "dark";
@@ -64,7 +61,6 @@ export const themeSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectThemeMode = (state: { theme: ThemeState }) => state.theme.mode;
 
 export const { toggleTheme, setTheme } = themeSlice.actions;

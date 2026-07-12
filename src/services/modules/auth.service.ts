@@ -30,7 +30,6 @@ export const AuthService = {
   },
 
   logout: async (): Promise<void> => {
-    // Mock veya gerçek backend çıkışı
     localStorage.removeItem("token");
     localStorage.removeItem("user");
   },

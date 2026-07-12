@@ -22,7 +22,6 @@ const initialState: AuthState = {
   error: null,
 };
 
-// Dummy Thunks (API veya business logic yok, sadece derleme hatasını önlemek için)
 export const loginUser = createAsyncThunk("auth/loginUser", async (credentials: LoginFormData) => {
   return { id: "1", email: credentials.email, name: "Alex" } as User;
 });
@@ -77,7 +76,6 @@ export const authSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectAuthUser = (state: { auth: AuthState }) => state.auth.user;
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;
 export const selectAuthLoading = (state: { auth: AuthState }) => state.auth.loading;

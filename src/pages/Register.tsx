@@ -30,7 +30,6 @@ const Register: React.FC = () => {
     },
   });
 
-  // Hata durumunu toast ile göster
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -77,7 +76,6 @@ const Register: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Logo Header */}
       <div className="text-left space-y-2 select-none">
         <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-none">
           Hesap Oluşturun
@@ -87,9 +85,7 @@ const Register: React.FC = () => {
         </p>
       </div>
 
-      {/* Kayıt Formu */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-left">
-        {/* Ad Soyad */}
         <div>
           <label
             className="block font-label-sm text-label-sm text-slate-700 dark:text-slate-350 mb-1.5"
@@ -120,7 +116,6 @@ const Register: React.FC = () => {
           )}
         </div>
 
-        {/* E-posta */}
         <div>
           <label
             className="block font-label-sm text-label-sm text-slate-700 dark:text-slate-350 mb-1.5"
@@ -151,7 +146,6 @@ const Register: React.FC = () => {
           )}
         </div>
 
-        {/* Şifre */}
         <div>
           <label
             className="block font-label-sm text-label-sm text-slate-700 dark:text-slate-350 mb-1.5"
@@ -182,7 +176,6 @@ const Register: React.FC = () => {
           )}
         </div>
 
-        {/* Şifre Tekrarı */}
         <div>
           <label
             className="block font-label-sm text-label-sm text-slate-700 dark:text-slate-350 mb-1.5"
@@ -213,7 +206,6 @@ const Register: React.FC = () => {
           )}
         </div>
 
-        {/* Koşullar */}
         <div className="flex items-start gap-2 pt-1">
           <input
             id="terms"
@@ -242,7 +234,6 @@ const Register: React.FC = () => {
           </span>
         )}
 
-        {/* Submit Butonu */}
         <button
           type="submit"
           disabled={loading}
@@ -252,7 +243,6 @@ const Register: React.FC = () => {
         </button>
       </form>
 
-      {/* Giriş Linki */}
       <div className="pt-4 text-center">
         <p className="font-body-sm text-body-sm text-slate-500 dark:text-slate-400">
           Zaten bir hesabınız var mı?{" "}

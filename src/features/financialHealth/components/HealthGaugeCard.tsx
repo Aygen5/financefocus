@@ -11,7 +11,6 @@ const HealthGaugeCard: React.FC<HealthGaugeCardProps> = ({ score, loading = fals
     return <div className="h-80 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />;
   }
 
-  // SVG dairesel gösterge hesaplamaları
   const radius = 90;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (score / 100) * circumference;
@@ -53,7 +52,6 @@ const HealthGaugeCard: React.FC<HealthGaugeCardProps> = ({ score, loading = fals
         </div>
       </div>
 
-      {/* Detail info */}
       <div className="flex-1 space-y-6">
         <div>
           <h3 className="font-headline-md text-headline-md text-slate-800 dark:text-white font-bold mb-2">

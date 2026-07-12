@@ -6,6 +6,7 @@ import { TrendingUp, TrendingDown, Minus, Download } from "lucide-react";
 import { formatCurrency } from "@/utils/financial";
 
 export interface AssetHolding {
+  id: string;
   symbol: string;
   name: string;
   shares: string;

@@ -13,7 +13,6 @@
     @apply bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased transition-colors duration-200;
   }
 
-  /* Executive Precision Custom Scrollbars */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -26,14 +25,12 @@
   }
 }
 
-/* Chrome, Safari, Edge, Opera number input spinner remove */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* Firefox number input spinner remove */
 input[type="number"] {
   -moz-appearance: textfield;
 }

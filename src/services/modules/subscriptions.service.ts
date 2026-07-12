@@ -16,6 +16,11 @@ export const SubscriptionsService = {
     return response.data;
   },
 
+  update: async (id: string, data: Partial<Subscription>): Promise<Subscription> => {
+    const response = await api.patch<Subscription>(ENDPOINTS.SUBSCRIPTIONS.DETAIL(id), data);
+    return response.data;
+  },
+
   delete: async (id: string): Promise<void> => {
     await api.delete(ENDPOINTS.SUBSCRIPTIONS.DETAIL(id));
   },

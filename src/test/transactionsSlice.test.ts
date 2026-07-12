@@ -3,8 +3,8 @@ import transactionsReducer, {
   setFilters,
   resetFilters,
   fetchTransactions,
-  TransactionsState,
 } from "../features/transactions/transactionsSlice";
+import type { TransactionsState } from "../features/transactions/transactionsSlice";
 
 describe("transactionsSlice Redux AsyncThunk Tests", () => {
   const initialState: TransactionsState = {
@@ -50,13 +50,14 @@ describe("transactionsSlice Redux AsyncThunk Tests", () => {
       {
         id: "1",
         userId: "1",
-        title: "Deneme Gelir",
+        description: "Deneme Gelir",
         amount: 5000,
         transactionType: "income" as const,
         date: "2026-07-06",
         category: "Maaş",
         account: "Mevduat",
         status: "completed" as const,
+        currency: "TRY",
         createdAt: "2026-07-06T10:00:00Z",
         updatedAt: "2026-07-06T10:00:00Z",
       },

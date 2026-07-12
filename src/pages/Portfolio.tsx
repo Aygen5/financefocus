@@ -55,17 +55,14 @@ const Portfolio: React.FC = () => {
     toast.success("Portföy detayları dışa aktarılıyor.");
   };
 
-  // 1. Dinamik Portföy Değerleri
   const assetsTotal = useMemo(() => calculateNetWorth(assets), [assets]);
   const totalProfitLoss = useMemo(() => calculateTotalPortfolioProfitLoss(assets), [assets]);
   const trend = useMemo(() => calculateTotalPortfolioChangeRate(assets), [assets]);
 
-  // 2. En Büyük Varlık Hesaplaması
   const largestAsset = useMemo(() => calculateLargestAsset(assets), [assets]);
   const largestAssetName = largestAsset ? largestAsset.symbol : "Yok";
   const largestAssetValue = largestAsset ? calculateAssetValue(largestAsset) : 0;
 
-  // 3. Varlık Dağılım Verisi
   const allocationData: AllocationItem[] = useMemo(() => {
     const rawAllocations = calculatePortfolioAssetAllocation(assets);
     return rawAllocations.map((alloc, idx) => ({
@@ -76,14 +73,12 @@ const Portfolio: React.FC = () => {
     }));
   }, [assets, assetsTotal]);
 
-  // 4. Detaylı Holdings Verisi Map'lemesi (Table uyumluluğu için)
   const holdingsData: AssetHolding[] = useMemo(() => {
     return assets.map((asset) => {
       const val = calculateAssetValue(asset);
       const change = calculateAssetPercentageChange(asset);
       const allocRatio = assetsTotal > 0 ? Number(((val / assetsTotal) * 100).toFixed(1)) : 0;
 
-      // Kategori Türkçeleştirmesi
       let catName = "Diğer";
       switch (asset.type) {
         case "stocks":
@@ -110,6 +105,7 @@ const Portfolio: React.FC = () => {
       }
 
       return {
+        id: asset.id,
         symbol: asset.symbol,
         name: asset.name,
         shares: `${asset.amount} ${asset.type === "gold" || asset.type === "silver" ? "Gr" : "Adet"}`,
@@ -121,7 +117,6 @@ const Portfolio: React.FC = () => {
     });
   }, [assets, assetsTotal]);
 
-  // Render Yüklenme Durumu
   if (loading) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left space-y-8 select-none">
@@ -140,7 +135,6 @@ const Portfolio: React.FC = () => {
     );
   }
 
-  // Render Hata Durumu
   if (error) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -156,7 +150,6 @@ const Portfolio: React.FC = () => {
     );
   }
 
-  // Render Boş Veri Durumu
   if (assets.length === 0) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -184,7 +177,6 @@ const Portfolio: React.FC = () => {
         </p>
       </div>
 
-      {/* Summary Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <NetWorthSummary
           netWorth={assetsTotal}
@@ -201,7 +193,6 @@ const Portfolio: React.FC = () => {
         </div>
       </div>
 
-      {/* Detailed Table */}
       <HoldingsTable assets={holdingsData} loading={false} onExport={handleExport} />
     </div>
   );

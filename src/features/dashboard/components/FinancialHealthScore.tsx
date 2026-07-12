@@ -7,7 +7,6 @@ export interface FinancialHealthScoreProps {
 }
 
 const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score, loading = false }) => {
-  // SVG yarım çember uzunluğu (pi * r) -> r = 35 için yaklaşık 110
   const strokeLength = 110;
   const strokeOffset = strokeLength - (strokeLength * score) / 100;
 
@@ -33,7 +32,7 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score, load
                 strokeWidth="10"
                 strokeLinecap="round"
               />
-              {/* Foreground Arc */}
+
               <path
                 d="M 15 50 A 35 35 0 0 1 85 50"
                 fill="none"

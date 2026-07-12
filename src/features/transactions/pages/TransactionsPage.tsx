@@ -45,7 +45,6 @@ export const TransactionsPage: React.FC = () => {
     handleDeleteTransaction,
   } = useTransactions();
 
-  // Modal ve Dialog States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -105,7 +104,6 @@ export const TransactionsPage: React.FC = () => {
     }
   }, [selectedTransaction, handleDeleteTransaction]);
 
-  // Dinamik Hata Mesajı ve İkon Belirleme Mantığı
   const getErrorConfig = (errStr: string) => {
     const lowerErr = errStr.toLowerCase();
     if (
@@ -144,7 +142,6 @@ export const TransactionsPage: React.FC = () => {
     };
   };
 
-  // Column definitions for the DataTable
   const columns = React.useMemo<Column<Transaction>[]>(
     () => [
       {
@@ -251,7 +248,6 @@ export const TransactionsPage: React.FC = () => {
           </p>
         </div>
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full sm:w-auto">
-          {/* Quick Search */}
           <div className="relative w-full sm:w-60">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none select-none">
               <Search size={16} />
@@ -279,7 +275,6 @@ export const TransactionsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters Panel */}
       <TransactionFiltersPanel
         filters={filters}
         activeFiltersCount={activeFiltersCount}
@@ -287,11 +282,9 @@ export const TransactionsPage: React.FC = () => {
         onReset={handleResetFilters}
       />
 
-      {/* Data Table / Loading / Empty / Error States Container */}
       {loading ? (
         <SkeletonTable columns={6} rows={8} />
       ) : error ? (
-        // Hata Durumu (Error State)
         (() => {
           const config = getErrorConfig(error);
           return (
@@ -307,7 +300,6 @@ export const TransactionsPage: React.FC = () => {
         })()
       ) : transactions.length === 0 ? (
         allTransactions.length === 0 ? (
-          // Senaryo 1: Sistemde hiç işlem yok
           <EmptyState
             title="Henüz İşlem Kaydedilmedi"
             description="Gelir veya gider hareketlerinizi ekleyerek bütçenizi yönetmeye başlayabilirsiniz."
@@ -317,7 +309,6 @@ export const TransactionsPage: React.FC = () => {
             primaryActionIcon={<Plus size={16} />}
           />
         ) : filters.search.trim() !== "" ? (
-          // Senaryo 2: Arama sonucu bulunamadı
           <EmptyState
             title="Arama Sonucu Bulunamadı"
             description={`"${filters.search}" araması ile eşleşen herhangi bir işlem kaydı mevcut değil.`}
@@ -327,7 +318,6 @@ export const TransactionsPage: React.FC = () => {
             primaryActionIcon={<RotateCcw size={16} />}
           />
         ) : (
-          // Senaryo 3: Filtre sonucu bulunamadı
           <EmptyState
             title="Filtre Sonucu Bulunamadı"
             description="Seçilen filtrelere uygun herhangi bir işlem bulunamadı. Filtreleri temizleyerek tekrar deneyebilirsiniz."
@@ -343,7 +333,6 @@ export const TransactionsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Add Transaction Modal */}
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
@@ -353,7 +342,6 @@ export const TransactionsPage: React.FC = () => {
         <TransactionForm onSubmit={onAddSubmit} loading={isSubmitLoading} submitLabel="Ekle" />
       </Modal>
 
-      {/* Edit Transaction Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => {
@@ -380,7 +368,6 @@ export const TransactionsPage: React.FC = () => {
         )}
       </Modal>
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={isDeleteOpen}
         onClose={() => {

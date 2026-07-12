@@ -114,7 +114,6 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           </div>
         </div>
 
-        {/* Next payment details */}
         <div className="space-y-2 mb-6">
           <div className="flex justify-between text-xs">
             <span className="font-bold text-slate-400 dark:text-slate-500">Sonraki Ödeme</span>
@@ -135,7 +134,6 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
         </div>
       </div>
 
-      {/* Actions footer */}
       <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800/80">
         <button
           onClick={() => onView(subscription)}

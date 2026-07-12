@@ -20,7 +20,6 @@ const initialState: ReportsState = {
   error: null,
 };
 
-// Dummy Thunks for compilation safety
 export const fetchReports = createAsyncThunk("reports/fetchReports", async () => {
   return [] as FinancialReport[];
 });
@@ -51,7 +50,6 @@ export const reportsSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectReports = (state: { reports: ReportsState }) => state.reports.items;
 export const selectReportsLoading = (state: { reports: ReportsState }) => state.reports.loading;
 export const selectReportsError = (state: { reports: ReportsState }) => state.reports.error;

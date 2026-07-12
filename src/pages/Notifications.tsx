@@ -62,7 +62,6 @@ const Notifications: React.FC = () => {
     error = null,
   } = useAppSelector((state) => state.notifications || {});
 
-  // States
   const [filter, setFilter] = useState<string>("All");
 
   useEffect(() => {
@@ -88,7 +87,6 @@ const Notifications: React.FC = () => {
     dispatch(fetchNotifications());
   };
 
-  // Filter logic
   const filteredNotifications = useMemo(() => {
     return notifications.filter((notif) => {
       if (filter === "All") return true;
@@ -154,9 +152,7 @@ const Notifications: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters & Summary Bar */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-gutter mb-8 select-none">
-        {/* Filter Tabs */}
         <div className="lg:col-span-3 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {[
             { value: "All", label: "Tüm Bildirimler" },
@@ -184,7 +180,6 @@ const Notifications: React.FC = () => {
           })}
         </div>
 
-        {/* Unread Counter Card */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/85 dark:border-slate-800/85 p-4 rounded-xl flex items-center justify-between shadow-soft-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary dark:text-brand-400">
@@ -202,7 +197,6 @@ const Notifications: React.FC = () => {
         </div>
       </div>
 
-      {/* Notification List / Empty State */}
       {filteredNotifications.length === 0 ? (
         <EmptyState
           title="Bildirim Bulunmuyor"
@@ -243,7 +237,6 @@ const Notifications: React.FC = () => {
                 </p>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 {!notif.isRead && (
                   <button

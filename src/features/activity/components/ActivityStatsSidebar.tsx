@@ -8,7 +8,6 @@ export interface ActivityStatsSidebarProps {
 const ActivityStatsSidebar: React.FC<ActivityStatsSidebarProps> = ({ onViewReport }) => {
   return (
     <div className="space-y-gutter text-left">
-      {/* Activity Stats */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-6 shadow-soft-sm">
         <h3 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold mb-4">
           Aktivite İstatistikleri (Activity Stats)
@@ -40,7 +39,6 @@ const ActivityStatsSidebar: React.FC<ActivityStatsSidebarProps> = ({ onViewRepor
         </div>
       </div>
 
-      {/* Intelligence report card */}
       <div className="bg-blue-600/90 dark:bg-brand-900/40 text-white p-6 rounded-xl shadow-soft-sm relative overflow-hidden">
         <div className="relative z-10">
           <h4 className="font-headline-sm text-headline-sm font-bold mb-2">Insight</h4>

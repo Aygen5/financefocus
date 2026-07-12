@@ -38,7 +38,6 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
     );
   }
 
-  // İkon seçme helper'ı
   const getActivityIcon = (category: string) => {
     switch (category.toLowerCase()) {
       case "transaction":
@@ -58,7 +57,6 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
     }
   };
 
-  // Zaman tüneli için tarihlere göre gruplama (örn. Today, Yesterday, This Week)
   const groupedLogs = logs.reduce<Record<string, ActivityLog[]>>((groups, log) => {
     const label = log.timeLabel || "Diğer Aktiviteler";
     if (!groups[label]) {
@@ -72,7 +70,6 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
     <div className="space-y-stack-lg text-left">
       {Object.entries(groupedLogs).map(([label, items]) => (
         <section key={label}>
-          {/* Section Header */}
           <div className="flex items-center gap-4 mb-6 select-none">
             <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">{label}</h4>
             <div className="h-[1px] flex-1 bg-slate-100 dark:bg-slate-850" />
@@ -85,17 +82,14 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
 
               return (
                 <div key={log.id} className="flex gap-6 relative">
-                  {/* Left Timeline vertical line indicator */}
                   {idx < items.length - 1 && (
                     <div className="absolute left-[19px] top-8 bottom-[-32px] w-[2px] bg-slate-200 dark:bg-slate-800 opacity-40" />
                   )}
 
-                  {/* Left circular icon */}
                   <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-850 flex items-center justify-center border border-slate-200 dark:border-slate-800 z-10 shrink-0">
                     {getActivityIcon(log.category || "")}
                   </div>
 
-                  {/* Right Detail bubble */}
                   <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-5 hover:shadow-soft-md transition-all group">
                     <div className="flex justify-between items-start mb-1">
                       <h5 className="font-headline-sm text-sm text-slate-800 dark:text-white group-hover:text-primary dark:group-hover:text-brand-400 transition-colors font-bold leading-tight">
@@ -123,14 +117,12 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
                       </div>
                     )}
 
-                    {/* Budget Progress bar */}
                     {isBudget && log.meta?.progress && (
                       <div className="mt-3">
                         <ProgressBar value={log.meta.progress} max={100} variant="brand" />
                       </div>
                     )}
 
-                    {/* Report actions buttons */}
                     {isReport && (
                       <div className="mt-4 flex gap-2">
                         <Button
@@ -159,7 +151,6 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
         </section>
       ))}
 
-      {/* End of recent history loader block */}
       <div className="flex flex-col items-center py-10">
         <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mb-4 text-slate-400">
           <History size={20} />

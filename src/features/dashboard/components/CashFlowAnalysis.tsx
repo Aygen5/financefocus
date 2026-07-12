@@ -29,7 +29,6 @@ export interface CashFlowAnalysisProps {
 const CashFlowAnalysis: React.FC<CashFlowAnalysisProps> = ({ data, loading = false }) => {
   const themeMode = useAppSelector(selectThemeMode);
 
-  // Resolve dark condition dynamically
   const isDark = React.useMemo(() => {
     if (themeMode === "dark") return true;
     if (themeMode === "system") {

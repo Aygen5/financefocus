@@ -19,7 +19,6 @@ const CategoryBudgets: React.FC<CategoryBudgetsProps> = ({ budgets, loading = fa
     );
   }
 
-  // Kategori ikon helper
   const getCategoryIcon = (category: string) => {
     const lower = category.toLowerCase();
     if (lower.includes("housing") || lower.includes("konut") || lower.includes("kira")) {
@@ -58,7 +57,6 @@ const CategoryBudgets: React.FC<CategoryBudgetsProps> = ({ budgets, loading = fa
           budget.category.toLowerCase().includes("tasarruf") ||
           budget.category.toLowerCase().includes("invest");
 
-        // Bütçe kartının genişliği (Tasarruf kartı geniş grid kaplar)
         const gridColSpan = isSavings ? "col-span-1 md:col-span-2" : "col-span-1";
 
         return (
@@ -66,7 +64,6 @@ const CategoryBudgets: React.FC<CategoryBudgetsProps> = ({ budgets, loading = fa
             key={budget.id}
             className={`bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-6 shadow-soft-sm hover:shadow-soft-md transition-shadow relative overflow-hidden ${gridColSpan}`}
           >
-            {/* Limit aşımında sağ üstte hafif kırmızı gölge detayı */}
             {isOver && (
               <div className="absolute top-0 right-0 w-16 h-16 bg-red-500/5 rotate-45 translate-x-8 -translate-y-8 rounded-lg pointer-events-none" />
             )}
@@ -95,7 +92,6 @@ const CategoryBudgets: React.FC<CategoryBudgetsProps> = ({ budgets, loading = fa
               )}
             </div>
 
-            {/* Progress Area */}
             <div className="mb-4">
               <div className="flex justify-between text-sm font-semibold mb-2">
                 <span className={isOver ? "text-red-500" : "text-slate-800 dark:text-slate-200"}>
@@ -107,7 +103,6 @@ const CategoryBudgets: React.FC<CategoryBudgetsProps> = ({ budgets, loading = fa
                 </span>
               </div>
 
-              {/* Bütçe aşımında kırmızı doluluk */}
               <div className="w-full">
                 <ProgressBar
                   value={spent}
@@ -119,7 +114,6 @@ const CategoryBudgets: React.FC<CategoryBudgetsProps> = ({ budgets, loading = fa
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex justify-between items-center text-xs font-semibold">
               <span className={isOver ? "text-red-500" : "text-slate-500"}>
                 {isOver

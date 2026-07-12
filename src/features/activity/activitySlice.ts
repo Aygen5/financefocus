@@ -13,6 +13,13 @@ export interface ActivityLog {
   icon: string;
   status: "success" | "warning" | "info" | "error";
   timestamp: string;
+  timeLabel?: string;
+  details?: string;
+  meta?: {
+    idLabel?: string;
+    userName?: string;
+    progress?: number;
+  };
 }
 
 export interface ActivityState {
@@ -27,7 +34,6 @@ const initialState: ActivityState = {
   error: null,
 };
 
-// Mock logs list for initial seeding if mock server fails or returns empty
 const MOCK_INITIAL_LOGS: ActivityLog[] = [
   {
     id: "act-1",
@@ -91,7 +97,6 @@ const MOCK_INITIAL_LOGS: ActivityLog[] = [
   },
 ];
 
-// Async Thunks
 export const fetchActivities = createAsyncThunk("activity/fetchActivities", async () => {
   try {
     const response = await api.get<ActivityLog[]>("/activities");

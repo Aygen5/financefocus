@@ -12,7 +12,6 @@ export const initializeLocalStorageDb = () => {
     "settings",
   ];
 
-  // Force reset if database version is outdated or missing
   const currentDbVersion = localStorage.getItem("financefocus_db_version");
   if (currentDbVersion !== "v3") {
     keys.forEach((key) => {

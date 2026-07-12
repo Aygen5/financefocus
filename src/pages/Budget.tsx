@@ -20,10 +20,8 @@ const Budget: React.FC = () => {
   const dispatch = useAppDispatch();
   const { items: budgets, loading } = useAppSelector((state) => state.budget);
 
-  // States
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Form
   const {
     register,
     handleSubmit,
@@ -81,14 +79,12 @@ const Budget: React.FC = () => {
     }
   };
 
-  // Dinamik Bütçe Hesaplamaları
   const totalBudget = budgets.reduce((sum, b) => sum + b.limitAmount, 0);
   const spent = budgets.reduce((sum, b) => sum + b.spentAmount, 0);
   const remaining = Math.max(totalBudget - spent, 0);
 
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
-      {/* Page Header */}
       <div className="flex justify-between items-end mb-stack-lg">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface">Bütçe Planlayıcı</h2>
@@ -101,7 +97,6 @@ const Budget: React.FC = () => {
         </Button>
       </div>
 
-      {/* Bento Grid Top summaries */}
       <BudgetSummaryCards
         totalBudget={totalBudget || 5000}
         spent={spent || 3200}
@@ -109,7 +104,6 @@ const Budget: React.FC = () => {
         loading={loading}
       />
 
-      {/* Category Breakdown list header */}
       <div className="mb-stack-md flex justify-between items-center">
         <h3 className="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">
           Kategori Dağılımı
@@ -119,10 +113,8 @@ const Budget: React.FC = () => {
         </div>
       </div>
 
-      {/* Budgets Progress Grid list */}
       <CategoryBudgets budgets={budgets} loading={loading} />
 
-      {/* Modal - Yeni Limit Belirleme */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Yeni Limit Belirle">
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <Select

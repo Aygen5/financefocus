@@ -22,7 +22,6 @@ const AllocationChart: React.FC<AllocationChartProps> = ({ data, totalValue, loa
 
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-6 shadow-soft-sm flex flex-col md:flex-row items-center gap-8 text-left">
-      {/* Recharts Pie Chart */}
       <div className="w-48 h-48 relative flex-shrink-0 flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -52,7 +51,6 @@ const AllocationChart: React.FC<AllocationChartProps> = ({ data, totalValue, loa
         </div>
       </div>
 
-      {/* Allocation List */}
       <div className="flex-1 w-full">
         <h3 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold mb-6">
           Varlık Dağılımı

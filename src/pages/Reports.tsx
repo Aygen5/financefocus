@@ -74,7 +74,6 @@ export const Reports: React.FC = () => {
   const dispatch = useAppDispatch();
   const themeMode = useAppSelector(selectThemeMode);
 
-  // Resolve dark condition dynamically
   const isDark = React.useMemo(() => {
     if (themeMode === "dark") return true;
     if (themeMode === "system") {
@@ -91,7 +90,6 @@ export const Reports: React.FC = () => {
   const tooltipColor = isDark ? "#f8fafc" : "#0f172a";
   const tooltipBorder = isDark ? "#1e293b" : "#e2e8f0";
 
-  // Redux States
   const {
     items: transactions,
     loading: transLoading,
@@ -114,7 +112,6 @@ export const Reports: React.FC = () => {
     error: subsError,
   } = useAppSelector((state) => state.subscriptions);
 
-  // Filter States
   const [filterType, setFilterType] = useState<string>("30gun");
   const [customStart, setCustomStart] = useState<string>("");
   const [customEnd, setCustomEnd] = useState<string>("");
@@ -131,7 +128,6 @@ export const Reports: React.FC = () => {
     loadAllData();
   }, [loadAllData]);
 
-  // Tarih aralığını belirleme mantığı
   const dateRange = useMemo(() => {
     const today = new Date();
     switch (filterType) {
@@ -158,7 +154,6 @@ export const Reports: React.FC = () => {
     }
   }, [filterType, customStart, customEnd]);
 
-  // 1. Dinamik Raporlama Metrikleri (useMemo ile)
   const reportMetrics = useMemo(() => {
     const totalIncome = generateIncomeReport(transactions, dateRange.start, dateRange.end);
     const totalExpense = generateExpenseReport(transactions, dateRange.start, dateRange.end);
@@ -182,7 +177,6 @@ export const Reports: React.FC = () => {
     };
   }, [transactions, assets, dateRange]);
 
-  // 2. Grafikler İçin Reaktif Veri Setleri
   const trendData = useMemo(() => {
     return calculateIncomeExpenseTrend(transactions, dateRange.start, dateRange.end);
   }, [transactions, dateRange]);
@@ -219,7 +213,6 @@ export const Reports: React.FC = () => {
     return calculateSubscriptionCategoryTotals(mapped);
   }, [subscriptions]);
 
-  // 3. Export Helper Functions (Excel / CSV / PDF)
   const handleExportCSV = () => {
     const filteredTxs = transactions.filter((t) => {
       const txDate = parseISO(t.date);
@@ -259,7 +252,6 @@ export const Reports: React.FC = () => {
   const loading = transLoading || budgetsLoading || portLoading || goalsLoading || subsLoading;
   const error = transError || budgetsError || portError || goalsError || subsError;
 
-  // Render loading state
   if (loading) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left space-y-8 select-none">
@@ -277,7 +269,6 @@ export const Reports: React.FC = () => {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -294,7 +285,6 @@ export const Reports: React.FC = () => {
 
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
-      {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
@@ -321,7 +311,6 @@ export const Reports: React.FC = () => {
         </div>
       </div>
 
-      {/* Date Filter Panel */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 mb-6 flex flex-wrap items-center justify-between gap-4 shadow-soft-sm select-none">
         <div className="flex flex-wrap items-center gap-2">
           {[
@@ -347,7 +336,6 @@ export const Reports: React.FC = () => {
           ))}
         </div>
 
-        {/* Custom Date Picker Fields */}
         {filterType === "ozel" && (
           <div className="flex flex-wrap items-center gap-2">
             <input
@@ -367,7 +355,6 @@ export const Reports: React.FC = () => {
         )}
       </div>
 
-      {/* Summary Stat Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8 select-none">
         {/* Toplam Gelir */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
@@ -382,7 +369,6 @@ export const Reports: React.FC = () => {
           </span>
         </div>
 
-        {/* Toplam Gider */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             Toplam Gider
@@ -395,7 +381,6 @@ export const Reports: React.FC = () => {
           </span>
         </div>
 
-        {/* Net Tasarruf */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             Net Tasarruf
@@ -408,7 +393,6 @@ export const Reports: React.FC = () => {
           </span>
         </div>
 
-        {/* Ortalama Aylık Harcama */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             Ort. Aylık Harcama
@@ -421,7 +405,6 @@ export const Reports: React.FC = () => {
           </span>
         </div>
 
-        {/* En Çok Harcanan Kategori */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             En Çok Harcanan
@@ -437,7 +420,6 @@ export const Reports: React.FC = () => {
           </span>
         </div>
 
-        {/* En Çok Kazandıran Yatırım */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             En Çok Kazandıran
@@ -454,7 +436,6 @@ export const Reports: React.FC = () => {
         </div>
       </div>
 
-      {/* Recharts Graphs Bento Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter select-none">
         {/* Graph 1: Income vs Expense Trend */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
@@ -517,7 +498,6 @@ export const Reports: React.FC = () => {
           </div>
         </div>
 
-        {/* Graph 2: Category Expense Distribution */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
             <PieIcon size={14} className="text-primary" /> Harcama Kategori Dağılımı
@@ -535,7 +515,7 @@ export const Reports: React.FC = () => {
                     paddingAngle={3}
                     dataKey="value"
                   >
-                    {expenseDistData.map((entry, index) => (
+                    {expenseDistData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -571,7 +551,6 @@ export const Reports: React.FC = () => {
           </div>
         </div>
 
-        {/* Graph 3: Monthly Cash Flow */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
             <BarChart2 size={14} className="text-primary" /> Aylık Nakit Akışı
@@ -606,7 +585,6 @@ export const Reports: React.FC = () => {
           </div>
         </div>
 
-        {/* Graph 4: Portfolio Growth / Values */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
             <TrendingUp size={14} className="text-primary" /> Portföy Varlık Dağılımı (₺)
@@ -646,7 +624,6 @@ export const Reports: React.FC = () => {
           </div>
         </div>
 
-        {/* Graph 5: Budget Usage */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
             <BarChart2 size={14} className="text-primary" /> Bütçe Limit vs Harcama Dağılımı
@@ -678,7 +655,6 @@ export const Reports: React.FC = () => {
           </div>
         </div>
 
-        {/* Graph 6: Subscription Cost Distribution */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
             <PieIcon size={14} className="text-primary" /> Aylık Abonelik Kategori Maliyetleri
@@ -696,7 +672,7 @@ export const Reports: React.FC = () => {
                     paddingAngle={3}
                     dataKey="value"
                   >
-                    {subCostData.map((entry, index) => (
+                    {subCostData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

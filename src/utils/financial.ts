@@ -13,10 +13,6 @@ import {
 } from "date-fns";
 import { tr } from "date-fns/locale";
 
-/**
- * Finansal hesaplama ve formatlama yardımcı fonksiyonları
- */
-
 export interface FinancialTransaction {
   amount: number;
   transactionType: "income" | "expense" | "neutral";
@@ -43,6 +39,7 @@ export interface FinancialBudget {
 
 export interface FinancialSubscription {
   id: string;
+  userId?: string;
   name: string;
   cost: number;
   billingCycle: "monthly" | "yearly";
@@ -50,6 +47,7 @@ export interface FinancialSubscription {
   category: string;
   color?: string;
   icon?: string;
+  status?: "active" | "paused" | "cancelled";
 }
 
 export interface FinancialGoal {
@@ -57,12 +55,8 @@ export interface FinancialGoal {
   targetAmount: number;
 }
 
-// USD/TRY kuru varsayılan olarak 34.00 TL olarak kabul edilmiş ve sabitlenmiştir.
 const USD_TO_TRY_RATE = 34.0;
 
-/**
- * Sayısal bir tutarı para birimi formatına dönüştürür.
- */
 export const formatCurrency = (amount: number, _currency = "TRY", _locale = "tr-TR"): string => {
   try {
     return new Intl.NumberFormat("tr-TR", {
@@ -77,26 +71,17 @@ export const formatCurrency = (amount: number, _currency = "TRY", _locale = "tr-
   }
 };
 
-/**
- * İki değer arasındaki yüzde oranını hesaplar.
- */
 export const calculatePercentage = (value: number, total: number): number => {
   if (!total || total === 0) return 0;
   return Math.round((value / total) * 100);
 };
 
-/**
- * İki dönem arasındaki değişim oranını (trend) hesaplar.
- */
 export const calculateTrend = (current: number, previous: number): number => {
   if (!previous || previous === 0) return 0;
   const change = current - previous;
   return Number(((change / previous) * 100).toFixed(1));
 };
 
-/**
- * Büyük finansal sayıları kısaltarak gösterir.
- */
 export const formatCompactNumber = (amount: number, locale = "tr-TR"): string => {
   try {
     return new Intl.NumberFormat(locale, {
@@ -109,16 +94,10 @@ export const formatCompactNumber = (amount: number, locale = "tr-TR"): string =>
   }
 };
 
-/**
- * Tekil bir varlığın maliyetini (TRY veya USD cinsinden kendi döviziyle) hesaplar.
- */
 export const calculateAssetCost = (asset: FinancialAsset): number => {
   return asset.amount * asset.avgCost;
 };
 
-/**
- * Tekil bir varlığın güncel değerini hesaplar.
- */
 export const calculateAssetValue = (asset: FinancialAsset, usdRate = USD_TO_TRY_RATE): number => {
   const localValue = asset.amount * asset.currentPrice;
   if (asset.currency === "USD") {
@@ -127,9 +106,6 @@ export const calculateAssetValue = (asset: FinancialAsset, usdRate = USD_TO_TRY_
   return localValue;
 };
 
-/**
- * Tekil bir varlığın toplam maliyetini base currency (TRY) bazında hesaplar.
- */
 export const calculateAssetCostInBaseCurrency = (
   asset: FinancialAsset,
   usdRate = USD_TO_TRY_RATE,
@@ -141,9 +117,6 @@ export const calculateAssetCostInBaseCurrency = (
   return localCost;
 };
 
-/**
- * Tekil bir varlığın kâr/zarar tutarını base currency (TRY) bazında hesaplar.
- */
 export const calculateAssetProfitLoss = (
   asset: FinancialAsset,
   usdRate = USD_TO_TRY_RATE,
@@ -153,24 +126,15 @@ export const calculateAssetProfitLoss = (
   return currentValue - totalCost;
 };
 
-/**
- * Tekil bir varlığın yüzde değişimini hesaplar.
- */
 export const calculateAssetPercentageChange = (asset: FinancialAsset): number => {
   if (!asset.avgCost || asset.avgCost === 0) return 0;
   return Number((((asset.currentPrice - asset.avgCost) / asset.avgCost) * 100).toFixed(2));
 };
 
-/**
- * Portföy varlıklarının toplam güncel değerini (Net Worth / Portfolio Total Value) hesaplar.
- */
 export const calculateNetWorth = (assets: FinancialAsset[], usdRate = USD_TO_TRY_RATE): number => {
   return assets.reduce((sum, asset) => sum + calculateAssetValue(asset, usdRate), 0);
 };
 
-/**
- * Portföy varlıklarının toplam maliyetini base currency (TRY) bazında hesaplar.
- */
 export const calculateTotalPortfolioCost = (
   assets: FinancialAsset[],
   usdRate = USD_TO_TRY_RATE,
@@ -178,9 +142,6 @@ export const calculateTotalPortfolioCost = (
   return assets.reduce((sum, asset) => sum + calculateAssetCostInBaseCurrency(asset, usdRate), 0);
 };
 
-/**
- * Portföyün toplam kâr/zarar tutarını hesaplar.
- */
 export const calculateTotalPortfolioProfitLoss = (
   assets: FinancialAsset[],
   usdRate = USD_TO_TRY_RATE,
@@ -190,9 +151,6 @@ export const calculateTotalPortfolioProfitLoss = (
   return totalValue - totalCost;
 };
 
-/**
- * Portföyün toplam yüzde değişim (trend) oranını hesaplar.
- */
 export const calculateTotalPortfolioChangeRate = (
   assets: FinancialAsset[],
   usdRate = USD_TO_TRY_RATE,
@@ -203,9 +161,6 @@ export const calculateTotalPortfolioChangeRate = (
   return Number(((totalProfitLoss / totalCost) * 100).toFixed(2));
 };
 
-/**
- * En büyük tekil varlığı bulur.
- */
 export const calculateLargestAsset = (
   assets: FinancialAsset[],
   usdRate = USD_TO_TRY_RATE,
@@ -218,9 +173,6 @@ export const calculateLargestAsset = (
   });
 };
 
-/**
- * En çok kazandıran yatırım varlığını bulur (most profitable).
- */
 export const calculateMostProfitableAsset = (
   assets: FinancialAsset[],
   usdRate = USD_TO_TRY_RATE,
@@ -233,9 +185,6 @@ export const calculateMostProfitableAsset = (
   return withProfit.reduce((most, current) => (current.profit > most.profit ? current : most));
 };
 
-/**
- * Portföy varlık dağılımı (Asset Allocation) grafik verisini hesaplar.
- */
 export const calculatePortfolioAssetAllocation = (
   assets: FinancialAsset[],
   usdRate = USD_TO_TRY_RATE,
@@ -278,9 +227,6 @@ export const calculatePortfolioAssetAllocation = (
   }));
 };
 
-/**
- * Portföy sektörel dağılımı (Sector Distribution) grafik verisini hesaplar.
- */
 export const calculatePortfolioSectorDistribution = (
   assets: FinancialAsset[],
   usdRate = USD_TO_TRY_RATE,
@@ -299,27 +245,18 @@ export const calculatePortfolioSectorDistribution = (
   }));
 };
 
-/**
- * Toplam Geliri hesaplar.
- */
 export const calculateTotalIncome = (transactions: FinancialTransaction[]): number => {
   return transactions
     .filter((t) => t.transactionType === "income")
     .reduce((sum, t) => sum + t.amount, 0);
 };
 
-/**
- * Toplam Gideri hesaplar.
- */
 export const calculateTotalExpenses = (transactions: FinancialTransaction[]): number => {
   return transactions
     .filter((t) => t.transactionType === "expense")
     .reduce((sum, t) => sum + t.amount, 0);
 };
 
-/**
- * Belirli bir tarih aralığındaki toplam geliri hesaplar (generateIncomeReport).
- */
 export const generateIncomeReport = (
   transactions: FinancialTransaction[],
   startDate: Date,
@@ -336,9 +273,6 @@ export const generateIncomeReport = (
     .reduce((sum, t) => sum + t.amount, 0);
 };
 
-/**
- * Belirli bir tarih aralığındaki toplam gideri hesaplar (generateExpenseReport).
- */
 export const generateExpenseReport = (
   transactions: FinancialTransaction[],
   startDate: Date,
@@ -355,9 +289,6 @@ export const generateExpenseReport = (
     .reduce((sum, t) => sum + t.amount, 0);
 };
 
-/**
- * En çok harcanan kategoriyi bulur.
- */
 export const calculateMostSpentCategory = (
   transactions: FinancialTransaction[],
   startDate: Date,
@@ -384,9 +315,6 @@ export const calculateMostSpentCategory = (
   return { name, amount };
 };
 
-/**
- * Ortalama aylık harcama tutarını hesaplar (calculateAverageMonthlySpending).
- */
 export const calculateAverageMonthlySpending = (transactions: FinancialTransaction[]): number => {
   const expenseTxs = transactions.filter((t) => t.transactionType === "expense");
   if (expenseTxs.length === 0) return 0;
@@ -403,41 +331,26 @@ export const calculateAverageMonthlySpending = (transactions: FinancialTransacti
   return Math.round(sum / monthlyTotals.length);
 };
 
-/**
- * Net Balance (Gelir - Gider) hesaplar.
- */
 export const calculateNetBalance = (income: number, expense: number): number => {
   return income - expense;
 };
 
-/**
- * Tasarruf Oranı (Savings Rate) hesaplar.
- */
 export const calculateSavingsRate = (income: number, expense: number): number => {
   if (!income || income === 0) return 0;
   const savings = Math.max(income - expense, 0);
   return Math.round((savings / income) * 100);
 };
 
-/**
- * Gider Oranı (Expense Ratio) hesaplar.
- */
 export const calculateExpenseRatio = (income: number, expense: number): number => {
   if (!income || income === 0) return 0;
   return Math.round((expense / income) * 100);
 };
 
-/**
- * Bütçe Kullanım Oranı (Budget Usage) hesaplar.
- */
 export const calculateBudgetUsage = (spent: number, limit: number): number => {
   if (!limit || limit === 0) return 0;
   return Math.round((spent / limit) * 100);
 };
 
-/**
- * Aylık Toplam Abonelik Maliyetini (Monthly Subscription Total) hesaplar.
- */
 export const calculateMonthlySubscriptionTotal = (
   subscriptions: FinancialSubscription[],
 ): number => {
@@ -449,9 +362,6 @@ export const calculateMonthlySubscriptionTotal = (
   }, 0);
 };
 
-/**
- * Yıllık Toplam Abonelik Maliyetini hesaplar.
- */
 export const calculateYearlySubscriptionTotal = (
   subscriptions: FinancialSubscription[],
 ): number => {
@@ -463,9 +373,6 @@ export const calculateYearlySubscriptionTotal = (
   }, 0);
 };
 
-/**
- * Aboneliklerin ortalama aylık maliyetini hesaplar.
- */
 export const calculateAverageSubscriptionCost = (
   subscriptions: FinancialSubscription[],
 ): number => {
@@ -474,9 +381,6 @@ export const calculateAverageSubscriptionCost = (
   return Number((totalMonthly / subscriptions.length).toFixed(2));
 };
 
-/**
- * En pahalı aylık aboneliği bulur.
- */
 export const calculateMostExpensiveSubscription = (
   subscriptions: FinancialSubscription[],
 ): FinancialSubscription | null => {
@@ -489,9 +393,6 @@ export const calculateMostExpensiveSubscription = (
   });
 };
 
-/**
- * Yaklaşan ödemeleri tarihe göre sıralar.
- */
 export const calculateUpcomingPayments = (
   subscriptions: FinancialSubscription[],
 ): FinancialSubscription[] => {
@@ -504,9 +405,6 @@ export const calculateUpcomingPayments = (
   });
 };
 
-/**
- * Kategoriye göre abonelik maliyet toplamlarını hesaplar.
- */
 export const calculateSubscriptionCategoryTotals = (
   subscriptions: FinancialSubscription[],
 ): { name: string; value: number }[] => {
@@ -523,9 +421,6 @@ export const calculateSubscriptionCategoryTotals = (
   }));
 };
 
-/**
- * Raporlar için tarih filtreli kategori gider dağılımı (Category Expense Distribution) hesaplar.
- */
 export const calculateCategoryExpenseDistribution = (
   transactions: FinancialTransaction[],
   startDate: Date,
@@ -550,16 +445,12 @@ export const calculateCategoryExpenseDistribution = (
   }));
 };
 
-/**
- * Son 6 aya ait gelir-gider nakit akışını (Monthly Cash Flow) işlemler listesinden hesaplar.
- */
 export const calculateMonthlyCashFlow = (
   transactions: FinancialTransaction[],
 ): { month: string; income: number; expense: number }[] => {
   const today = new Date();
   const monthsData: { [key: string]: { income: number; expense: number } } = {};
 
-  // Son 6 ayın anahtarlarını oluşturalım
   for (let i = 5; i >= 0; i--) {
     const monthDate = subMonths(today, i);
     const key = format(monthDate, "yyyy-MM");
@@ -568,7 +459,6 @@ export const calculateMonthlyCashFlow = (
 
   const sixMonthsAgo = startOfMonth(subMonths(today, 5));
 
-  // Son 6 aydaki işlemleri hesaplayalım
   transactions.forEach((tx) => {
     const txDate = parseISO(tx.date);
     if (
@@ -597,9 +487,6 @@ export const calculateMonthlyCashFlow = (
   });
 };
 
-/**
- * Raporlar için tarih filtreli gelir-gider akışını (Income vs Expense Trend) hesaplar.
- */
 export const calculateIncomeExpenseTrend = (
   transactions: FinancialTransaction[],
   startDate: Date,
@@ -633,25 +520,16 @@ export const calculateIncomeExpenseTrend = (
   }));
 };
 
-/**
- * Hedef ilerleme yüzdesini (calculateProgress / calculateCompletionPercentage) hesaplar.
- */
 export const calculateGoalProgress = (current: number, target: number): number => {
   if (!target || target === 0) return 0;
   const percentage = Math.round((current / target) * 100);
   return Math.min(percentage, 100);
 };
 
-/**
- * Hedef kalan tutarını (calculateRemainingAmount) hesaplar.
- */
 export const calculateGoalRemainingAmount = (current: number, target: number): number => {
   return Math.max(target - current, 0);
 };
 
-/**
- * Hedef tamamlanmasına kalan ayı (calculateRemainingMonths) hesaplar.
- */
 export const calculateGoalRemainingMonths = (targetDateStr: string): number => {
   try {
     const today = new Date();
@@ -663,9 +541,6 @@ export const calculateGoalRemainingMonths = (targetDateStr: string): number => {
   }
 };
 
-/**
- * Aylık gereken birikim miktarını (calculateRequiredMonthlySaving) hesaplar.
- */
 export const calculateGoalRequiredMonthlySaving = (
   remainingAmount: number,
   remainingMonths: number,
@@ -674,9 +549,6 @@ export const calculateGoalRequiredMonthlySaving = (
   return Math.round(remainingAmount / remainingMonths);
 };
 
-/**
- * İki tarih arasındaki gün farkını hesaplar.
- */
 export const calculateDaysDifference = (dateStr: string): number => {
   try {
     const today = new Date();
@@ -687,13 +559,6 @@ export const calculateDaysDifference = (dateStr: string): number => {
   }
 };
 
-// -------------------------------------------------------------
-// FORECAST ENGINE (SMA - Simple Moving Average) FUNCTIONS
-// -------------------------------------------------------------
-
-/**
- * Son 3 aya ait ortalama geliri hesaplayıp gelecekteki aylara yansıtır (forecastIncome).
- */
 export const forecastIncome = (
   transactions: FinancialTransaction[],
   months: number,
@@ -719,9 +584,6 @@ export const forecastIncome = (
   return result;
 };
 
-/**
- * Son 3 aya ait ortalama gideri hesaplayıp gelecekteki aylara yansıtır (forecastExpenses).
- */
 export const forecastExpenses = (
   transactions: FinancialTransaction[],
   months: number,
@@ -747,9 +609,6 @@ export const forecastExpenses = (
   return result;
 };
 
-/**
- * Geleceğe ait beklenen nakit akışını (forecastCashFlow) hesaplar.
- */
 export const forecastCashFlow = (
   transactions: FinancialTransaction[],
   months: number,
@@ -764,17 +623,11 @@ export const forecastCashFlow = (
   }));
 };
 
-/**
- * Geleceğe yönelik kümülatif tasarruf tahmini yapar.
- */
 export const forecastSavings = (income: number, expense: number, months: number): number => {
   const monthlySavings = Math.max(income - expense, 0);
   return monthlySavings * months;
 };
 
-/**
- * Geleceğe yönelik portföy büyüme tahminini (forecastPortfolioGrowth) hesaplar.
- */
 export const forecastPortfolioGrowth = (
   assets: FinancialAsset[],
   transactions: FinancialTransaction[],
@@ -803,15 +656,8 @@ export const forecastPortfolioGrowth = (
   return result;
 };
 
-// -------------------------------------------------------------
-// FINANCIAL HEALTH ENGINE FUNCTIONS
-// -------------------------------------------------------------
-
-/**
- * Bütçeye uyum sağlığını (calculateBudgetHealth) hesaplar.
- */
 export const calculateBudgetHealth = (budgets: FinancialBudget[]): number => {
-  if (budgets.length === 0) return 80; // Baseline
+  if (budgets.length === 0) return 80;
 
   let totalUsage = 0;
   budgets.forEach((b) => {
@@ -820,32 +666,24 @@ export const calculateBudgetHealth = (budgets: FinancialBudget[]): number => {
   });
 
   const avgUsage = totalUsage / budgets.length;
-  // Bütçe kullanım oranı %70 ile %90 arasındaysa idealdir (100 puan). Aşılan bütçe veya kullanılmayan bütçeye göre ceza verilir.
   if (avgUsage <= 85) return 100;
   if (avgUsage <= 100) return 85;
   if (avgUsage <= 120) return 60;
   return 30; // Ciddi bütçe aşımı
 };
 
-/**
- * Yatırım çeşitlilik sağlığını (calculateInvestmentHealth) hesaplar.
- */
 export const calculateInvestmentHealth = (assets: FinancialAsset[]): number => {
   if (assets.length === 0) return 20;
 
-  // Farklı varlık tiplerini bulalım
   const types = new Set(assets.map((a) => a.type));
   const distinctCount = types.size;
 
   if (distinctCount >= 4) return 100;
   if (distinctCount === 3) return 85;
   if (distinctCount === 2) return 65;
-  return 45; // Çeşitlilik az
+  return 45;
 };
 
-/**
- * Abonelik gider yükü sağlığını (calculateSubscriptionHealth) hesaplar.
- */
 export const calculateSubscriptionHealth = (
   subscriptions: FinancialSubscription[],
   totalIncome: number,
@@ -863,9 +701,6 @@ export const calculateSubscriptionHealth = (
   return 25; // Ciddi yük
 };
 
-/**
- * Hedef ilerleme başarısı sağlığını (calculateGoalHealth) hesaplar.
- */
 export const calculateGoalHealth = (goals: FinancialGoal[]): number => {
   if (goals.length === 0) return 80; // baseline
 
@@ -881,9 +716,6 @@ export const calculateGoalHealth = (goals: FinancialGoal[]): number => {
   return 45;
 };
 
-/**
- * Genel Finansal Sağlık Skorunu (calculateFinancialHealthScore) hesaplar.
- */
 export const calculateFinancialHealthScore = (
   transactions: FinancialTransaction[],
   budgets: FinancialBudget[],
@@ -901,7 +733,6 @@ export const calculateFinancialHealthScore = (
   const totalIncome = calculateTotalIncome(transactions);
   const totalExpense = calculateTotalExpenses(transactions);
 
-  // 1. Savings Score
   const savingsRate = calculateSavingsRate(totalIncome, totalExpense);
   let savings = 30;
   if (savingsRate >= 40) savings = 100;
@@ -909,19 +740,14 @@ export const calculateFinancialHealthScore = (
   else if (savingsRate >= 15) savings = 65;
   else if (savingsRate >= 0) savings = 45;
 
-  // 2. Budget Score
   const budget = calculateBudgetHealth(budgets);
 
-  // 3. Investment Score
   const investment = calculateInvestmentHealth(assets);
 
-  // 4. Goal Score
   const goal = calculateGoalHealth(goals);
 
-  // 5. Subscription Score
   const subscription = calculateSubscriptionHealth(subscriptions, totalIncome);
 
-  // Genel skor (5 modül ağırlıklı ortalaması)
   const overall = Math.round(
     savings * 0.25 + budget * 0.2 + investment * 0.2 + goal * 0.15 + subscription * 0.2,
   );

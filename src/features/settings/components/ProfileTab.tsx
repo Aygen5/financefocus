@@ -56,21 +56,18 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
 
     const file = files[0];
 
-    // Format control (PNG, JPG, JPEG)
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
       toast.error("Yalnızca PNG ve JPG formatları desteklenmektedir!");
       return;
     }
 
-    // Size control (Max 10MB)
     const maxSizeBytes = 10 * 1024 * 1024;
     if (file.size > maxSizeBytes) {
       toast.error("Dosya boyutu maksimum 10MB olmalıdır!");
       return;
     }
 
-    // Read file as Base64 Data URL
     const reader = new FileReader();
     reader.onload = (event) => {
       if (event.target?.result) {
@@ -108,7 +105,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         </Button>
       </div>
 
-      {/* Hidden File Input */}
       <input
         type="file"
         ref={fileInputRef}
@@ -117,7 +113,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         className="hidden"
       />
 
-      {/* Profile Picture */}
       <div className="flex items-center gap-8 py-6 border-y border-slate-100 dark:border-slate-800/80">
         <div className="relative group">
           <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-primary/10 flex items-center justify-center overflow-hidden">
@@ -156,7 +151,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         </div>
       </div>
 
-      {/* Input Fields */}
       <div className="grid grid-cols-2 gap-6">
         <Input
           label="Ad Soyad"

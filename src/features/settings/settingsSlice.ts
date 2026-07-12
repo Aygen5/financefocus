@@ -45,7 +45,6 @@ const initialState: SettingsState = {
   error: null,
 };
 
-// Async Thunks integrated with LocalStorage
 export const fetchSettings = createAsyncThunk("settings/fetchSettings", async () => {
   const localData = localStorage.getItem("user_settings");
   if (localData) {
@@ -100,7 +99,6 @@ export const settingsSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectSettings = (state: { settings: SettingsState }) => state.settings.settings;
 export const selectSettingsLoading = (state: { settings: SettingsState }) => state.settings.loading;
 export const selectSettingsError = (state: { settings: SettingsState }) => state.settings.error;

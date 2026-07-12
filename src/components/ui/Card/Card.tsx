@@ -3,10 +3,12 @@ import { cn } from "@/utils/styles";
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   hoverable?: boolean;
+  title?: string;
+  extra?: React.ReactNode;
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className = "", hoverable = false, children, ...props }, ref) => {
+  ({ className = "", hoverable = false, title, extra, children, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -18,6 +20,16 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         )}
         {...props}
       >
+        {(title || extra) && (
+          <div className="px-6 py-4 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between shrink-0">
+            {title && (
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight">
+                {title}
+              </h3>
+            )}
+            {extra && <div>{extra}</div>}
+          </div>
+        )}
         {children}
       </div>
     );

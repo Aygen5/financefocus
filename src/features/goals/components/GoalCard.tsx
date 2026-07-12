@@ -58,7 +58,6 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onDelete, onVi
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-soft-sm hover:shadow-soft-md transition-all flex flex-col justify-between h-full select-none text-left">
       <div>
-        {/* Category & Status */}
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-1.5">
             <span
@@ -75,12 +74,10 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onDelete, onVi
           </div>
         </div>
 
-        {/* Title */}
         <h4 className="text-base font-extrabold text-slate-800 dark:text-slate-100 tracking-tight mb-4">
           {goal.name}
         </h4>
 
-        {/* Progress Bar Area */}
         <div className="space-y-2 mb-6 bg-slate-50 dark:bg-slate-850 p-3 rounded-xl border border-slate-100 dark:border-slate-800/80">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-slate-500 dark:text-slate-400">İlerleme</span>
@@ -95,7 +92,6 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onDelete, onVi
           </div>
         </div>
 
-        {/* Dynamic breakdown metrics */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div>
             <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-0.5">
@@ -128,7 +124,6 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onDelete, onVi
         </div>
       </div>
 
-      {/* Action buttons footer */}
       <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800/80">
         <button
           onClick={() => onView(goal)}

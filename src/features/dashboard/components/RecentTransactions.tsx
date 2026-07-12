@@ -61,8 +61,8 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({
       className: "text-right",
       render: (row) => (
         <CurrencyDisplay
-          amount={row.type === "expense" ? -row.amount : row.amount}
-          type={row.type}
+          amount={row.transactionType === "expense" ? -row.amount : row.amount}
+          type={row.transactionType}
           colored
         />
       ),

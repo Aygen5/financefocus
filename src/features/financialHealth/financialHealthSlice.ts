@@ -27,7 +27,6 @@ const initialState: FinancialHealthState = {
   error: null,
 };
 
-// Dummy Thunks for compilation safety
 export const fetchFinancialHealth = createAsyncThunk(
   "financialHealth/fetchFinancialHealth",
   async () => {
@@ -74,7 +73,6 @@ export const financialHealthSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectFinancialHealthScore = (state: { financialHealth: FinancialHealthState }) =>
   state.financialHealth.score;
 export const selectFinancialHealthFactors = (state: { financialHealth: FinancialHealthState }) =>

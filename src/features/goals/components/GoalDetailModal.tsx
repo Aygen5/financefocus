@@ -178,7 +178,6 @@ export const GoalDetailModal: React.FC<GoalDetailModalProps> = ({ isOpen, onClos
           </div>
         </div>
 
-        {/* Required savings suggestion */}
         {calculations.remainingAmount > 0 && (
           <div className="bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-400 p-4 rounded-xl flex items-start gap-3">
             <AlertCircle size={18} className="shrink-0 mt-0.5" />
@@ -195,7 +194,6 @@ export const GoalDetailModal: React.FC<GoalDetailModalProps> = ({ isOpen, onClos
           </div>
         )}
 
-        {/* Dates & Notes Section */}
         <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4 space-y-3">
           <div className="flex justify-between text-xs font-bold">
             <span className="text-slate-400 dark:text-slate-500">Başlangıç Tarihi</span>

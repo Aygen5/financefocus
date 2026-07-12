@@ -29,7 +29,6 @@ import { RotateCcw, AlertCircle } from "lucide-react";
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  // Redux Slices
   const { user } = useAppSelector((state) => state.auth || {});
   const {
     items: transactions = [],
@@ -57,7 +56,6 @@ const Dashboard: React.FC = () => {
     error: budgetsError = null,
   } = useAppSelector((state) => state.budget || {});
 
-  // Verileri çek
   const loadDashboardData = React.useCallback(() => {
     dispatch(fetchTransactions());
     dispatch(fetchGoals());
@@ -70,7 +68,6 @@ const Dashboard: React.FC = () => {
     loadDashboardData();
   }, [loadDashboardData]);
 
-  // Finansal hesaplamaların useMemo ile optimize edilmesi
   const totalIncome = useMemo(() => calculateTotalIncome(transactions), [transactions]);
   const totalExpenses = useMemo(() => calculateTotalExpenses(transactions), [transactions]);
   const netWorth = useMemo(() => calculateNetWorth(assets), [assets]);
@@ -79,17 +76,14 @@ const Dashboard: React.FC = () => {
     [totalIncome, totalExpenses],
   );
 
-  // İşlemler listesinden dinamik aylık nakit akışı verisi
   const cashFlowData = useMemo(() => calculateMonthlyCashFlow(transactions), [transactions]);
 
-  // Son işlemleri tarihe göre azalan sırada sıralayıp ilk 3'ünü al
   const sortedRecentTransactions = useMemo(() => {
     return [...transactions]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 3);
   }, [transactions]);
 
-  // Reaktif Genel Finansal Sağlık Skoru
   const healthScore = useMemo(() => {
     const scores = calculateFinancialHealthScore(
       transactions,
@@ -115,17 +109,14 @@ const Dashboard: React.FC = () => {
     transLoading || goalsLoading || subsLoading || portLoading || budgetsLoading;
   const dashboardError = transError || goalsError || subsError || portError || budgetsError;
 
-  // Render Loading Skeleton
   if (dashboardLoading) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left space-y-gutter select-none">
-        {/* Karşılama Maskesi */}
         <div className="space-y-2">
           <div className="h-8 w-1/4 bg-slate-200 dark:bg-slate-800 rounded-md animate-pulse" />
           <div className="h-4 w-1/3 bg-slate-200 dark:bg-slate-800 rounded-md animate-pulse" />
         </div>
 
-        {/* 4 Adet Summary Cards Skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <SkeletonCard hasAvatar={false} lines={1} className="h-32" />
           <SkeletonCard hasAvatar={false} lines={1} className="h-32" />
@@ -133,7 +124,6 @@ const Dashboard: React.FC = () => {
           <SkeletonCard hasAvatar={false} lines={1} className="h-32" />
         </div>
 
-        {/* Grid Skeletons */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
           <div className="lg:col-span-2 space-y-gutter">
             <SkeletonCard hasAvatar={false} lines={3} className="h-[300px]" />
@@ -149,7 +139,6 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  // Render Error State
   if (dashboardError) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -165,7 +154,6 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  // Render Empty State (Hiç veri yoksa)
   if (transactions.length === 0 && assets.length === 0 && goals.length === 0) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -191,7 +179,6 @@ const Dashboard: React.FC = () => {
         </p>
       </div>
 
-      {/* Finansal Özet Kartları */}
       <SummaryCards
         netWorth={netWorth}
         income={totalIncome}
@@ -200,29 +187,20 @@ const Dashboard: React.FC = () => {
         loading={false}
       />
 
-      {/* Bento Grid Yapısı */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
-        {/* Sol Kolon (Geniş) */}
         <div className="lg:col-span-2 flex flex-col gap-gutter">
-          {/* Nakit Akış Grafiği */}
           <CashFlowAnalysis data={cashFlowData} loading={false} />
 
-          {/* Son İşlemler Tablosu */}
           <RecentTransactions transactions={sortedRecentTransactions} loading={false} />
         </div>
 
-        {/* Outer column (Right) */}
         <div className="flex flex-col gap-gutter">
-          {/* Finansal Sağlık Skoru */}
           <FinancialHealthScore score={healthScore} loading={false} />
 
-          {/* Aktif Hedefler */}
           <ActiveGoals goals={goals.slice(0, 2)} loading={false} />
 
-          {/* Yaklaşan Abonelik Yenilemeleri */}
           <UpcomingRenewals subscriptions={subscriptions.slice(0, 2)} loading={false} />
 
-          {/* Hızlı Aksiyonlar */}
           <QuickActions onTransfer={handleTransfer} onExport={handleExport} />
         </div>
       </div>

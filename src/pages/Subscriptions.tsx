@@ -88,7 +88,6 @@ export const Subscriptions: React.FC = () => {
     }
   };
 
-  // 1. Dinamik Hesaplamalar
   const monthlyTotal = useMemo(
     () => calculateMonthlySubscriptionTotal(subscriptions),
     [subscriptions],
@@ -114,7 +113,6 @@ export const Subscriptions: React.FC = () => {
       : mostExpensive.cost
     : 0;
 
-  // 2. Filtreleme ve Sıralama
   const filteredSubscriptions = useMemo(() => {
     return upcomingPayments.filter((sub) => {
       const matchesCategory =
@@ -124,7 +122,6 @@ export const Subscriptions: React.FC = () => {
     });
   }, [upcomingPayments, categoryFilter, statusFilter]);
 
-  // Render loading state
   if (loading) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left space-y-8 select-none">
@@ -147,7 +144,6 @@ export const Subscriptions: React.FC = () => {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left py-12">
@@ -180,7 +176,6 @@ export const Subscriptions: React.FC = () => {
         </Button>
       </div>
 
-      {/* Summary metrics bento cards */}
       <SubscriptionSummary
         monthlyTotal={monthlyTotal}
         yearlyTotal={yearlyTotal}
@@ -190,7 +185,6 @@ export const Subscriptions: React.FC = () => {
         loading={false}
       />
 
-      {/* Filters bar */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 mb-6 flex flex-wrap items-center justify-between gap-4 shadow-soft-sm select-none">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
@@ -232,7 +226,6 @@ export const Subscriptions: React.FC = () => {
         </div>
       </div>
 
-      {/* Subscription Cards Grid / Empty State */}
       {filteredSubscriptions.length === 0 ? (
         <EmptyState
           title="Abonelik Bulunamadı"
@@ -259,7 +252,6 @@ export const Subscriptions: React.FC = () => {
         </div>
       )}
 
-      {/* Add Subscription Modal */}
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
@@ -269,7 +261,6 @@ export const Subscriptions: React.FC = () => {
         <SubscriptionForm onSubmit={onAddSubmit} loading={isSubmitLoading} submitLabel="Ekle" />
       </Modal>
 
-      {/* Edit Subscription Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => {
@@ -301,7 +292,6 @@ export const Subscriptions: React.FC = () => {
         )}
       </Modal>
 
-      {/* Detail Subscription Modal */}
       <SubscriptionDetailModal
         isOpen={isDetailModalOpen}
         onClose={() => {
@@ -311,7 +301,6 @@ export const Subscriptions: React.FC = () => {
         subscription={selectedSub}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={isDeleteOpen}
         onClose={() => {

@@ -9,7 +9,6 @@ export interface NotificationSidebarProps {
 const NotificationSidebar: React.FC<NotificationSidebarProps> = ({ onManageStorage }) => {
   return (
     <div className="space-y-gutter text-left">
-      {/* Trends Widget */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-soft-sm">
         <h4 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold mb-4">
           Notification Trends
@@ -39,7 +38,6 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({ onManageStora
         </div>
       </div>
 
-      {/* Storage Widget */}
       <div className="bg-blue-600/90 dark:bg-brand-900/40 text-white rounded-2xl p-6 shadow-soft-sm">
         <h4 className="font-headline-sm text-headline-sm font-bold mb-4">Auto-Clearing Enabled</h4>
         <p className="text-body-md text-blue-100 dark:text-slate-350 opacity-90 mb-6 font-medium leading-relaxed">
@@ -55,14 +53,12 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({ onManageStora
         </Button>
       </div>
 
-      {/* Last Login Location map widget */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 shadow-soft-sm">
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-2 flex items-center gap-1">
           <MapPin size={12} /> Son Giriş Konumu
         </p>
-        {/* Map Placeholder */}
+
         <div className="w-full h-40 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-850 border border-slate-200/50 dark:border-slate-800/50 relative flex items-center justify-center">
-          {/* Geolocation marker indicator animation */}
           <div className="relative">
             <div className="w-4 h-4 bg-primary rounded-full animate-ping" />
             <div className="w-3 h-3 bg-primary rounded-full absolute top-0.5 left-0.5 shadow-lg" />

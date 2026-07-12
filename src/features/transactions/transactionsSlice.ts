@@ -40,7 +40,6 @@ const initialState: TransactionsState = {
   error: null,
 };
 
-// Async Thunks
 export const fetchTransactions = createAsyncThunk(
   "transactions/fetchTransactions",
   async (_, { rejectWithValue }) => {
@@ -145,7 +144,6 @@ export const transactionsSlice = createSlice({
   },
 });
 
-// Selectors
 export const selectTransactions = (state: { transactions: TransactionsState }) =>
   state.transactions.items;
 export const selectFilters = (state: { transactions: TransactionsState }) =>
@@ -155,12 +153,10 @@ export const selectTransactionsLoading = (state: { transactions: TransactionsSta
 export const selectTransactionsError = (state: { transactions: TransactionsState }) =>
   state.transactions.error;
 
-// Memoized Filtered Selector
 export const selectFilteredTransactions = createSelector(
   [selectTransactions, selectFilters],
   (items, filters) => {
     return items.filter((item) => {
-      // 1. Search Query Filter
       if (filters.search.trim()) {
         const query = filters.search.toLowerCase();
         const descMatch = item.description?.toLowerCase().includes(query);
@@ -169,12 +165,10 @@ export const selectFilteredTransactions = createSelector(
         if (!descMatch && !catMatch && !accMatch) return false;
       }
 
-      // 2. Transaction Type Filter
       if (filters.transactionType !== "all" && item.transactionType !== filters.transactionType) {
         return false;
       }
 
-      // 3. Category Filter
       if (
         filters.category !== "all" &&
         item.category.toLowerCase() !== filters.category.toLowerCase()
@@ -182,12 +176,10 @@ export const selectFilteredTransactions = createSelector(
         return false;
       }
 
-      // 4. Status Filter
       if (filters.status !== "all" && item.status !== filters.status) {
         return false;
       }
 
-      // 5. Amount Range Filter
       if (filters.minAmount !== undefined && item.amount < filters.minAmount) {
         return false;
       }
@@ -195,7 +187,6 @@ export const selectFilteredTransactions = createSelector(
         return false;
       }
 
-      // 6. Date Range Filter
       if (filters.dateRange !== "all") {
         const itemDate = parseISO(item.date);
         const today = new Date();
@@ -243,7 +234,6 @@ export const selectFilteredTransactions = createSelector(
   },
 );
 
-// Active Filters Count Selector
 export const selectActiveFiltersCount = createSelector([selectFilters], (filters) => {
   let count = 0;
   if (filters.transactionType !== "all") count++;

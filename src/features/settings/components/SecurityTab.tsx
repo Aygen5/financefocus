@@ -26,13 +26,11 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
   onDeleteAccount,
   userEmail = "aygen@financefocus.com",
 }) => {
-  // Modal States
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isFirstConfirmOpen, setIsFirstConfirmOpen] = useState(false);
   const [isSecondConfirmOpen, setIsSecondConfirmOpen] = useState(false);
   const [confirmEmailInput, setConfirmEmailInput] = useState("");
 
-  // Hook Form for Password Change
   const {
     register,
     handleSubmit,
@@ -101,7 +99,6 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
           </Button>
         </div>
 
-        {/* Two factor */}
         <div className="p-4 border border-slate-200/80 dark:border-slate-800/80 rounded-xl flex items-center justify-between shadow-soft-sm">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600">
@@ -123,7 +120,6 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
         </div>
       </div>
 
-      {/* Danger zone */}
       <div className="pt-6 border-t border-slate-100 dark:border-slate-800/80">
         <h4 className="font-label-md text-label-md text-red-650 font-bold mb-4">
           Tehlikeli Alan (Danger Zone)
@@ -147,7 +143,6 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
         </div>
       </div>
 
-      {/* Modal 1: Change Password Modal */}
       <Modal
         isOpen={isPasswordOpen}
         onClose={() => setIsPasswordOpen(false)}
@@ -190,7 +185,7 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
             </Button>
             <Button
               type="submit"
-              variant="brand"
+              variant="primary"
               className="flex-1 font-bold text-xs"
               loading={isSubmitting}
             >
@@ -200,7 +195,6 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
         </form>
       </Modal>
 
-      {/* dialog 1: First Confirm dialog (Danger) */}
       <ConfirmDialog
         isOpen={isFirstConfirmOpen}
         onClose={() => setIsFirstConfirmOpen(false)}
@@ -212,7 +206,6 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
         variant="danger"
       />
 
-      {/* Modal 2: Second Confirm Modal with text input */}
       <Modal
         isOpen={isSecondConfirmOpen}
         onClose={() => setIsSecondConfirmOpen(false)}

@@ -28,7 +28,6 @@ const ExpenseBreakdown: React.FC<ExpenseBreakdownProps> = ({ data, loading = fal
         </h4>
       </div>
 
-      {/* Donut Chart */}
       <div className="relative h-56 w-full mb-6 flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -56,7 +55,6 @@ const ExpenseBreakdown: React.FC<ExpenseBreakdownProps> = ({ data, loading = fal
         </div>
       </div>
 
-      {/* Detail list */}
       <div className="space-y-4 flex-1">
         {data.map((item, index) => {
           const ratio = totalValue > 0 ? (item.value / totalValue) * 100 : 0;

@@ -40,7 +40,6 @@ const ReportBuilderAd: React.FC<ReportBuilderAdProps> = ({ onBuildReport }) => {
         </div>
       </div>
 
-      {/* Decorative Blur Spheres */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none" />
     </div>
