@@ -11,6 +11,7 @@ import {
   Bell,
   Settings,
   ShieldCheck,
+  Bot,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import ROUTES from "@/constants/routes";
@@ -34,6 +35,7 @@ export const navigationConfig: NavigationItem[] = [
   { path: ROUTES.NOTIFICATIONS, label: "Bildirimler", icon: Bell },
   { path: ROUTES.SUBSCRIPTIONS, label: "Abonelikler", icon: CalendarCheck },
   { path: ROUTES.SETTINGS, label: "Ayarlar", icon: Settings },
+  { path: ROUTES.AI, label: "AI Finansal Asistan", icon: Bot },
 ];
 
 export default navigationConfig;

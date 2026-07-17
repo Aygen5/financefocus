@@ -156,6 +156,7 @@ export const setupInterceptors = (client: AxiosInstance): AxiosInstance => {
       ) {
         if (!isServerOffline) {
           isServerOffline = true;
+          // eslint-disable-next-line no-console
           console.warn("API Server offline, switching to fast LocalStorage fallback mode.");
         }
         const fallbackResponse = handleLocalFallback(config);

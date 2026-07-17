@@ -21,6 +21,7 @@ import activityReducer from "@/features/activity/activitySlice";
 import financialHealthReducer from "@/features/financialHealth/financialHealthSlice";
 import settingsReducer from "@/features/settings/settingsSlice";
 import dashboardReducer from "@/features/dashboard/dashboardSlice";
+import aiReducer from "@/features/ai/aiSlice";
 
 export function renderWithProviders(
   ui: React.ReactElement,
@@ -42,6 +43,7 @@ export function renderWithProviders(
         financialHealth: financialHealthReducer,
         settings: settingsReducer,
         dashboard: dashboardReducer,
+        ai: aiReducer,
       },
       preloadedState: preloadedState as undefined,
     }),

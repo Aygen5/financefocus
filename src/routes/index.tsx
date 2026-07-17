@@ -20,6 +20,7 @@ const FinancialHealth = React.lazy(() => import("@/pages/FinancialHealth"));
 const Notifications = React.lazy(() => import("@/pages/Notifications"));
 const Activity = React.lazy(() => import("@/pages/ActivityLog"));
 const Settings = React.lazy(() => import("@/pages/Settings"));
+const AiAssistant = React.lazy(() => import("@/pages/AiAssistant"));
 const NotFound = React.lazy(() => import("@/pages/NotFound"));
 import ErrorPage from "@/pages/ErrorPage";
 
@@ -101,6 +102,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.SETTINGS,
             element: <Settings />,
+          },
+          {
+            path: ROUTES.AI,
+            element: <AiAssistant />,
           },
         ],
       },

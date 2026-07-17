@@ -14,6 +14,7 @@ import notificationsReducer from "@/features/notifications/notificationsSlice";
 import activityReducer from "@/features/activity/activitySlice";
 import financialHealthReducer from "@/features/financialHealth/financialHealthSlice";
 import settingsReducer from "@/features/settings/settingsSlice";
+import aiReducer from "@/features/ai/aiSlice";
 import themeReducer from "./themeSlice";
 
 export const store = configureStore({
@@ -31,6 +32,7 @@ export const store = configureStore({
     activity: activityReducer,
     financialHealth: financialHealthReducer,
     settings: settingsReducer,
+    ai: aiReducer,
     theme: themeReducer,
   },
 });

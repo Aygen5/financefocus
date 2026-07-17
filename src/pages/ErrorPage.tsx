@@ -18,6 +18,7 @@ const ErrorPage: React.FC = () => {
 
   React.useEffect(() => {
     if (isDev) {
+      // eslint-disable-next-line no-console
       console.error("[Global Error Boundary Catch]:", error);
     }
   }, [error, isDev]);
