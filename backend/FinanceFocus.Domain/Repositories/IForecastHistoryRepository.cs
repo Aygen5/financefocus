@@ -4,9 +4,6 @@ using FinanceFocus.Domain.Entities;
 
 namespace FinanceFocus.Domain.Repositories;
 
-/// <summary>
-/// ForecastHistory varlığına özel veri tabanı sorgularını tanımlayan arayüz.
-/// </summary>
 public interface IForecastHistoryRepository : IRepository<ForecastHistory>
 {
     Task<IEnumerable<ForecastHistory>> GetByUserIdAsync(string userId);

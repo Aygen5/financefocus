@@ -3,9 +3,6 @@ using FinanceFocus.Domain.Enums;
 
 namespace FinanceFocus.Domain.Entities;
 
-/// <summary>
-/// Kullanıcı bildirimlerini temsil eden varlık sınıfı.
-/// </summary>
 public class Notification : BaseEntity
 {
     public string Title { get; set; } = string.Empty;

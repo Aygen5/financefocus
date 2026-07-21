@@ -4,10 +4,6 @@ using FinanceFocus.Domain.Common;
 
 namespace FinanceFocus.Domain.Repositories;
 
-/// <summary>
-/// Tüm varlıklar (Entities) için temel CRUD operasyonlarını tanımlayan generic repository arayüzü.
-/// </summary>
-/// <typeparam name="T">BaseEntity sınıfından kalıtım alan varlık türü.</typeparam>
 public interface IRepository<T> where T : BaseEntity
 {
     Task<T?> GetByIdAsync(string id);

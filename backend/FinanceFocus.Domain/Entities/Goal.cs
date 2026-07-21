@@ -3,9 +3,6 @@ using FinanceFocus.Domain.Common;
 
 namespace FinanceFocus.Domain.Entities;
 
-/// <summary>
-/// Kullanıcının birikim hedeflerini temsil eden varlık sınıfı.
-/// </summary>
 public class Goal : BaseEntity
 {
     public string Name { get; set; } = string.Empty;

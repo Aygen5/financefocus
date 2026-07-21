@@ -4,9 +4,6 @@ using FinanceFocus.Domain.Repositories;
 
 namespace FinanceFocus.Domain.UnitOfWork;
 
-/// <summary>
-/// Tüm veri tabanı işlemlerini ve transaction yönetimini tek bir çatı altında toplayan Unit of Work arayüzü.
-/// </summary>
 public interface IUnitOfWork : IDisposable
 {
     ITransactionRepository Transactions { get; }

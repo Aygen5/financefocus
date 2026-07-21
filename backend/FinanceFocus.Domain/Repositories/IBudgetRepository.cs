@@ -4,9 +4,6 @@ using FinanceFocus.Domain.Entities;
 
 namespace FinanceFocus.Domain.Repositories;
 
-/// <summary>
-/// Budget varlığına özel veri tabanı sorgularını tanımlayan arayüz.
-/// </summary>
 public interface IBudgetRepository : IRepository<Budget>
 {
     Task<IEnumerable<Budget>> GetByUserIdAsync(string userId);

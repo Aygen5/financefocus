@@ -3,10 +3,6 @@ using FinanceFocus.Domain.Common;
 using FinanceFocus.Domain.Enums;
 
 namespace FinanceFocus.Domain.Entities;
-
-/// <summary>
-/// Kullanıcının gelir ve gider kayıtlarını temsil eden varlık sınıfı.
-/// </summary>
 public class Transaction : BaseEntity
 {
     public string Description { get; set; } = string.Empty;

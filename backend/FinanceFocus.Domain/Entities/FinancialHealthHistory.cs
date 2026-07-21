@@ -3,9 +3,6 @@ using FinanceFocus.Domain.Common;
 
 namespace FinanceFocus.Domain.Entities;
 
-/// <summary>
-/// Belirli periyotlarda hesaplanan finansal sağlık skor geçmişlerini tutan varlık sınıfı.
-/// </summary>
 public class FinancialHealthHistory : BaseEntity
 {
     public DateTime CalculationDate { get; set; } = DateTime.UtcNow;

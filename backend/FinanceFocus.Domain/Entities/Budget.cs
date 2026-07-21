@@ -3,9 +3,6 @@ using FinanceFocus.Domain.Common;
 
 namespace FinanceFocus.Domain.Entities;
 
-/// <summary>
-/// Kullanıcının kategori bazlı bütçe limitlerini temsil eden varlık sınıfı.
-/// </summary>
 public class Budget : BaseEntity
 {
     public string Category { get; set; } = string.Empty;

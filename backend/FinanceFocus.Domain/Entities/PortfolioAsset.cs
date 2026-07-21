@@ -3,9 +3,6 @@ using FinanceFocus.Domain.Enums;
 
 namespace FinanceFocus.Domain.Entities;
 
-/// <summary>
-/// Kullanıcının yatırım varlıklarını temsil eden varlık sınıfı.
-/// </summary>
 public class PortfolioAsset : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
