@@ -1,4 +1,4 @@
-
+# Logs
 logs
 *.log
 npm-debug.log*
@@ -7,22 +7,38 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Node modules & build artifacts
+node_modules/
+dist/
+dist-ssr/
 *.local
 
+# Environment variables
 .env
 .env.*
+
+# Testing
 coverage/
 
-
+# IDE files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Frontend folder specific ignores
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/coverage/
+frontend/.env
+frontend/.env.*
+backend/**bin
+backend//**obj
+
+docs/

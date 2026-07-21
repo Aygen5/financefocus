@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "FinanceFocus.Infrastructure/1.0.0": {
+        "dependencies": {
+          "FinanceFocus.Application": "1.0.0",
+          "FinanceFocus.Domain": "1.0.0"
+        },
+        "runtime": {
+          "FinanceFocus.Infrastructure.dll": {}
+        }
+      },
+      "FinanceFocus.Application/1.0.0": {
+        "dependencies": {
+          "FinanceFocus.Domain": "1.0.0"
+        },
+        "runtime": {
+          "FinanceFocus.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "FinanceFocus.Domain/1.0.0": {
+        "runtime": {
+          "FinanceFocus.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "FinanceFocus.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "FinanceFocus.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "FinanceFocus.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

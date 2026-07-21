@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="FinanceFocus.API/FinanceFocus.API.csproj" />
+  <Project Path="FinanceFocus.Application/FinanceFocus.Application.csproj" />
+  <Project Path="FinanceFocus.Domain/FinanceFocus.Domain.csproj" />
+  <Project Path="FinanceFocus.Infrastructure/FinanceFocus.Infrastructure.csproj" />
+  <Project Path="FinanceFocus.Tests/FinanceFocus.Tests.csproj" />
+</Solution>
