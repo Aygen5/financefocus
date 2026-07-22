@@ -1,8 +1,23 @@
 {
   "version": 2,
-  "dgSpecHash": "vsM5RlTStsg=",
+  "dgSpecHash": "tfothumYI/Q=",
   "success": true,
   "projectFilePath": "C:\\Users\\aygen\\OneDrive\\Masaüstü\\financefocus\\backend\\FinanceFocus.Infrastructure\\FinanceFocus.Infrastructure.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.entityframeworkcore\\10.0.0-preview.1.25081.1\\microsoft.entityframeworkcore.10.0.0-preview.1.25081.1.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\10.0.0-preview.1.25081.1\\microsoft.entityframeworkcore.abstractions.10.0.0-preview.1.25081.1.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\10.0.0-preview.1.25081.1\\microsoft.entityframeworkcore.relational.10.0.0-preview.1.25081.1.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\10.0.0-preview.1.25080.5\\microsoft.extensions.caching.abstractions.10.0.0-preview.1.25080.5.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.extensions.caching.memory\\10.0.0-preview.1.25080.5\\microsoft.extensions.caching.memory.10.0.0-preview.1.25080.5.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\10.0.0-preview.1.25080.5\\microsoft.extensions.configuration.abstractions.10.0.0-preview.1.25080.5.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\10.0.0-preview.1.25080.5\\microsoft.extensions.dependencyinjection.10.0.0-preview.1.25080.5.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.0-preview.1.25080.5\\microsoft.extensions.dependencyinjection.abstractions.10.0.0-preview.1.25080.5.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.extensions.logging\\10.0.0-preview.1.25080.5\\microsoft.extensions.logging.10.0.0-preview.1.25080.5.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.0-preview.1.25080.5\\microsoft.extensions.logging.abstractions.10.0.0-preview.1.25080.5.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.extensions.options\\10.0.0-preview.1.25080.5\\microsoft.extensions.options.10.0.0-preview.1.25080.5.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.0-preview.1.25080.5\\microsoft.extensions.primitives.10.0.0-preview.1.25080.5.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\npgsql\\9.0.2\\npgsql.9.0.2.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\10.0.0-preview.1\\npgsql.entityframeworkcore.postgresql.10.0.0-preview.1.nupkg.sha512"
+  ],
   "logs": []
 }
