@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "9Sei3UDT6Q0=",
+  "dgSpecHash": "9l+/avKACe8=",
   "success": true,
   "projectFilePath": "C:\\Users\\aygen\\OneDrive\\Masaüstü\\financefocus\\backend\\FinanceFocus.API\\FinanceFocus.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\aygen\\.nuget\\packages\\asp.versioning.abstractions\\8.1.0\\asp.versioning.abstractions.8.1.0.nupkg.sha512",
     "C:\\Users\\aygen\\.nuget\\packages\\asp.versioning.http\\8.1.0\\asp.versioning.http.8.1.0.nupkg.sha512",
     "C:\\Users\\aygen\\.nuget\\packages\\asp.versioning.mvc\\8.1.0\\asp.versioning.mvc.8.1.0.nupkg.sha512",
+    "C:\\Users\\aygen\\.nuget\\packages\\asp.versioning.mvc.apiexplorer\\8.1.0\\asp.versioning.mvc.apiexplorer.8.1.0.nupkg.sha512",
     "C:\\Users\\aygen\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\aygen\\.nuget\\packages\\fluentvalidation\\11.11.0\\fluentvalidation.11.11.0.nupkg.sha512",
     "C:\\Users\\aygen\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\11.11.0\\fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512",
