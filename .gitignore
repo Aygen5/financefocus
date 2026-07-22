@@ -13,6 +13,13 @@ dist/
 dist-ssr/
 *.local
 
+# .NET build outputs
+**/bin/
+**/obj/
+*.user
+*.userosscache
+*.sln.docstates
+
 # Environment variables
 .env
 .env.*
@@ -38,7 +45,3 @@ frontend/dist-ssr/
 frontend/coverage/
 frontend/.env
 frontend/.env.*
-backend/**bin
-backend//**obj
-
-docs/
