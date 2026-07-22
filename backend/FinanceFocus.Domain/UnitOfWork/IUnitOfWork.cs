@@ -16,6 +16,9 @@ public interface IUnitOfWork : IDisposable
     IAIConversationRepository AIConversations { get; }
     IForecastHistoryRepository ForecastHistories { get; }
     IFinancialHealthHistoryRepository FinancialHealthHistories { get; }
-    
+
     Task<int> SaveChangesAsync();
+    Task BeginTransactionAsync();
+    Task CommitTransactionAsync();
+    Task RollbackTransactionAsync();
 }
