@@ -4,7 +4,7 @@ using FinanceFocus.Application.Mappings;
 using FinanceFocus.Application.Services;
 using FinanceFocus.Application.Validators.Transactions;
 using FinanceFocus.Domain.UnitOfWork;
-using FinanceFocus.Infrastructure.Data;
+using FinanceFocus.Infrastructure.Persistence;
 using FinanceFocus.Infrastructure.UnitOfWork;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
