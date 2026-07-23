@@ -41,8 +41,11 @@ builder.Services.AddCorsConfiguration();
 var app = builder.Build();
 
 app.UseMiddleware<CorrelationIdMiddleware>();
-app.UseMiddleware<SecurityHeadersMiddleware>();
+
+app.UseCors("AllowFrontend");
+
 app.UseExceptionHandler();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -55,11 +58,10 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
 
 app.UseSerilogRequestLogging();
-app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
 app.UseRateLimiter();
 
 app.UseAuthentication();

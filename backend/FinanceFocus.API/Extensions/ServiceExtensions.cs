@@ -124,7 +124,7 @@ public static class ServiceExtensions
         })
         .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = true;
+            options.RequireHttpsMetadata = false;
             options.SaveToken = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -192,7 +192,7 @@ public static class ServiceExtensions
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins("http://localhost:5173", "http://localhost:3000", "https://localhost:5001")
+                policy.WithOrigins("http://localhost:5173", "http://localhost:3000", "http://localhost:5000", "https://localhost:5001")
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
