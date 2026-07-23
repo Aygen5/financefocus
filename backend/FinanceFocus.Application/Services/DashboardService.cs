@@ -8,6 +8,7 @@ using FinanceFocus.Application.DTOs.ActivityLogs;
 using FinanceFocus.Application.DTOs.Budgets;
 using FinanceFocus.Application.DTOs.Dashboard;
 using FinanceFocus.Application.DTOs.FinancialHealth;
+using FinanceFocus.Application.DTOs.Forecast;
 using FinanceFocus.Application.DTOs.Goals;
 using FinanceFocus.Application.DTOs.Notifications;
 using FinanceFocus.Application.DTOs.Portfolio;
@@ -29,6 +30,7 @@ public class DashboardService : IDashboardService
     private readonly INotificationService _notificationService;
     private readonly IActivityLogService _activityLogService;
     private readonly IFinancialHealthService _financialHealthService;
+    private readonly IForecastEngineService _forecastEngineService;
     private readonly IMapper _mapper;
 
     public DashboardService(
@@ -41,6 +43,7 @@ public class DashboardService : IDashboardService
         INotificationService notificationService,
         IActivityLogService activityLogService,
         IFinancialHealthService financialHealthService,
+        IForecastEngineService forecastEngineService,
         IMapper mapper)
     {
         _unitOfWork = unitOfWork;
@@ -52,6 +55,7 @@ public class DashboardService : IDashboardService
         _notificationService = notificationService;
         _activityLogService = activityLogService;
         _financialHealthService = financialHealthService;
+        _forecastEngineService = forecastEngineService;
         _mapper = mapper;
     }
 
@@ -102,6 +106,7 @@ public class DashboardService : IDashboardService
         var savingsRate = monthlyIncome > 0 ? Math.Round((netSavings / monthlyIncome) * 100m, 2) : 0m;
 
         var healthSummary = (await _financialHealthService.GetHealthSummaryAsync(userId)).Data;
+        var forecastSummary = (await _forecastEngineService.GetForecastSummaryAsync(userId)).Data;
 
         var goals = (await _goalService.GetUserGoalsAsync(userId)).Data?.ToList() ?? new List<GoalDto>();
         var activeGoalCount = goals.Count(g => g.CurrentAmount < g.TargetAmount);
@@ -130,6 +135,12 @@ public class DashboardService : IDashboardService
             FinancialHealthScore = healthSummary?.FinancialHealthScore ?? 50,
             RiskLevel = healthSummary?.RiskLevel ?? "Moderate",
             TopInsights = healthSummary?.TopInsights ?? new List<FinancialInsightDto>(),
+            EstimatedMonthlyIncome = forecastSummary?.EstimatedMonthlyIncome ?? 0m,
+            EstimatedMonthlyExpense = forecastSummary?.EstimatedMonthlyExpense ?? 0m,
+            EstimatedSavings = forecastSummary?.EstimatedSavings ?? 0m,
+            BudgetRiskLevel = forecastSummary?.BudgetRiskLevel ?? "Low",
+            EstimatedGoalCompletionDate = forecastSummary?.EstimatedGoalCompletionDate,
+            EstimatedPortfolioValue = forecastSummary?.EstimatedPortfolioValue ?? 0m,
             ActiveGoalCount = activeGoalCount,
             CompletedGoalCount = completedGoalCount,
             AverageGoalProgressPercentage = avgGoalProgress,

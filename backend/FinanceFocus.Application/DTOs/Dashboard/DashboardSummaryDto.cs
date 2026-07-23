@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FinanceFocus.Application.DTOs.FinancialHealth;
 
@@ -14,6 +15,13 @@ public class DashboardSummaryDto
     public int FinancialHealthScore { get; set; }
     public string RiskLevel { get; set; } = "Moderate";
     public IEnumerable<FinancialInsightDto> TopInsights { get; set; } = new List<FinancialInsightDto>();
+
+    public decimal EstimatedMonthlyIncome { get; set; }
+    public decimal EstimatedMonthlyExpense { get; set; }
+    public decimal EstimatedSavings { get; set; }
+    public string BudgetRiskLevel { get; set; } = "Low";
+    public DateTime? EstimatedGoalCompletionDate { get; set; }
+    public decimal EstimatedPortfolioValue { get; set; }
 
     public int ActiveGoalCount { get; set; }
     public int CompletedGoalCount { get; set; }
