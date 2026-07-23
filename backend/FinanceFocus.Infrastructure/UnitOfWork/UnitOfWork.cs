@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FinanceFocus.Domain.Repositories;
 using FinanceFocus.Domain.UnitOfWork;
 using FinanceFocus.Infrastructure.Persistence;
+using FinanceFocus.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FinanceFocus.Infrastructure.UnitOfWork;
@@ -24,30 +25,19 @@ public class UnitOfWork : IUnitOfWork
     public IForecastHistoryRepository ForecastHistories { get; }
     public IFinancialHealthHistoryRepository FinancialHealthHistories { get; }
 
-    public UnitOfWork(
-        FinanceFocusDbContext context,
-        ITransactionRepository transactions,
-        IBudgetRepository budgets,
-        IGoalRepository goals,
-        IPortfolioAssetRepository portfolioAssets,
-        ISubscriptionRepository subscriptions,
-        INotificationRepository notifications,
-        IActivityLogRepository activityLogs,
-        IAIConversationRepository aiConversations,
-        IForecastHistoryRepository forecastHistories,
-        IFinancialHealthHistoryRepository financialHealthHistories)
+    public UnitOfWork(FinanceFocusDbContext context)
     {
         _context = context;
-        Transactions = transactions;
-        Budgets = budgets;
-        Goals = goals;
-        PortfolioAssets = portfolioAssets;
-        Subscriptions = subscriptions;
-        Notifications = notifications;
-        ActivityLogs = activityLogs;
-        AIConversations = aiConversations;
-        ForecastHistories = forecastHistories;
-        FinancialHealthHistories = financialHealthHistories;
+        Transactions = new TransactionRepository(_context);
+        Budgets = new BudgetRepository(_context);
+        Goals = new GoalRepository(_context);
+        PortfolioAssets = new PortfolioAssetRepository(_context);
+        Subscriptions = new SubscriptionRepository(_context);
+        Notifications = new NotificationRepository(_context);
+        ActivityLogs = new ActivityLogRepository(_context);
+        AIConversations = new AIConversationRepository(_context);
+        ForecastHistories = new ForecastHistoryRepository(_context);
+        FinancialHealthHistories = new FinancialHealthHistoryRepository(_context);
     }
 
     public async Task<int> SaveChangesAsync()
