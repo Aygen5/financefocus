@@ -1,56 +1,96 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
 using FinanceFocus.Application.Common;
-using FinanceFocus.Application.DTOs.AI;
+using FinanceFocus.Application.DTOs.AIAssistant;
+using FinanceFocus.Application.DTOs.Dashboard;
+using FinanceFocus.Application.DTOs.FinancialHealth;
+using FinanceFocus.Application.DTOs.Forecast;
 using FinanceFocus.Application.Interfaces;
-using FinanceFocus.Domain.Entities;
-using FinanceFocus.Domain.UnitOfWork;
 
 namespace FinanceFocus.Application.Services;
 
 public class AIAssistantService : IAIAssistantService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
+    private readonly IDashboardService _dashboardService;
+    private readonly IFinancialHealthService _financialHealthService;
+    private readonly IForecastEngineService _forecastEngineService;
+    private readonly IAIProvider _aiProvider;
 
-    public AIAssistantService(IUnitOfWork unitOfWork, IMapper mapper)
+    public AIAssistantService(
+        IDashboardService dashboardService,
+        IFinancialHealthService financialHealthService,
+        IForecastEngineService forecastEngineService,
+        IAIProvider aiProvider)
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
+        _dashboardService = dashboardService;
+        _financialHealthService = financialHealthService;
+        _forecastEngineService = forecastEngineService;
+        _aiProvider = aiProvider;
     }
 
-    public async Task<Result<ChatMessageDto>> ProcessChatAsync(AIChatRequestDto dto, string userId)
+    public async Task<Result<AIAssistantDto>> GetFullAnalysisAsync(string userId)
     {
-        var userMsg = new AIConversation
-        {
-            UserId = userId,
-            MessageText = dto.Message,
-            Sender = "user",
-            Timestamp = DateTime.UtcNow
-        };
-        await _unitOfWork.AIConversations.AddAsync(userMsg);
+        var (dashboard, health, forecast) = await FetchAllContextDataAsync(userId);
 
-        var mockAiResponseText = $"FinanceFocus AI: '{dto.Message}' talebiniz analiz edildi. Finansal durumunuz stabil görünmektedir.";
-        var aiMsg = new AIConversation
-        {
-            UserId = userId,
-            MessageText = mockAiResponseText,
-            Sender = "ai",
-            Timestamp = DateTime.UtcNow.AddMilliseconds(100)
-        };
-        await _unitOfWork.AIConversations.AddAsync(aiMsg);
-        await _unitOfWork.SaveChangesAsync();
+        var summary = await _aiProvider.GenerateSummaryAsync(userId, dashboard, health, forecast);
+        var advices = await _aiProvider.GenerateAdvicesAsync(userId, dashboard, health, forecast);
+        var riskAnalysis = await _aiProvider.GenerateRiskAnalysisAsync(userId, dashboard, health, forecast);
+        var opportunities = await _aiProvider.GenerateOpportunitiesAsync(userId, dashboard, health, forecast);
 
-        var chatDto = _mapper.Map<ChatMessageDto>(aiMsg);
-        return Result<ChatMessageDto>.Success(chatDto);
+        var dto = new AIAssistantDto
+        {
+            Summary = summary,
+            Advices = advices,
+            RiskAnalysis = riskAnalysis,
+            Opportunities = opportunities,
+            ProviderUsed = _aiProvider.ProviderName,
+            GeneratedAt = DateTime.UtcNow
+        };
+
+        return Result<AIAssistantDto>.Success(dto);
     }
 
-    public async Task<Result<IEnumerable<AIConversationDto>>> GetUserConversationsAsync(string userId)
+    public async Task<Result<IEnumerable<AIAdviceDto>>> GetAdvicesAsync(string userId)
     {
-        var conversations = await _unitOfWork.AIConversations.GetByUserIdAsync(userId);
-        var dtos = _mapper.Map<IEnumerable<AIConversationDto>>(conversations);
-        return Result<IEnumerable<AIConversationDto>>.Success(dtos);
+        var (dashboard, health, forecast) = await FetchAllContextDataAsync(userId);
+        var advices = await _aiProvider.GenerateAdvicesAsync(userId, dashboard, health, forecast);
+        return Result<IEnumerable<AIAdviceDto>>.Success(advices);
+    }
+
+    public async Task<Result<AIConversationSummaryDto>> GetSummaryAsync(string userId)
+    {
+        var (dashboard, health, forecast) = await FetchAllContextDataAsync(userId);
+        var summary = await _aiProvider.GenerateSummaryAsync(userId, dashboard, health, forecast);
+        return Result<AIConversationSummaryDto>.Success(summary);
+    }
+
+    public async Task<Result<IEnumerable<AIAdviceDto>>> GetRiskAnalysisAsync(string userId)
+    {
+        var (dashboard, health, forecast) = await FetchAllContextDataAsync(userId);
+        var riskAnalysis = await _aiProvider.GenerateRiskAnalysisAsync(userId, dashboard, health, forecast);
+        return Result<IEnumerable<AIAdviceDto>>.Success(riskAnalysis);
+    }
+
+    public async Task<Result<IEnumerable<AIAdviceDto>>> GetOpportunitiesAsync(string userId)
+    {
+        var (dashboard, health, forecast) = await FetchAllContextDataAsync(userId);
+        var opportunities = await _aiProvider.GenerateOpportunitiesAsync(userId, dashboard, health, forecast);
+        return Result<IEnumerable<AIAdviceDto>>.Success(opportunities);
+    }
+
+    private async Task<(DashboardDto dashboard, FinancialHealthDto health, ForecastDto forecast)> FetchAllContextDataAsync(string userId)
+    {
+        var dashboardTask = _dashboardService.GetFullDashboardAsync(userId);
+        var healthTask = _financialHealthService.CalculateHealthScoreAsync(userId);
+        var forecastTask = _forecastEngineService.CalculateForecastAsync(userId);
+
+        await Task.WhenAll(dashboardTask, healthTask, forecastTask);
+
+        var dashboard = (await dashboardTask).Data ?? new DashboardDto();
+        var health = (await healthTask).Data ?? new FinancialHealthDto();
+        var forecast = (await forecastTask).Data ?? new ForecastDto();
+
+        return (dashboard, health, forecast);
     }
 }

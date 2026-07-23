@@ -3,6 +3,7 @@ using Asp.Versioning;
 using FinanceFocus.Application.Interfaces;
 using FinanceFocus.Application.Mappings;
 using FinanceFocus.Application.Services;
+using FinanceFocus.Application.Services.Providers;
 using FinanceFocus.Application.Validators.Transactions;
 using FinanceFocus.Domain.Entities;
 using FinanceFocus.Domain.UnitOfWork;
@@ -37,6 +38,7 @@ public static class ServiceExtensions
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IForecastEngineService, ForecastEngineService>();
         services.AddScoped<IFinancialHealthService, FinancialHealthService>();
+        services.AddScoped<IAIProvider, RuleBasedAIProvider>();
         services.AddScoped<IAIAssistantService, AIAssistantService>();
 
         return services;
