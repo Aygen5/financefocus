@@ -33,6 +33,10 @@ public class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
         builder.Property(s => s.Category)
             .HasMaxLength(100);
 
+        builder.Property(s => s.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
         builder.Property(s => s.UserId)
             .IsRequired()
             .HasMaxLength(450);
