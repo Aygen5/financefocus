@@ -13,7 +13,7 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}")
-    .WriteTo.File("logs/financefocus-.log", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("logs/financefocus-security-.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -28,12 +28,14 @@ builder.Services.AddProblemDetails();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddRateLimitingConfiguration();
 builder.Services.AddApiVersioningConfiguration();
 builder.Services.AddCorsConfiguration();
 
 var app = builder.Build();
 
 app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
@@ -44,10 +46,15 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "FinanceFocus API v1");
     });
 }
+else
+{
+    app.UseHsts();
+}
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -56,7 +63,7 @@ app.MapControllers();
 
 try
 {
-    Log.Information("Starting FinanceFocus Backend Host...");
+    Log.Information("Starting FinanceFocus Hardened Backend Host...");
     app.Run();
 }
 catch (Exception ex)

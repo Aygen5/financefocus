@@ -21,11 +21,18 @@ public class FinanceFocusDbContext : IdentityDbContext<AppUser>
     public DbSet<AIConversation> AIConversations => Set<AIConversation>();
     public DbSet<ForecastHistory> ForecastHistories => Set<ForecastHistory>();
     public DbSet<FinancialHealthHistory> FinancialHealthHistories => Set<FinancialHealthHistory>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(FinanceFocusDbContext).Assembly);
+
+        modelBuilder.Entity<RefreshToken>(builder =>
+        {
+            builder.HasIndex(r => r.Token).IsUnique();
+            builder.HasIndex(r => r.UserId);
+        });
 
         modelBuilder.Entity<Transaction>(builder =>
         {

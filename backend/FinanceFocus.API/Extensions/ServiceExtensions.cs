@@ -1,4 +1,6 @@
+using System;
 using System.Text;
+using System.Threading.RateLimiting;
 using Asp.Versioning;
 using FinanceFocus.Application.Interfaces;
 using FinanceFocus.Application.Mappings;
@@ -12,7 +14,10 @@ using FinanceFocus.Infrastructure.Services;
 using FinanceFocus.Infrastructure.UnitOfWork;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,11 +57,11 @@ public static class ServiceExtensions
 
         services.AddIdentity<AppUser, IdentityRole>(options =>
         {
-            options.Password.RequireDigit = false;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequiredLength = 6;
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequiredLength = 8;
             options.User.RequireUniqueEmail = true;
         })
         .AddEntityFrameworkStores<FinanceFocusDbContext>()
@@ -86,7 +91,7 @@ public static class ServiceExtensions
         })
         .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false;
+            options.RequireHttpsMetadata = true;
             options.SaveToken = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -97,8 +102,35 @@ public static class ServiceExtensions
                 ValidateAudience = true,
                 ValidAudience = audience,
                 ValidateLifetime = true,
-                ClockSkew = System.TimeSpan.Zero
+                ClockSkew = TimeSpan.FromSeconds(5)
             };
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddRateLimitingConfiguration(this IServiceCollection services)
+    {
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            options.AddFixedWindowLimiter(policyName: "AuthPolicy", limitOptions =>
+            {
+                limitOptions.PermitLimit = 5;
+                limitOptions.Window = TimeSpan.FromMinutes(1);
+                limitOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                limitOptions.QueueLimit = 0;
+            });
+
+            options.AddSlidingWindowLimiter(policyName: "ApiPolicy", limitOptions =>
+            {
+                limitOptions.PermitLimit = 100;
+                limitOptions.Window = TimeSpan.FromMinutes(1);
+                limitOptions.SegmentsPerWindow = 4;
+                limitOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                limitOptions.QueueLimit = 0;
+            });
         });
 
         return services;
@@ -127,7 +159,7 @@ public static class ServiceExtensions
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+                policy.WithOrigins("http://localhost:5173", "http://localhost:3000", "https://localhost:5001")
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
