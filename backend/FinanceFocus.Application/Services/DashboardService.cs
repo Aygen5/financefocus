@@ -100,7 +100,7 @@ public class DashboardService : IDashboardService
         var goals = (await _goalService.GetUserGoalsAsync(userId)).Data?.ToList() ?? new List<GoalDto>();
         var activeGoalCount = goals.Count(g => g.CurrentAmount < g.TargetAmount);
         var completedGoalCount = goals.Count(g => g.CurrentAmount >= g.TargetAmount);
-        var avgGoalProgress = goals.Any() ? Math.Round(goals.Average(g => g.ProgressPercentage), 2) : 0m;
+        var avgGoalProgress = goals.Any() ? Convert.ToDecimal(Math.Round(goals.Average(g => g.ProgressPercentage), 2)) : 0m;
 
         var portfolioResult = await _portfolioService.GetPortfolioSummaryAsync(userId);
         var portfolio = portfolioResult.Data ?? new PortfolioSummaryDto();
@@ -127,7 +127,7 @@ public class DashboardService : IDashboardService
             PortfolioTotalInvestment = portfolio.TotalInvestment,
             PortfolioCurrentValue = portfolio.TotalCurrentValue,
             PortfolioTotalProfitLoss = portfolio.TotalProfitLoss,
-            PortfolioTotalProfitLossPercentage = portfolio.TotalProfitLossPercentage,
+            PortfolioTotalProfitLossPercentage = (decimal)portfolio.TotalProfitLossPercentage,
             ActiveSubscriptionCount = subSummary.ActiveSubscriptionCount,
             MonthlyTotalSubscriptionCost = subSummary.TotalMonthlyCost,
             UpcomingPaymentsCount = subSummary.UpcomingRenewalsCount,
