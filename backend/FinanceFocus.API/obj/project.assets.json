@@ -1025,7 +1025,8 @@
           "FinanceFocus.Application": "1.0.0",
           "FinanceFocus.Domain": "1.0.0",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "10.0.10",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.3"
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.3",
+          "System.IdentityModel.Tokens.Jwt": "8.6.0"
         },
         "compile": {
           "bin/placeholder/FinanceFocus.Infrastructure.dll": {}
