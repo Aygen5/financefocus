@@ -15,17 +15,20 @@ namespace FinanceFocus.Application.Services;
 public class SubscriptionService : ISubscriptionService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
     private readonly IMapper _mapper;
     private readonly IValidator<CreateSubscriptionDto> _createValidator;
     private readonly IValidator<UpdateSubscriptionDto> _updateValidator;
 
     public SubscriptionService(
         IUnitOfWork unitOfWork,
+        ICacheService cacheService,
         IMapper mapper,
         IValidator<CreateSubscriptionDto> createValidator,
         IValidator<UpdateSubscriptionDto> updateValidator)
     {
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
         _mapper = mapper;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
@@ -124,6 +127,8 @@ public class SubscriptionService : ISubscriptionService
         await _unitOfWork.Subscriptions.AddAsync(subscription);
         await _unitOfWork.SaveChangesAsync();
 
+        await _cacheService.RemoveByPrefixAsync(userId);
+
         var resultDto = _mapper.Map<SubscriptionDto>(subscription);
         return Result<SubscriptionDto>.Success(resultDto, "Abonelik başarıyla oluşturuldu.");
     }
@@ -149,6 +154,8 @@ public class SubscriptionService : ISubscriptionService
         _unitOfWork.Subscriptions.Update(subscription);
         await _unitOfWork.SaveChangesAsync();
 
+        await _cacheService.RemoveByPrefixAsync(userId);
+
         var resultDto = _mapper.Map<SubscriptionDto>(subscription);
         return Result<SubscriptionDto>.Success(resultDto, "Abonelik başarıyla güncellendi.");
     }
@@ -163,6 +170,8 @@ public class SubscriptionService : ISubscriptionService
 
         _unitOfWork.Subscriptions.Delete(subscription);
         await _unitOfWork.SaveChangesAsync();
+
+        await _cacheService.RemoveByPrefixAsync(userId);
 
         return Result.Success("Abonelik başarıyla silindi.");
     }

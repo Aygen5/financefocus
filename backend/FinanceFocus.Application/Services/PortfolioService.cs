@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using FinanceFocus.Application.Common;
+using FinanceFocus.Application.Common.Caching;
 using FinanceFocus.Application.DTOs.Portfolio;
 using FinanceFocus.Application.Interfaces;
 using FinanceFocus.Domain.Entities;
@@ -15,17 +16,20 @@ namespace FinanceFocus.Application.Services;
 public class PortfolioService : IPortfolioService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
     private readonly IMapper _mapper;
     private readonly IValidator<CreatePortfolioAssetDto> _createValidator;
     private readonly IValidator<UpdatePortfolioAssetDto> _updateValidator;
 
     public PortfolioService(
         IUnitOfWork unitOfWork,
+        ICacheService cacheService,
         IMapper mapper,
         IValidator<CreatePortfolioAssetDto> createValidator,
         IValidator<UpdatePortfolioAssetDto> updateValidator)
     {
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
         _mapper = mapper;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
@@ -52,6 +56,13 @@ public class PortfolioService : IPortfolioService
 
     public async Task<Result<PortfolioSummaryDto>> GetPortfolioSummaryAsync(string userId)
     {
+        var cacheKey = CacheKeyFactory.PortfolioSummary(userId);
+        var cached = await _cacheService.GetAsync<PortfolioSummaryDto>(cacheKey);
+        if (cached != null)
+        {
+            return Result<PortfolioSummaryDto>.Success(cached);
+        }
+
         var assets = (await _unitOfWork.PortfolioAssets.GetByUserIdAsync(userId)).ToList();
         var dtos = _mapper.Map<IEnumerable<PortfolioAssetDto>>(assets).ToList();
 
@@ -71,6 +82,8 @@ public class PortfolioService : IPortfolioService
             AssetCount = dtos.Count,
             Assets = dtos
         };
+
+        await _cacheService.SetAsync(cacheKey, summary, CacheDuration.PortfolioSummary);
 
         return Result<PortfolioSummaryDto>.Success(summary);
     }
@@ -103,6 +116,8 @@ public class PortfolioService : IPortfolioService
             _unitOfWork.PortfolioAssets.Update(existingAsset);
             await _unitOfWork.SaveChangesAsync();
 
+            await _cacheService.RemoveByPrefixAsync(userId);
+
             var updatedDto = _mapper.Map<PortfolioAssetDto>(existingAsset);
             return Result<PortfolioAssetDto>.Success(updatedDto, "Mevcut varlığın miktarı ve ağırlıklı ortalama maliyeti güncellendi.");
         }
@@ -112,6 +127,8 @@ public class PortfolioService : IPortfolioService
 
         await _unitOfWork.PortfolioAssets.AddAsync(asset);
         await _unitOfWork.SaveChangesAsync();
+
+        await _cacheService.RemoveByPrefixAsync(userId);
 
         var resultDto = _mapper.Map<PortfolioAssetDto>(asset);
         return Result<PortfolioAssetDto>.Success(resultDto, "Portföye varlık başarıyla eklendi.");
@@ -138,6 +155,8 @@ public class PortfolioService : IPortfolioService
         _unitOfWork.PortfolioAssets.Update(asset);
         await _unitOfWork.SaveChangesAsync();
 
+        await _cacheService.RemoveByPrefixAsync(userId);
+
         var resultDto = _mapper.Map<PortfolioAssetDto>(asset);
         return Result<PortfolioAssetDto>.Success(resultDto, "Varlık kaydı başarıyla güncellendi.");
     }
@@ -152,6 +171,8 @@ public class PortfolioService : IPortfolioService
 
         _unitOfWork.PortfolioAssets.Delete(asset);
         await _unitOfWork.SaveChangesAsync();
+
+        await _cacheService.RemoveByPrefixAsync(userId);
 
         return Result.Success("Varlık kaydı başarıyla silindi.");
     }

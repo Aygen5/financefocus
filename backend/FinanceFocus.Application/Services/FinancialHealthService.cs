@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FinanceFocus.Application.Common;
+using FinanceFocus.Application.Common.Caching;
 using FinanceFocus.Application.DTOs.FinancialHealth;
 using FinanceFocus.Application.Interfaces;
 using FinanceFocus.Domain.Enums;
@@ -17,23 +18,33 @@ public class FinancialHealthService : IFinancialHealthService
     private readonly ISubscriptionService _subscriptionService;
     private readonly IBudgetService _budgetService;
     private readonly IGoalService _goalService;
+    private readonly ICacheService _cacheService;
 
     public FinancialHealthService(
         IUnitOfWork unitOfWork,
         IPortfolioService portfolioService,
         ISubscriptionService subscriptionService,
         IBudgetService budgetService,
-        IGoalService goalService)
+        IGoalService goalService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _portfolioService = portfolioService;
         _subscriptionService = subscriptionService;
         _budgetService = budgetService;
         _goalService = goalService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<FinancialHealthDto>> CalculateHealthScoreAsync(string userId)
     {
+        var cacheKey = CacheKeyFactory.FinancialHealth(userId);
+        var cached = await _cacheService.GetAsync<FinancialHealthDto>(cacheKey);
+        if (cached != null)
+        {
+            return Result<FinancialHealthDto>.Success(cached);
+        }
+
         var breakdown = (await GetScoreBreakdownAsync(userId)).Data ?? new ScoreBreakdownDto();
         var totalScore = (int)Math.Round(breakdown.TotalScore, MidpointRounding.AwayFromZero);
         totalScore = Math.Clamp(totalScore, 0, 100);
@@ -50,11 +61,20 @@ public class FinancialHealthService : IFinancialHealthService
             CalculationDate = DateTime.UtcNow
         };
 
+        await _cacheService.SetAsync(cacheKey, dto, CacheDuration.FinancialHealth);
+
         return Result<FinancialHealthDto>.Success(dto);
     }
 
     public async Task<Result<FinancialHealthSummaryDto>> GetHealthSummaryAsync(string userId)
     {
+        var cacheKey = CacheKeyFactory.FinancialHealthSummary(userId);
+        var cached = await _cacheService.GetAsync<FinancialHealthSummaryDto>(cacheKey);
+        if (cached != null)
+        {
+            return Result<FinancialHealthSummaryDto>.Success(cached);
+        }
+
         var fullHealth = (await CalculateHealthScoreAsync(userId)).Data;
         var summary = new FinancialHealthSummaryDto
         {
@@ -62,6 +82,8 @@ public class FinancialHealthService : IFinancialHealthService
             RiskLevel = fullHealth?.RiskLevel ?? "Moderate",
             TopInsights = fullHealth?.Insights.Take(5) ?? new List<FinancialInsightDto>()
         };
+
+        await _cacheService.SetAsync(cacheKey, summary, CacheDuration.FinancialHealth);
 
         return Result<FinancialHealthSummaryDto>.Success(summary);
     }

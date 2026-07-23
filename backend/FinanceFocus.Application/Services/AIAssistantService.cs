@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FinanceFocus.Application.Common;
+using FinanceFocus.Application.Common.Caching;
 using FinanceFocus.Application.DTOs.AIAssistant;
 using FinanceFocus.Application.DTOs.Dashboard;
 using FinanceFocus.Application.DTOs.FinancialHealth;
@@ -16,21 +17,31 @@ public class AIAssistantService : IAIAssistantService
     private readonly IFinancialHealthService _financialHealthService;
     private readonly IForecastEngineService _forecastEngineService;
     private readonly IAIProvider _aiProvider;
+    private readonly ICacheService _cacheService;
 
     public AIAssistantService(
         IDashboardService dashboardService,
         IFinancialHealthService financialHealthService,
         IForecastEngineService forecastEngineService,
-        IAIProvider aiProvider)
+        IAIProvider aiProvider,
+        ICacheService cacheService)
     {
         _dashboardService = dashboardService;
         _financialHealthService = financialHealthService;
         _forecastEngineService = forecastEngineService;
         _aiProvider = aiProvider;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<AIAssistantDto>> GetFullAnalysisAsync(string userId)
     {
+        var cacheKey = CacheKeyFactory.AIAnalysis(userId);
+        var cached = await _cacheService.GetAsync<AIAssistantDto>(cacheKey);
+        if (cached != null)
+        {
+            return Result<AIAssistantDto>.Success(cached);
+        }
+
         var (dashboard, health, forecast) = await FetchAllContextDataAsync(userId);
 
         var summary = await _aiProvider.GenerateSummaryAsync(userId, dashboard, health, forecast);
@@ -48,6 +59,8 @@ public class AIAssistantService : IAIAssistantService
             GeneratedAt = DateTime.UtcNow
         };
 
+        await _cacheService.SetAsync(cacheKey, dto, CacheDuration.AISummary);
+
         return Result<AIAssistantDto>.Success(dto);
     }
 
@@ -60,8 +73,18 @@ public class AIAssistantService : IAIAssistantService
 
     public async Task<Result<AIConversationSummaryDto>> GetSummaryAsync(string userId)
     {
+        var cacheKey = CacheKeyFactory.AISummary(userId);
+        var cached = await _cacheService.GetAsync<AIConversationSummaryDto>(cacheKey);
+        if (cached != null)
+        {
+            return Result<AIConversationSummaryDto>.Success(cached);
+        }
+
         var (dashboard, health, forecast) = await FetchAllContextDataAsync(userId);
         var summary = await _aiProvider.GenerateSummaryAsync(userId, dashboard, health, forecast);
+
+        await _cacheService.SetAsync(cacheKey, summary, CacheDuration.AISummary);
+
         return Result<AIConversationSummaryDto>.Success(summary);
     }
 

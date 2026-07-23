@@ -16,17 +16,20 @@ namespace FinanceFocus.Application.Services;
 public class BudgetService : IBudgetService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
     private readonly IMapper _mapper;
     private readonly IValidator<CreateBudgetDto> _createValidator;
     private readonly IValidator<UpdateBudgetDto> _updateValidator;
 
     public BudgetService(
         IUnitOfWork unitOfWork,
+        ICacheService cacheService,
         IMapper mapper,
         IValidator<CreateBudgetDto> createValidator,
         IValidator<UpdateBudgetDto> updateValidator)
     {
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
         _mapper = mapper;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
@@ -106,6 +109,8 @@ public class BudgetService : IBudgetService
         await _unitOfWork.Budgets.AddAsync(budget);
         await _unitOfWork.SaveChangesAsync();
 
+        await _cacheService.RemoveByPrefixAsync(userId);
+
         var resultDto = _mapper.Map<BudgetDto>(budget);
         return Result<BudgetDto>.Success(resultDto, "Bütçe limiti başarıyla eklendi.");
     }
@@ -131,6 +136,8 @@ public class BudgetService : IBudgetService
         _unitOfWork.Budgets.Update(budget);
         await _unitOfWork.SaveChangesAsync();
 
+        await _cacheService.RemoveByPrefixAsync(userId);
+
         var resultDto = _mapper.Map<BudgetDto>(budget);
 
         var transactions = (await _unitOfWork.Transactions.GetByUserIdAsync(userId)).ToList();
@@ -154,6 +161,8 @@ public class BudgetService : IBudgetService
 
         _unitOfWork.Budgets.Delete(budget);
         await _unitOfWork.SaveChangesAsync();
+
+        await _cacheService.RemoveByPrefixAsync(userId);
 
         return Result.Success("Bütçe limiti başarıyla silindi.");
     }

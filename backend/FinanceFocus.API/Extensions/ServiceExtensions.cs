@@ -62,6 +62,9 @@ public static class ServiceExtensions
         .AddEntityFrameworkStores<FinanceFocusDbContext>()
         .AddDefaultTokenProviders();
 
+        services.AddMemoryCache();
+        services.AddSingleton<ICacheService, MemoryCacheService>();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 

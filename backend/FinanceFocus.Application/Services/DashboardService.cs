@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using FinanceFocus.Application.Common;
+using FinanceFocus.Application.Common.Caching;
 using FinanceFocus.Application.DTOs.ActivityLogs;
 using FinanceFocus.Application.DTOs.Budgets;
 using FinanceFocus.Application.DTOs.Dashboard;
@@ -31,6 +32,7 @@ public class DashboardService : IDashboardService
     private readonly IActivityLogService _activityLogService;
     private readonly IFinancialHealthService _financialHealthService;
     private readonly IForecastEngineService _forecastEngineService;
+    private readonly ICacheService _cacheService;
     private readonly IMapper _mapper;
 
     public DashboardService(
@@ -44,6 +46,7 @@ public class DashboardService : IDashboardService
         IActivityLogService activityLogService,
         IFinancialHealthService financialHealthService,
         IForecastEngineService forecastEngineService,
+        ICacheService cacheService,
         IMapper mapper)
     {
         _unitOfWork = unitOfWork;
@@ -56,11 +59,19 @@ public class DashboardService : IDashboardService
         _activityLogService = activityLogService;
         _financialHealthService = financialHealthService;
         _forecastEngineService = forecastEngineService;
+        _cacheService = cacheService;
         _mapper = mapper;
     }
 
     public async Task<Result<DashboardDto>> GetFullDashboardAsync(string userId)
     {
+        var cacheKey = CacheKeyFactory.Dashboard(userId);
+        var cached = await _cacheService.GetAsync<DashboardDto>(cacheKey);
+        if (cached != null)
+        {
+            return Result<DashboardDto>.Success(cached);
+        }
+
         var summaryResult = await GetDashboardSummaryAsync(userId);
         var summary = summaryResult.Data ?? new DashboardSummaryDto();
 
@@ -84,11 +95,20 @@ public class DashboardService : IDashboardService
             RecentActivities = recentActivities
         };
 
+        await _cacheService.SetAsync(cacheKey, dashboard, CacheDuration.Dashboard);
+
         return Result<DashboardDto>.Success(dashboard);
     }
 
     public async Task<Result<DashboardSummaryDto>> GetDashboardSummaryAsync(string userId)
     {
+        var cacheKey = CacheKeyFactory.DashboardSummary(userId);
+        var cached = await _cacheService.GetAsync<DashboardSummaryDto>(cacheKey);
+        if (cached != null)
+        {
+            return Result<DashboardSummaryDto>.Success(cached);
+        }
+
         var transactions = (await _unitOfWork.Transactions.GetByUserIdAsync(userId)).ToList();
 
         var totalIncome = transactions.Where(t => t.TransactionType == TransactionType.Income).Sum(t => t.Amount);
@@ -154,6 +174,8 @@ public class DashboardService : IDashboardService
             UnreadNotificationCount = unreadNotifCount,
             TotalActivityCount = totalActivities
         };
+
+        await _cacheService.SetAsync(cacheKey, summary, CacheDuration.Dashboard);
 
         return Result<DashboardSummaryDto>.Success(summary);
     }

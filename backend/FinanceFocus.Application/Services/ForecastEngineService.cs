@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FinanceFocus.Application.Common;
+using FinanceFocus.Application.Common.Caching;
 using FinanceFocus.Application.DTOs.Budgets;
 using FinanceFocus.Application.DTOs.Forecast;
 using FinanceFocus.Application.DTOs.Goals;
@@ -21,23 +22,33 @@ public class ForecastEngineService : IForecastEngineService
     private readonly IGoalService _goalService;
     private readonly IPortfolioService _portfolioService;
     private readonly ISubscriptionService _subscriptionService;
+    private readonly ICacheService _cacheService;
 
     public ForecastEngineService(
         IUnitOfWork unitOfWork,
         IBudgetService budgetService,
         IGoalService goalService,
         IPortfolioService portfolioService,
-        ISubscriptionService subscriptionService)
+        ISubscriptionService subscriptionService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _budgetService = budgetService;
         _goalService = goalService;
         _portfolioService = portfolioService;
         _subscriptionService = subscriptionService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<ForecastDto>> CalculateForecastAsync(string userId)
     {
+        var cacheKey = CacheKeyFactory.Forecast(userId);
+        var cached = await _cacheService.GetAsync<ForecastDto>(cacheKey);
+        if (cached != null)
+        {
+            return Result<ForecastDto>.Success(cached);
+        }
+
         var cashFlow = (await GetCashFlowForecastAsync(userId)).Data ?? new CashFlowForecastDto();
         var budgets = (await GetBudgetForecastsAsync(userId)).Data ?? new List<BudgetForecastDto>();
         var goals = (await GetGoalForecastsAsync(userId)).Data ?? new List<GoalForecastDto>();
@@ -56,11 +67,20 @@ public class ForecastEngineService : IForecastEngineService
             GeneratedAt = DateTime.UtcNow
         };
 
+        await _cacheService.SetAsync(cacheKey, dto, CacheDuration.Forecast);
+
         return Result<ForecastDto>.Success(dto);
     }
 
     public async Task<Result<ForecastSummaryDto>> GetForecastSummaryAsync(string userId)
     {
+        var cacheKey = CacheKeyFactory.ForecastSummary(userId);
+        var cached = await _cacheService.GetAsync<ForecastSummaryDto>(cacheKey);
+        if (cached != null)
+        {
+            return Result<ForecastSummaryDto>.Success(cached);
+        }
+
         var cashFlow = (await GetCashFlowForecastAsync(userId)).Data;
         var budgets = (await GetBudgetForecastsAsync(userId)).Data?.ToList() ?? new List<BudgetForecastDto>();
         var goals = (await GetGoalForecastsAsync(userId)).Data?.ToList() ?? new List<GoalForecastDto>();
@@ -83,6 +103,8 @@ public class ForecastEngineService : IForecastEngineService
             EstimatedGoalCompletionDate = earliestGoalCompletion,
             EstimatedPortfolioValue = portfolio?.ExpectedPortfolioValueIn12Months ?? 0m
         };
+
+        await _cacheService.SetAsync(cacheKey, summary, CacheDuration.Forecast);
 
         return Result<ForecastSummaryDto>.Success(summary);
     }

@@ -12,11 +12,13 @@ namespace FinanceFocus.Application.Services;
 public class TransactionService : ITransactionService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
     private readonly IMapper _mapper;
 
-    public TransactionService(IUnitOfWork unitOfWork, IMapper mapper)
+    public TransactionService(IUnitOfWork unitOfWork, ICacheService cacheService, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
         _mapper = mapper;
     }
 
@@ -47,6 +49,8 @@ public class TransactionService : ITransactionService
         await _unitOfWork.Transactions.AddAsync(transaction);
         await _unitOfWork.SaveChangesAsync();
 
+        await _cacheService.RemoveByPrefixAsync(userId);
+
         var resultDto = _mapper.Map<TransactionDto>(transaction);
         return Result<TransactionDto>.Success(resultDto, "İşlem başarıyla eklendi.");
     }
@@ -63,6 +67,8 @@ public class TransactionService : ITransactionService
         _unitOfWork.Transactions.Update(transaction);
         await _unitOfWork.SaveChangesAsync();
 
+        await _cacheService.RemoveByPrefixAsync(userId);
+
         var resultDto = _mapper.Map<TransactionDto>(transaction);
         return Result<TransactionDto>.Success(resultDto, "İşlem başarıyla güncellendi.");
     }
@@ -77,6 +83,8 @@ public class TransactionService : ITransactionService
 
         _unitOfWork.Transactions.Delete(transaction);
         await _unitOfWork.SaveChangesAsync();
+
+        await _cacheService.RemoveByPrefixAsync(userId);
 
         return Result.Success("İşlem başarıyla silindi.");
     }

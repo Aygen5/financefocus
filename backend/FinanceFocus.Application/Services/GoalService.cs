@@ -15,17 +15,20 @@ namespace FinanceFocus.Application.Services;
 public class GoalService : IGoalService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
     private readonly IMapper _mapper;
     private readonly IValidator<CreateGoalDto> _createValidator;
     private readonly IValidator<UpdateGoalDto> _updateValidator;
 
     public GoalService(
         IUnitOfWork unitOfWork,
+        ICacheService cacheService,
         IMapper mapper,
         IValidator<CreateGoalDto> createValidator,
         IValidator<UpdateGoalDto> updateValidator)
     {
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
         _mapper = mapper;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
@@ -77,6 +80,8 @@ public class GoalService : IGoalService
         await _unitOfWork.Goals.AddAsync(goal);
         await _unitOfWork.SaveChangesAsync();
 
+        await _cacheService.RemoveByPrefixAsync(userId);
+
         var resultDto = _mapper.Map<GoalDto>(goal);
         return Result<GoalDto>.Success(resultDto, "Hedef başarıyla oluşturuldu.");
     }
@@ -107,6 +112,8 @@ public class GoalService : IGoalService
         _unitOfWork.Goals.Update(goal);
         await _unitOfWork.SaveChangesAsync();
 
+        await _cacheService.RemoveByPrefixAsync(userId);
+
         var resultDto = _mapper.Map<GoalDto>(goal);
         return Result<GoalDto>.Success(resultDto, "Hedef başarıyla güncellendi.");
     }
@@ -121,6 +128,8 @@ public class GoalService : IGoalService
 
         _unitOfWork.Goals.Delete(goal);
         await _unitOfWork.SaveChangesAsync();
+
+        await _cacheService.RemoveByPrefixAsync(userId);
 
         return Result.Success("Hedef başarıyla silindi.");
     }
