@@ -1,8 +1,3 @@
-using System.Collections.Generic;
-using FinanceFocus.Application.DTOs.Budgets;
-using FinanceFocus.Application.DTOs.Goals;
-using FinanceFocus.Application.DTOs.Transactions;
-
 namespace FinanceFocus.Application.DTOs.Dashboard;
 
 public class DashboardSummaryDto
@@ -11,7 +6,21 @@ public class DashboardSummaryDto
     public decimal MonthlyIncome { get; set; }
     public decimal MonthlyExpense { get; set; }
     public decimal NetSavings { get; set; }
-    public IEnumerable<TransactionDto> RecentTransactions { get; set; } = new List<TransactionDto>();
-    public IEnumerable<BudgetDto> ActiveBudgets { get; set; } = new List<BudgetDto>();
-    public IEnumerable<GoalDto> TopGoals { get; set; } = new List<GoalDto>();
+    public decimal SavingsRate { get; set; }
+
+    public int ActiveGoalCount { get; set; }
+    public int CompletedGoalCount { get; set; }
+    public decimal AverageGoalProgressPercentage { get; set; }
+
+    public decimal PortfolioTotalInvestment { get; set; }
+    public decimal PortfolioCurrentValue { get; set; }
+    public decimal PortfolioTotalProfitLoss { get; set; }
+    public decimal PortfolioTotalProfitLossPercentage { get; set; }
+
+    public int ActiveSubscriptionCount { get; set; }
+    public decimal MonthlyTotalSubscriptionCost { get; set; }
+    public int UpcomingPaymentsCount { get; set; }
+
+    public int UnreadNotificationCount { get; set; }
+    public int TotalActivityCount { get; set; }
 }
