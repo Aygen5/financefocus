@@ -41,6 +41,7 @@ public class MappingProfile : Profile
         CreateMap<Notification, NotificationDto>();
         CreateMap<CreateNotificationDto, Notification>();
         CreateMap<ActivityLog, ActivityLogDto>();
+        CreateMap<CreateActivityLogDto, ActivityLog>();
         CreateMap<AIConversation, AIConversationDto>();
         CreateMap<AIConversation, ChatMessageDto>();
         CreateMap<ForecastHistory, ForecastDto>();
