@@ -81,15 +81,13 @@ public class AIAssistantService : IAIAssistantService
 
     private async Task<(DashboardDto dashboard, FinancialHealthDto health, ForecastDto forecast)> FetchAllContextDataAsync(string userId)
     {
-        var dashboardTask = _dashboardService.GetFullDashboardAsync(userId);
-        var healthTask = _financialHealthService.CalculateHealthScoreAsync(userId);
-        var forecastTask = _forecastEngineService.CalculateForecastAsync(userId);
+        var dashboardRes = await _dashboardService.GetFullDashboardAsync(userId);
+        var healthRes = await _financialHealthService.CalculateHealthScoreAsync(userId);
+        var forecastRes = await _forecastEngineService.CalculateForecastAsync(userId);
 
-        await Task.WhenAll(dashboardTask, healthTask, forecastTask);
-
-        var dashboard = (await dashboardTask).Data ?? new DashboardDto();
-        var health = (await healthTask).Data ?? new FinancialHealthDto();
-        var forecast = (await forecastTask).Data ?? new ForecastDto();
+        var dashboard = dashboardRes.Data ?? new DashboardDto();
+        var health = healthRes.Data ?? new FinancialHealthDto();
+        var forecast = forecastRes.Data ?? new ForecastDto();
 
         return (dashboard, health, forecast);
     }
