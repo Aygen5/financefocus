@@ -7,6 +7,7 @@ using FinanceFocus.Application.Common;
 using FinanceFocus.Application.DTOs.ActivityLogs;
 using FinanceFocus.Application.DTOs.Budgets;
 using FinanceFocus.Application.DTOs.Dashboard;
+using FinanceFocus.Application.DTOs.FinancialHealth;
 using FinanceFocus.Application.DTOs.Goals;
 using FinanceFocus.Application.DTOs.Notifications;
 using FinanceFocus.Application.DTOs.Portfolio;
@@ -27,6 +28,7 @@ public class DashboardService : IDashboardService
     private readonly ISubscriptionService _subscriptionService;
     private readonly INotificationService _notificationService;
     private readonly IActivityLogService _activityLogService;
+    private readonly IFinancialHealthService _financialHealthService;
     private readonly IMapper _mapper;
 
     public DashboardService(
@@ -38,6 +40,7 @@ public class DashboardService : IDashboardService
         ISubscriptionService subscriptionService,
         INotificationService notificationService,
         IActivityLogService activityLogService,
+        IFinancialHealthService financialHealthService,
         IMapper mapper)
     {
         _unitOfWork = unitOfWork;
@@ -48,6 +51,7 @@ public class DashboardService : IDashboardService
         _subscriptionService = subscriptionService;
         _notificationService = notificationService;
         _activityLogService = activityLogService;
+        _financialHealthService = financialHealthService;
         _mapper = mapper;
     }
 
@@ -97,6 +101,8 @@ public class DashboardService : IDashboardService
         var netSavings = monthlyIncome - monthlyExpense;
         var savingsRate = monthlyIncome > 0 ? Math.Round((netSavings / monthlyIncome) * 100m, 2) : 0m;
 
+        var healthSummary = (await _financialHealthService.GetHealthSummaryAsync(userId)).Data;
+
         var goals = (await _goalService.GetUserGoalsAsync(userId)).Data?.ToList() ?? new List<GoalDto>();
         var activeGoalCount = goals.Count(g => g.CurrentAmount < g.TargetAmount);
         var completedGoalCount = goals.Count(g => g.CurrentAmount >= g.TargetAmount);
@@ -121,6 +127,9 @@ public class DashboardService : IDashboardService
             MonthlyExpense = monthlyExpense,
             NetSavings = netSavings,
             SavingsRate = savingsRate,
+            FinancialHealthScore = healthSummary?.FinancialHealthScore ?? 50,
+            RiskLevel = healthSummary?.RiskLevel ?? "Moderate",
+            TopInsights = healthSummary?.TopInsights ?? new List<FinancialInsightDto>(),
             ActiveGoalCount = activeGoalCount,
             CompletedGoalCount = completedGoalCount,
             AverageGoalProgressPercentage = avgGoalProgress,
