@@ -9,7 +9,7 @@ namespace FinanceFocus.API.Controllers;
 public abstract class BaseApiController : ControllerBase
 {
     protected string CurrentUserId =>
-        User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "demo-user-id";
+        User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
     protected IActionResult ActionResultFrom<T>(Result<T> result)
     {

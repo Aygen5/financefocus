@@ -4,11 +4,13 @@ using Asp.Versioning;
 using FinanceFocus.Application.Common;
 using FinanceFocus.Application.DTOs.Transactions;
 using FinanceFocus.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceFocus.API.Controllers;
 
 [ApiVersion("1.0")]
+[Authorize]
 public class TransactionsController : BaseApiController
 {
     private readonly ITransactionService _transactionService;

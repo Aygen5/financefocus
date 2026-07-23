@@ -1,15 +1,21 @@
+using System.Text;
 using Asp.Versioning;
 using FinanceFocus.Application.Interfaces;
 using FinanceFocus.Application.Mappings;
 using FinanceFocus.Application.Services;
 using FinanceFocus.Application.Validators.Transactions;
+using FinanceFocus.Domain.Entities;
 using FinanceFocus.Domain.UnitOfWork;
 using FinanceFocus.Infrastructure.Persistence;
+using FinanceFocus.Infrastructure.Services;
 using FinanceFocus.Infrastructure.UnitOfWork;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FinanceFocus.API.Extensions;
 
@@ -20,6 +26,7 @@ public static class ServiceExtensions
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
         services.AddValidatorsFromAssemblyContaining<CreateTransactionValidator>();
 
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IBudgetService, BudgetService>();
         services.AddScoped<IGoalService, GoalService>();
@@ -41,7 +48,53 @@ public static class ServiceExtensions
         services.AddDbContext<FinanceFocusDbContext>(options =>
             options.UseNpgsql(connectionString));
 
+        services.AddIdentity<AppUser, IdentityRole>(options =>
+        {
+            options.Password.RequireDigit = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 6;
+            options.User.RequireUniqueEmail = true;
+        })
+        .AddEntityFrameworkStores<FinanceFocusDbContext>()
+        .AddDefaultTokenProviders();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        var secretKey = configuration["JwtSettings:SecretKey"] ?? "FinanceFocusSuperSecretProductionLevelJwtSigningKey2026!";
+        var issuer = configuration["JwtSettings:Issuer"] ?? "FinanceFocusAPI";
+        var audience = configuration["JwtSettings:Audience"] ?? "FinanceFocusClient";
+
+        var key = Encoding.UTF8.GetBytes(secretKey);
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false;
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = issuer,
+                ValidateAudience = true,
+                ValidAudience = audience,
+                ValidateLifetime = true,
+                ClockSkew = System.TimeSpan.Zero
+            };
+        });
 
         return services;
     }
@@ -53,6 +106,7 @@ public static class ServiceExtensions
             options.DefaultApiVersion = new ApiVersion(1, 0);
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ReportApiVersions = true;
+            options.ApiVersionReader = new UrlSegmentApiVersionReader();
         }).AddApiExplorer(options =>
         {
             options.GroupNameFormat = "'v'VVV";
