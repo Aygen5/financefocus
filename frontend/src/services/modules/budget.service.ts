@@ -1,29 +1,56 @@
-import api from "../api";
-import ENDPOINTS from "../api/endpoints";
+import budgetApi from "@/api/budgetApi";
+import type { CreateBudgetDto } from "@/api/budgetApi";
 import type { Budget } from "@/features/budget/budgetSlice";
 
 export const BudgetService = {
   getAll: async (): Promise<Budget[]> => {
-    const response = await api.get<Budget[]>(ENDPOINTS.BUDGETS.BASE);
-    return response.data;
+    const response = await budgetApi.getAll();
+    return (response.data || []).map((b) => ({
+      id: b.id,
+      userId: b.userId,
+      category: b.category,
+      limitAmount: b.limit,
+      spentAmount: b.spentAmount,
+      period: b.month,
+    }));
   },
 
   create: async (data: Omit<Budget, "id" | "userId" | "spentAmount">): Promise<Budget> => {
-    const response = await api.post<Budget>(ENDPOINTS.BUDGETS.BASE, {
-      ...data,
-      spentAmount: 0,
-      userId: "1",
-    });
-    return response.data;
+    const payload: CreateBudgetDto = {
+      category: data.category,
+      limit: data.limitAmount,
+      month: data.period || new Date().toISOString().substring(0, 7),
+    };
+    const response = await budgetApi.create(payload);
+    return {
+      id: response.data.id,
+      userId: response.data.userId,
+      category: response.data.category,
+      limitAmount: response.data.limit,
+      spentAmount: response.data.spentAmount,
+      period: response.data.month,
+    };
   },
 
   update: async (id: string, data: Partial<Budget>): Promise<Budget> => {
-    const response = await api.patch<Budget>(ENDPOINTS.BUDGETS.DETAIL(id), data);
-    return response.data;
+    const payload: CreateBudgetDto = {
+      category: data.category || "Genel",
+      limit: data.limitAmount || 0,
+      month: data.period || new Date().toISOString().substring(0, 7),
+    };
+    const response = await budgetApi.update(id, payload);
+    return {
+      id: response.data.id,
+      userId: response.data.userId,
+      category: response.data.category,
+      limitAmount: response.data.limit,
+      spentAmount: response.data.spentAmount,
+      period: response.data.month,
+    };
   },
 
   delete: async (id: string): Promise<void> => {
-    await api.delete(ENDPOINTS.BUDGETS.DETAIL(id));
+    await budgetApi.delete(id);
   },
 };
 

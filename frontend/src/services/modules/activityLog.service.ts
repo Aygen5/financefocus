@@ -1,11 +1,15 @@
-import api from "../api";
-import ENDPOINTS from "../api/endpoints";
+import activityApi from "@/api/activityApi";
 import type { ActivityLog } from "@/features/activity/activitySlice";
 
 export const ActivityLogService = {
   getAll: async (): Promise<ActivityLog[]> => {
-    const response = await api.get<ActivityLog[]>(ENDPOINTS.ACTIVITY_LOG.BASE);
-    return response.data;
+    const response = await activityApi.getAll();
+    return (response.data || []).map((a) => ({
+      id: a.id,
+      action: a.action,
+      timestamp: a.createdAt,
+      description: a.description || a.title,
+    })) as unknown as ActivityLog[];
   },
 };
 

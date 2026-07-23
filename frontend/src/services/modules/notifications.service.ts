@@ -1,22 +1,29 @@
-import api from "../api";
-import ENDPOINTS from "../api/endpoints";
+import notificationApi from "@/api/notificationApi";
 import type { SystemNotification } from "@/features/notifications/notificationsSlice";
 
 export const NotificationsService = {
   getAll: async (): Promise<SystemNotification[]> => {
-    const response = await api.get<SystemNotification[]>(ENDPOINTS.NOTIFICATIONS.BASE);
-    return response.data;
+    const response = await notificationApi.getAll();
+    return (response.data || []).map((n) => ({
+      id: n.id,
+      title: n.title,
+      message: n.message,
+      read: n.isRead,
+      createdAt: n.createdAt,
+      type: n.category || "info",
+    })) as unknown as SystemNotification[];
   },
 
   markRead: async (id: string): Promise<SystemNotification> => {
-    const response = await api.patch<SystemNotification>(ENDPOINTS.NOTIFICATIONS.DETAIL(id), {
+    await notificationApi.markAsRead(id);
+    return {
+      id,
       read: true,
-    });
-    return response.data;
+    } as unknown as SystemNotification;
   },
 
   markAllRead: async (): Promise<void> => {
-    await api.post(ENDPOINTS.NOTIFICATIONS.MARK_ALL_READ, {});
+    await notificationApi.markAllAsRead();
   },
 };
 

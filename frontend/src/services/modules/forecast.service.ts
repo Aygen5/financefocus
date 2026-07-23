@@ -1,9 +1,12 @@
-import api from "../api";
-import ENDPOINTS from "../api/endpoints";
+import forecastApi, { ForecastDto } from "@/api/forecastApi";
 
 export const ForecastService = {
-  getAll: async (): Promise<unknown[]> => {
-    const response = await api.get<unknown[]>(ENDPOINTS.FORECAST.BASE);
+  getForecast: async (): Promise<ForecastDto> => {
+    const response = await forecastApi.getFullForecast();
+    return response.data;
+  },
+  getSummary: async () => {
+    const response = await forecastApi.getSummary();
     return response.data;
   },
 };

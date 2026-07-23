@@ -1,54 +1,50 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-
-export interface HealthFactors {
-  incomeExpenseRatio: number;
-  savingsRate: number;
-  budgetAdherence: number;
-  debtToIncomeRatio: number;
-}
+import financialHealthApi from "@/api/financialHealthApi";
+import type { FinancialHealthDto } from "@/api/financialHealthApi";
 
 export interface FinancialHealthState {
+  healthData: FinancialHealthDto | null;
   score: number;
-  factors: HealthFactors;
+  riskLevel: string;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: FinancialHealthState = {
+  healthData: null,
   score: 0,
-  factors: {
-    incomeExpenseRatio: 0,
-    savingsRate: 0,
-    budgetAdherence: 0,
-    debtToIncomeRatio: 0,
-  },
+  riskLevel: "Moderate",
   loading: false,
   error: null,
 };
 
 export const fetchFinancialHealth = createAsyncThunk(
   "financialHealth/fetchFinancialHealth",
-  async () => {
-    return {
-      score: 0,
-      factors: {
-        incomeExpenseRatio: 0,
-        savingsRate: 0,
-        budgetAdherence: 0,
-        debtToIncomeRatio: 0,
-      },
-    };
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await financialHealthApi.getFullHealth();
+      if (response.success && response.data) {
+        return response.data;
+      }
+      return rejectWithValue(response.message || "Finansal sağlık verisi alınamadı.");
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
+      return rejectWithValue(
+        errorObj.response?.data?.message || errorObj.message || "Finansal sağlık yüklenemedi.",
+      );
+    }
   },
 );
 
 export const financialHealthSlice = createSlice({
-  name: "financeHealth",
+  name: "financialHealth",
   initialState,
   reducers: {
     resetHealth: (state) => {
+      state.healthData = null;
       state.score = 0;
-      state.factors = initialState.factors;
+      state.riskLevel = "Moderate";
     },
   },
   extraReducers: (builder) => {
@@ -59,24 +55,27 @@ export const financialHealthSlice = createSlice({
       })
       .addCase(
         fetchFinancialHealth.fulfilled,
-        (state, action: PayloadAction<{ score: number; factors: HealthFactors }>) => {
+        (state, action: PayloadAction<FinancialHealthDto>) => {
           state.loading = false;
-          state.score = action.payload.score;
-          state.factors = action.payload.factors;
+          state.healthData = action.payload;
+          state.score = action.payload.financialHealthScore;
+          state.riskLevel = action.payload.riskLevel;
           state.error = null;
         },
       )
       .addCase(fetchFinancialHealth.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Yüklenemedi";
+        state.error = (action.payload as string) || "Yüklenemedi";
       });
   },
 });
 
+export const selectFinancialHealthData = (state: { financialHealth: FinancialHealthState }) =>
+  state.financialHealth.healthData;
 export const selectFinancialHealthScore = (state: { financialHealth: FinancialHealthState }) =>
   state.financialHealth.score;
-export const selectFinancialHealthFactors = (state: { financialHealth: FinancialHealthState }) =>
-  state.financialHealth.factors;
+export const selectFinancialHealthRiskLevel = (state: { financialHealth: FinancialHealthState }) =>
+  state.financialHealth.riskLevel;
 export const selectFinancialHealthLoading = (state: { financialHealth: FinancialHealthState }) =>
   state.financialHealth.loading;
 export const selectFinancialHealthError = (state: { financialHealth: FinancialHealthState }) =>

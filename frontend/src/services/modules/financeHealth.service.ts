@@ -1,9 +1,12 @@
-import api from "../api";
-import ENDPOINTS from "../api/endpoints";
+import financialHealthApi, { FinancialHealthDto } from "@/api/financialHealthApi";
 
 export const FinanceHealthService = {
-  getAll: async (): Promise<unknown[]> => {
-    const response = await api.get<unknown[]>(ENDPOINTS.FINANCE_HEALTH.BASE);
+  getHealth: async (): Promise<FinancialHealthDto> => {
+    const response = await financialHealthApi.getFullHealth();
+    return response.data;
+  },
+  getSummary: async () => {
+    const response = await financialHealthApi.getSummary();
     return response.data;
   },
 };

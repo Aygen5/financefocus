@@ -1,35 +1,67 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
-import type { LoginFormData, RegisterFormData } from "./auth.types";
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-}
+import authApi from "../../api/authApi";
+import type { LoginRequestDto, UserDto } from "../../api/authApi";
 
 export interface AuthState {
-  user: User | null;
+  user: UserDto | null;
+  token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
 }
 
+const savedToken = localStorage.getItem("token");
+const savedUserStr = localStorage.getItem("user");
+const initialUser: UserDto | null = savedUserStr ? JSON.parse(savedUserStr) : null;
+
 const initialState: AuthState = {
-  user: null,
-  isAuthenticated: false,
+  user: initialUser,
+  token: savedToken,
+  isAuthenticated: !!savedToken,
   loading: false,
   error: null,
 };
 
-export const loginUser = createAsyncThunk("auth/loginUser", async (credentials: LoginFormData) => {
-  return { id: "1", email: credentials.email, name: "Alex" } as User;
-});
+export const loginUser = createAsyncThunk(
+  "auth/loginUser",
+  async (credentials: LoginRequestDto, { rejectWithValue }) => {
+    try {
+      const response = await authApi.login(credentials);
+      if (response.success && response.data) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        return response.data;
+      }
+      return rejectWithValue(response.message || "Giriş başarısız.");
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
+      return rejectWithValue(
+        errorObj.response?.data?.message || errorObj.message || "Giriş yapılamadı.",
+      );
+    }
+  },
+);
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
-  async (userData: Omit<RegisterFormData, "confirmPassword" | "terms">) => {
-    return { id: "1", email: userData.email, name: userData.fullName } as User;
+  async (
+    userData: { firstName: string; lastName: string; email: string; password: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await authApi.register(userData);
+      if (response.success && response.data) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        return response.data;
+      }
+      return rejectWithValue(response.message || "Kayıt başarısız.");
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
+      return rejectWithValue(
+        errorObj.response?.data?.message || errorObj.message || "Kayıt yapılamadı.",
+      );
+    }
   },
 );
 
@@ -38,8 +70,12 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       state.user = null;
+      state.token = null;
       state.isAuthenticated = false;
+      state.error = null;
     },
     clearError: (state) => {
       state.error = null;
@@ -51,27 +87,31 @@ export const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action: PayloadAction<User>) => {
+      .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.isAuthenticated = true;
-        state.user = action.payload;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Giriş başarısız";
+        state.error = (action.payload as string) || "Giriş başarısız.";
       })
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state) => {
+      .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
+        state.isAuthenticated = true;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Kayıt başarısız";
+        state.error = (action.payload as string) || "Kayıt başarısız.";
       });
   },
 });
