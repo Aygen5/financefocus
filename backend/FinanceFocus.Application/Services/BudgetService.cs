@@ -9,6 +9,7 @@ using FinanceFocus.Application.Interfaces;
 using FinanceFocus.Domain.Entities;
 using FinanceFocus.Domain.Enums;
 using FinanceFocus.Domain.UnitOfWork;
+using FluentValidation;
 
 namespace FinanceFocus.Application.Services;
 
@@ -16,11 +17,19 @@ public class BudgetService : IBudgetService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IValidator<CreateBudgetDto> _createValidator;
+    private readonly IValidator<UpdateBudgetDto> _updateValidator;
 
-    public BudgetService(IUnitOfWork unitOfWork, IMapper mapper)
+    public BudgetService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        IValidator<CreateBudgetDto> createValidator,
+        IValidator<UpdateBudgetDto> updateValidator)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
     }
 
     public async Task<Result<IEnumerable<BudgetDto>>> GetUserBudgetsAsync(string userId)
@@ -73,6 +82,13 @@ public class BudgetService : IBudgetService
 
     public async Task<Result<BudgetDto>> CreateBudgetAsync(CreateBudgetDto dto, string userId)
     {
+        var validationResult = await _createValidator.ValidateAsync(dto);
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage);
+            return Result<BudgetDto>.Failure("Doğrulama hatası oluştu.", errors);
+        }
+
         var existingBudgets = await _unitOfWork.Budgets.GetByUserIdAsync(userId);
         var isDuplicate = existingBudgets.Any(b =>
             string.Equals(b.Category, dto.Category, StringComparison.OrdinalIgnoreCase) &&
@@ -96,6 +112,13 @@ public class BudgetService : IBudgetService
 
     public async Task<Result<BudgetDto>> UpdateBudgetAsync(string id, UpdateBudgetDto dto, string userId)
     {
+        var validationResult = await _updateValidator.ValidateAsync(dto);
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage);
+            return Result<BudgetDto>.Failure("Doğrulama hatası oluştu.", errors);
+        }
+
         var budget = await _unitOfWork.Budgets.GetByIdAsync(id);
         if (budget == null || budget.UserId != userId)
         {
