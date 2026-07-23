@@ -18,5 +18,8 @@ public class UpdatePortfolioAssetValidator : AbstractValidator<UpdatePortfolioAs
 
         RuleFor(x => x.PurchasePrice)
             .GreaterThan(0).WithMessage("Alış fiyatı sıfırdan büyük olmalıdır.");
+
+        RuleFor(x => x.CurrentPrice)
+            .GreaterThan(0).WithMessage("Güncel fiyat sıfırdan büyük olmalıdır.");
     }
 }
