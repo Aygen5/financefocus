@@ -39,6 +39,7 @@ public class MappingProfile : Profile
         CreateMap<UpdateSubscriptionDto, Subscription>();
 
         CreateMap<Notification, NotificationDto>();
+        CreateMap<CreateNotificationDto, Notification>();
         CreateMap<ActivityLog, ActivityLogDto>();
         CreateMap<AIConversation, AIConversationDto>();
         CreateMap<AIConversation, ChatMessageDto>();
