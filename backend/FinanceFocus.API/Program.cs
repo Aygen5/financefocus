@@ -4,6 +4,7 @@ using FinanceFocus.API.Filters;
 using FinanceFocus.API.Handlers;
 using FinanceFocus.API.Middlewares;
 using FinanceFocus.Application.Interfaces;
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;

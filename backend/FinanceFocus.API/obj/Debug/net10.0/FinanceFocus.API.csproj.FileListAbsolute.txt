@@ -174,3 +174,4 @@ C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.API\bin\Deb
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.API\bin\Debug\net10.0\tr-TR\Hangfire.Core.resources.dll
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.API\bin\Debug\net10.0\zh-TW\Hangfire.Core.resources.dll
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.API\bin\Debug\net10.0\zh\Hangfire.Core.resources.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.API\bin\Debug\net10.0\Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore.dll
