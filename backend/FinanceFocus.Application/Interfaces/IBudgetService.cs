@@ -8,6 +8,7 @@ namespace FinanceFocus.Application.Interfaces;
 public interface IBudgetService
 {
     Task<Result<IEnumerable<BudgetDto>>> GetUserBudgetsAsync(string userId);
+    Task<Result<BudgetDto>> GetBudgetByIdAsync(string id, string userId);
     Task<Result<BudgetDto>> CreateBudgetAsync(CreateBudgetDto dto, string userId);
     Task<Result<BudgetDto>> UpdateBudgetAsync(string id, UpdateBudgetDto dto, string userId);
     Task<Result> DeleteBudgetAsync(string id, string userId);
