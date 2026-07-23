@@ -15,9 +15,14 @@ public class ActivityLogConfiguration : IEntityTypeConfiguration<ActivityLog>
         builder.Property(a => a.Id)
             .HasMaxLength(36);
 
-        builder.Property(a => a.Action)
-            .IsRequired()
+        builder.Property(a => a.ActivityType)
             .HasMaxLength(100);
+
+        builder.Property(a => a.Action)
+            .HasMaxLength(100);
+
+        builder.Property(a => a.Title)
+            .HasMaxLength(200);
 
         builder.Property(a => a.Category)
             .IsRequired()
@@ -25,7 +30,7 @@ public class ActivityLogConfiguration : IEntityTypeConfiguration<ActivityLog>
 
         builder.Property(a => a.Description)
             .IsRequired()
-            .HasMaxLength(300);
+            .HasMaxLength(500);
 
         builder.Property(a => a.Status)
             .IsRequired()
