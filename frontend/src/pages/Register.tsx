@@ -39,9 +39,14 @@ const Register: React.FC = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
+      const nameParts = data.fullName.trim().split(" ");
+      const firstName = nameParts[0] || "Kullanıcı";
+      const lastName = nameParts.slice(1).join(" ") || "Soyadı";
+
       const resultAction = await dispatch(
         registerUser({
-          fullName: data.fullName,
+          firstName,
+          lastName,
           email: data.email,
           password: data.password,
         }),

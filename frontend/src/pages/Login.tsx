@@ -23,7 +23,6 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
 
-  // States
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isForgotSuccess, setIsForgotSuccess] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
@@ -61,7 +60,7 @@ const Login: React.FC = () => {
           action: "Giriş Yap",
           category: "Auth",
           description: "Kullanıcı sisteme başarıyla giriş yaptı.",
-          user: "Aygen",
+          user: "Demo Kullanıcı",
           icon: "LogIn",
           status: "success",
         }),
@@ -99,18 +98,17 @@ const Login: React.FC = () => {
 
   const handleQuickDemoFill = () => {
     setValue("email", "demo@financefocus.com");
-    setValue("password", "123456");
+    setValue("password", "Password123!");
     toast.success("Demo giriş bilgileri dolduruldu!");
   };
 
   return (
     <div className="space-y-6">
-      {/* Başlık */}
       <div className="text-left space-y-2">
         <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-none">
           {isForgotPassword ? "Şifremi Unuttum" : "Giriş Yap"}
         </h1>
-        <p className="text-xs font-semibold text-slate-550 dark:text-slate-400">
+        <p className="text-xs font-semibold text-slate-555 dark:text-slate-400">
           {isForgotPassword
             ? "Hesabınızın e-posta adresini girerek şifre sıfırlama talebinde bulunun."
             : "Tekrar hoş geldiniz. Lütfen bilgilerinizi girin."}
@@ -201,7 +199,6 @@ const Login: React.FC = () => {
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 text-left">
-          {/* E-posta Alanı */}
           <div>
             <label
               className="block font-label-sm text-label-sm text-slate-700 dark:text-slate-350 mb-1.5"

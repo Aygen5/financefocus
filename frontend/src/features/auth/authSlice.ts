@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authApi from "../../api/authApi";
-import type { LoginRequestDto, UserDto } from "../../api/authApi";
+import type { LoginRequestDto, RegisterRequestDto, UserDto } from "../../api/authApi";
 
 export interface AuthState {
   user: UserDto | null;
@@ -34,20 +34,21 @@ export const loginUser = createAsyncThunk(
       }
       return rejectWithValue(response.message || "Giriş başarısız.");
     } catch (err: unknown) {
-      const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
-      return rejectWithValue(
-        errorObj.response?.data?.message || errorObj.message || "Giriş yapılamadı.",
-      );
+      const errorObj = err as {
+        response?: { data?: { message?: string; errors?: string[] } };
+        message?: string;
+      };
+      const errorMessage = errorObj.response?.data?.errors?.length
+        ? errorObj.response.data.errors.join(" ")
+        : errorObj.response?.data?.message || errorObj.message || "Giriş yapılamadı.";
+      return rejectWithValue(errorMessage);
     }
   },
 );
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
-  async (
-    userData: { firstName: string; lastName: string; email: string; password: string },
-    { rejectWithValue },
-  ) => {
+  async (userData: RegisterRequestDto, { rejectWithValue }) => {
     try {
       const response = await authApi.register(userData);
       if (response.success && response.data) {
@@ -57,10 +58,14 @@ export const registerUser = createAsyncThunk(
       }
       return rejectWithValue(response.message || "Kayıt başarısız.");
     } catch (err: unknown) {
-      const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
-      return rejectWithValue(
-        errorObj.response?.data?.message || errorObj.message || "Kayıt yapılamadı.",
-      );
+      const errorObj = err as {
+        response?: { data?: { message?: string; errors?: string[] } };
+        message?: string;
+      };
+      const errorMessage = errorObj.response?.data?.errors?.length
+        ? errorObj.response.data.errors.join(" ")
+        : errorObj.response?.data?.message || errorObj.message || "Kayıt yapılamadı.";
+      return rejectWithValue(errorMessage);
     }
   },
 );

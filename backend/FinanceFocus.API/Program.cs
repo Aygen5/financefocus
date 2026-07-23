@@ -4,9 +4,12 @@ using FinanceFocus.API.Filters;
 using FinanceFocus.API.Handlers;
 using FinanceFocus.API.Middlewares;
 using FinanceFocus.Application.Interfaces;
+using FinanceFocus.Domain.Entities;
+using FinanceFocus.Infrastructure.Persistence;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -74,6 +77,10 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
 
 using (var scope = app.Services.CreateScope())
 {
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await DbInitializer.SeedAsync(userManager, roleManager);
+
     var jobScheduler = scope.ServiceProvider.GetRequiredService<IJobScheduler>();
     jobScheduler.AddOrUpdateRecurring<IBackgroundJobService>(
         "subscription-payment-reminder",
