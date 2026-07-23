@@ -1,9 +1,10 @@
 using FinanceFocus.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceFocus.Infrastructure.Persistence;
 
-public class FinanceFocusDbContext : DbContext
+public class FinanceFocusDbContext : IdentityDbContext<AppUser>
 {
     public FinanceFocusDbContext(DbContextOptions<FinanceFocusDbContext> options)
         : base(options)
