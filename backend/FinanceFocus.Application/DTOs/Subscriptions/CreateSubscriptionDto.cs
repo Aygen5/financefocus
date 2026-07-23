@@ -9,4 +9,5 @@ public class CreateSubscriptionDto
     public string BillingCycle { get; set; } = "Monthly";
     public DateTime NextBillingDate { get; set; }
     public string Category { get; set; } = string.Empty;
+    public bool IsActive { get; set; } = true;
 }
