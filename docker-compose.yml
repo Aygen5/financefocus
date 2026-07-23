@@ -2,20 +2,58 @@ services:
   financefocus-db:
     image: postgres:16-alpine
     container_name: financefocus-postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: financefocus_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: postgres_secure_password_2026!
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - financefocus-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d financefocus_db"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  financefocus-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: financefocus-backend-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=financefocus-postgres;Database=financefocus_db;Username=postgres;Password=postgres_secure_password_2026!
+      - JwtSettings__SecretKey=FinanceFocusSuperSecretProductionLevelJwtSigningKey2026!
+      - JwtSettings__Issuer=FinanceFocusAPI
+      - JwtSettings__Audience=FinanceFocusClient
+    depends_on:
+      financefocus-db:
+        condition: service_healthy
+    networks:
+      - financefocus-network
+
+  financefocus-nginx:
+    image: nginx:alpine
+    container_name: financefocus-nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - financefocus-api
+    networks:
+      - financefocus-network
+
+networks:
+  financefocus-network:
+    driver: bridge
 
 volumes:
   postgres_data:
