@@ -10,3 +10,4 @@ C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Domain\obj\
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Domain\obj\Debug\net10.0\refint\FinanceFocus.Domain.dll
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Domain\obj\Debug\net10.0\FinanceFocus.Domain.pdb
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Domain\obj\Debug\net10.0\ref\FinanceFocus.Domain.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Domain\obj\Debug\net10.0\FinanceFocus.Domain.csproj.AssemblyReference.cache

@@ -107,3 +107,17 @@ C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\D
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Options.dll
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Primitives.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Configuration.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Diagnostics.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Identity.Core.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Identity.Stores.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Logging.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Tests\bin\Debug\net10.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll

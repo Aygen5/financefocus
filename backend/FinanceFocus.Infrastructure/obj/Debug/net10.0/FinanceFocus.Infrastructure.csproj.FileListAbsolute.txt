@@ -16,3 +16,5 @@ C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Infrastruct
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Infrastructure\obj\Debug\net10.0\refint\FinanceFocus.Infrastructure.dll
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Infrastructure\obj\Debug\net10.0\FinanceFocus.Infrastructure.pdb
 C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Infrastructure\obj\Debug\net10.0\ref\FinanceFocus.Infrastructure.dll
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Infrastructure\bin\Debug\net10.0\FinanceFocus.Infrastructure.runtimeconfig.json
+C:\Users\aygen\OneDrive\Masaüstü\financefocus\backend\FinanceFocus.Infrastructure\obj\Debug\net10.0\FinanceFocus.Infrastructure.genruntimeconfig.cache
