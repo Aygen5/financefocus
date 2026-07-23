@@ -26,5 +26,42 @@ public class FinanceFocusDbContext : IdentityDbContext<AppUser>
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(FinanceFocusDbContext).Assembly);
+
+        modelBuilder.Entity<Transaction>(builder =>
+        {
+            builder.HasIndex(t => new { t.UserId, t.TransactionDate });
+            builder.HasIndex(t => new { t.UserId, t.TransactionType });
+            builder.HasIndex(t => new { t.UserId, t.Category });
+        });
+
+        modelBuilder.Entity<Budget>(builder =>
+        {
+            builder.HasIndex(b => new { b.UserId, b.Category, b.Month }).IsUnique();
+        });
+
+        modelBuilder.Entity<Goal>(builder =>
+        {
+            builder.HasIndex(g => new { g.UserId, g.Name }).IsUnique();
+        });
+
+        modelBuilder.Entity<PortfolioAsset>(builder =>
+        {
+            builder.HasIndex(p => new { p.UserId, p.Symbol });
+        });
+
+        modelBuilder.Entity<Subscription>(builder =>
+        {
+            builder.HasIndex(s => new { s.UserId, s.IsActive, s.NextBillingDate });
+        });
+
+        modelBuilder.Entity<Notification>(builder =>
+        {
+            builder.HasIndex(n => new { n.UserId, n.IsRead, n.CreatedAt });
+        });
+
+        modelBuilder.Entity<ActivityLog>(builder =>
+        {
+            builder.HasIndex(a => new { a.UserId, a.CreatedAt });
+        });
     }
 }
