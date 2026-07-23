@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinanceFocus.API.Controllers;
 
 [ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/financial-health")]
 [Authorize]
 public class FinancialHealthController : BaseApiController
 {
