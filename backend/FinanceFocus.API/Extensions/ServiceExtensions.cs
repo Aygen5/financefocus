@@ -76,9 +76,18 @@ public static class ServiceExtensions
 
         services.AddMemoryCache();
         services.AddSingleton<ICacheService, MemoryCacheService>();
+        services.AddScoped<IJobScheduler, HangfireJobScheduler>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddHealthChecksConfiguration(this IServiceCollection services)
+    {
+        services.AddHealthChecks()
+            .AddDbContextCheck<FinanceFocusDbContext>(name: "PostgreSQL Database", tags: new[] { "ready" });
 
         return services;
     }

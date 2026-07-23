@@ -4,8 +4,8 @@ using FinanceFocus.API.Filters;
 using FinanceFocus.API.Handlers;
 using FinanceFocus.API.Middlewares;
 using FinanceFocus.Application.Interfaces;
-using Hangfire;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -16,7 +16,7 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}")
-    .WriteTo.File("logs/financefocus-jobs-.log", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("logs/financefocus-telemetry-.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -30,6 +30,7 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddHealthChecksConfiguration();
 builder.Services.AddHangfireConfiguration(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddRateLimitingConfiguration();
@@ -70,23 +71,33 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
 
 using (var scope = app.Services.CreateScope())
 {
-    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-    recurringJobManager.AddOrUpdate<IBackgroundJobService>(
+    var jobScheduler = scope.ServiceProvider.GetRequiredService<IJobScheduler>();
+    jobScheduler.AddOrUpdateRecurring<IBackgroundJobService>(
         "subscription-payment-reminder",
         job => job.ProcessSubscriptionRemindersAsync(),
-        Cron.Daily(8));
+        "0 8 * * *");
 
-    recurringJobManager.AddOrUpdate<IBackgroundJobService>(
+    jobScheduler.AddOrUpdateRecurring<IBackgroundJobService>(
         "goal-progress-reminder",
         job => job.ProcessGoalProgressRemindersAsync(),
-        Cron.Daily(9));
+        "0 9 * * *");
 }
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false
+});
 
 app.MapControllers();
 
 try
 {
-    Log.Information("Starting FinanceFocus Enterprise Background Jobs Host...");
+    Log.Information("Starting FinanceFocus Enterprise Observability Host...");
     app.Run();
 }
 catch (Exception ex)
