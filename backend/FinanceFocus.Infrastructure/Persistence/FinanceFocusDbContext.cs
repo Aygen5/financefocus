@@ -22,6 +22,7 @@ public class FinanceFocusDbContext : IdentityDbContext<AppUser>
     public DbSet<ForecastHistory> ForecastHistories => Set<ForecastHistory>();
     public DbSet<FinancialHealthHistory> FinancialHealthHistories => Set<FinancialHealthHistory>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<SecurityAuditEvent> SecurityAuditEvents => Set<SecurityAuditEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,6 +33,12 @@ public class FinanceFocusDbContext : IdentityDbContext<AppUser>
         {
             builder.HasIndex(r => r.Token).IsUnique();
             builder.HasIndex(r => r.UserId);
+        });
+
+        modelBuilder.Entity<SecurityAuditEvent>(builder =>
+        {
+            builder.HasIndex(s => new { s.UserId, s.EventTime });
+            builder.HasIndex(s => s.EventType);
         });
 
         modelBuilder.Entity<Transaction>(builder =>

@@ -1,7 +1,10 @@
 using System;
 using FinanceFocus.API.Extensions;
+using FinanceFocus.API.Filters;
 using FinanceFocus.API.Handlers;
 using FinanceFocus.API.Middlewares;
+using FinanceFocus.Application.Interfaces;
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,7 +16,7 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}")
-    .WriteTo.File("logs/financefocus-security-.log", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("logs/financefocus-jobs-.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -27,6 +30,7 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddHangfireConfiguration(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddRateLimitingConfiguration();
 builder.Services.AddApiVersioningConfiguration();
@@ -59,11 +63,30 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
+});
+
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    recurringJobManager.AddOrUpdate<IBackgroundJobService>(
+        "subscription-payment-reminder",
+        job => job.ProcessSubscriptionRemindersAsync(),
+        Cron.Daily(8));
+
+    recurringJobManager.AddOrUpdate<IBackgroundJobService>(
+        "goal-progress-reminder",
+        job => job.ProcessGoalProgressRemindersAsync(),
+        Cron.Daily(9));
+}
+
 app.MapControllers();
 
 try
 {
-    Log.Information("Starting FinanceFocus Hardened Backend Host...");
+    Log.Information("Starting FinanceFocus Enterprise Background Jobs Host...");
     app.Run();
 }
 catch (Exception ex)

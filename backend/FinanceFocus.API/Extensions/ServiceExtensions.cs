@@ -13,6 +13,8 @@ using FinanceFocus.Infrastructure.Persistence;
 using FinanceFocus.Infrastructure.Services;
 using FinanceFocus.Infrastructure.UnitOfWork;
 using FluentValidation;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -45,6 +47,7 @@ public static class ServiceExtensions
         services.AddScoped<IFinancialHealthService, FinancialHealthService>();
         services.AddScoped<IAIProvider, RuleBasedAIProvider>();
         services.AddScoped<IAIAssistantService, AIAssistantService>();
+        services.AddScoped<IBackgroundJobService, BackgroundJobService>();
 
         return services;
     }
@@ -63,6 +66,10 @@ public static class ServiceExtensions
             options.Password.RequireNonAlphanumeric = true;
             options.Password.RequiredLength = 8;
             options.User.RequireUniqueEmail = true;
+
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.AllowedForNewUsers = true;
         })
         .AddEntityFrameworkStores<FinanceFocusDbContext>()
         .AddDefaultTokenProviders();
@@ -72,6 +79,23 @@ public static class ServiceExtensions
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddHangfireConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)));
+
+        services.AddHangfireServer(options =>
+        {
+            options.WorkerCount = Environment.ProcessorCount * 2;
+        });
 
         return services;
     }
