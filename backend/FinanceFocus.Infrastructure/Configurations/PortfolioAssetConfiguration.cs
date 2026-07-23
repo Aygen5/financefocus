@@ -31,6 +31,10 @@ public class PortfolioAssetConfiguration : IEntityTypeConfiguration<PortfolioAss
             .IsRequired()
             .HasPrecision(18, 2);
 
+        builder.Property(p => p.CurrentPrice)
+            .IsRequired()
+            .HasPrecision(18, 2);
+
         builder.Property(p => p.AssetType)
             .IsRequired()
             .HasConversion<string>()
