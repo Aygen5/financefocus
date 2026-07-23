@@ -8,7 +8,7 @@ public class FinanceFocusDbContextFactory : IDesignTimeDbContextFactory<FinanceF
     public FinanceFocusDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<FinanceFocusDbContext>();
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=financefocus_db;Username=postgres;Password=postgres");
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=financefocus_db;Username=postgres;Password=aygen123");
 
         return new FinanceFocusDbContext(optionsBuilder.Options);
     }
