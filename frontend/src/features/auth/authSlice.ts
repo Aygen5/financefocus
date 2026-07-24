@@ -51,10 +51,8 @@ export const registerUser = createAsyncThunk(
   async (userData: RegisterRequestDto, { rejectWithValue }) => {
     try {
       const response = await authApi.register(userData);
-      if (response.success && response.data) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        return response.data;
+      if (response.success) {
+        return response.message || "Kayıt başarıyla gerçekleşti.";
       }
       return rejectWithValue(response.message || "Kayıt başarısız.");
     } catch (err: unknown) {
@@ -107,11 +105,8 @@ export const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.loading = false;
-        state.isAuthenticated = true;
-        state.token = action.payload.token;
-        state.user = action.payload.user;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
