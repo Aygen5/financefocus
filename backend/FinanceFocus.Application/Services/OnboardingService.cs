@@ -39,7 +39,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Maaş",
                 PaymentMethod = "Banka Transferi",
                 Account = "Garanti BBVA",
-                TransactionDate = now.AddDays(-60)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-60), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -50,7 +50,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Freelance",
                 PaymentMethod = "Banka Transferi",
                 Account = "İş Bankası",
-                TransactionDate = now.AddDays(-45)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-45), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -61,7 +61,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Yatırım Geliri",
                 PaymentMethod = "Hesaba Havale",
                 Account = "Midas",
-                TransactionDate = now.AddDays(-15)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-15), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -72,7 +72,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Maaş",
                 PaymentMethod = "Banka Transferi",
                 Account = "Garanti BBVA",
-                TransactionDate = now.AddDays(-30)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-30), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -83,7 +83,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Kira & Barınma",
                 PaymentMethod = "Banka Transferi",
                 Account = "Garanti BBVA",
-                TransactionDate = now.AddDays(-58)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-58), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -94,7 +94,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Market & Gıda",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Bonus Card",
-                TransactionDate = now.AddDays(-50)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-50), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -105,7 +105,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Faturalar",
                 PaymentMethod = "Otomatik Ödeme",
                 Account = "Garanti BBVA",
-                TransactionDate = now.AddDays(-40)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-40), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -116,7 +116,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Restoran & Eğlence",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Bonus Card",
-                TransactionDate = now.AddDays(-35)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-35), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -127,7 +127,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Ulaşım & Yakıt",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Maximum Card",
-                TransactionDate = now.AddDays(-28)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-28), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -138,7 +138,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Kira & Barınma",
                 PaymentMethod = "Banka Transferi",
                 Account = "Garanti BBVA",
-                TransactionDate = now.AddDays(-28)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-28), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -149,7 +149,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Market & Gıda",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Bonus Card",
-                TransactionDate = now.AddDays(-20)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-20), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -160,7 +160,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Teknoloji & Elektronik",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Bonus Card",
-                TransactionDate = now.AddDays(-12)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-12), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -171,7 +171,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Sağlık & Spor",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Maximum Card",
-                TransactionDate = now.AddDays(-8)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-8), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -182,7 +182,7 @@ public class OnboardingService : IOnboardingService
                 Category = "Restoran & Eğlence",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Bonus Card",
-                TransactionDate = now.AddDays(-3)
+                TransactionDate = DateTime.SpecifyKind(now.AddDays(-3), DateTimeKind.Utc)
             }
         };
 
@@ -193,10 +193,10 @@ public class OnboardingService : IOnboardingService
 
         var sampleBudgets = new[]
         {
-            new Budget { UserId = userId, Category = "Market & Gıda", Limit = 15000, Month = new DateTime(now.Year, now.Month, 1) },
-            new Budget { UserId = userId, Category = "Restoran & Eğlence", Limit = 8000, Month = new DateTime(now.Year, now.Month, 1) },
-            new Budget { UserId = userId, Category = "Ulaşım & Yakıt", Limit = 5000, Month = new DateTime(now.Year, now.Month, 1) },
-            new Budget { UserId = userId, Category = "Faturalar", Limit = 4000, Month = new DateTime(now.Year, now.Month, 1) }
+            new Budget { UserId = userId, Category = "Market & Gıda", Limit = 15000, Month = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc) },
+            new Budget { UserId = userId, Category = "Restoran & Eğlence", Limit = 8000, Month = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc) },
+            new Budget { UserId = userId, Category = "Ulaşım & Yakıt", Limit = 5000, Month = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc) },
+            new Budget { UserId = userId, Category = "Faturalar", Limit = 4000, Month = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc) }
         };
 
         foreach (var b in sampleBudgets)
@@ -206,10 +206,10 @@ public class OnboardingService : IOnboardingService
 
         var sampleGoals = new[]
         {
-            new Goal { UserId = userId, Name = "Acil Durum Fonu", TargetAmount = 100000, CurrentAmount = 65000, Category = "Tasarruf", Deadline = now.AddMonths(6) },
-            new Goal { UserId = userId, Name = "Yeni MacBook Pro", TargetAmount = 90000, CurrentAmount = 45000, Category = "Teknoloji", Deadline = now.AddMonths(4) },
-            new Goal { UserId = userId, Name = "Yaz Tatili Bütçesi", TargetAmount = 50000, CurrentAmount = 32000, Category = "Seyahat", Deadline = now.AddMonths(3) },
-            new Goal { UserId = userId, Name = "Yatırım Portföyü", TargetAmount = 250000, CurrentAmount = 140000, Category = "Yatırım", Deadline = now.AddMonths(12) }
+            new Goal { UserId = userId, Name = "Acil Durum Fonu", TargetAmount = 100000, CurrentAmount = 65000, Category = "Tasarruf", Deadline = DateTime.SpecifyKind(now.AddMonths(6), DateTimeKind.Utc) },
+            new Goal { UserId = userId, Name = "Yeni MacBook Pro", TargetAmount = 90000, CurrentAmount = 45000, Category = "Teknoloji", Deadline = DateTime.SpecifyKind(now.AddMonths(4), DateTimeKind.Utc) },
+            new Goal { UserId = userId, Name = "Yaz Tatili Bütçesi", TargetAmount = 50000, CurrentAmount = 32000, Category = "Seyahat", Deadline = DateTime.SpecifyKind(now.AddMonths(3), DateTimeKind.Utc) },
+            new Goal { UserId = userId, Name = "Yatırım Portföyü", TargetAmount = 250000, CurrentAmount = 140000, Category = "Yatırım", Deadline = DateTime.SpecifyKind(now.AddMonths(12), DateTimeKind.Utc) }
         };
 
         foreach (var g in sampleGoals)
@@ -219,10 +219,10 @@ public class OnboardingService : IOnboardingService
 
         var sampleSubscriptions = new[]
         {
-            new Subscription { UserId = userId, Name = "Netflix Premium", Price = 299, BillingCycle = "Monthly", Category = "Eğlence", IsActive = true, NextBillingDate = now.AddDays(5) },
-            new Subscription { UserId = userId, Name = "Spotify Family", Price = 99, BillingCycle = "Monthly", Category = "Müzik", IsActive = true, NextBillingDate = now.AddDays(12) },
-            new Subscription { UserId = userId, Name = "Claude AI Pro", Price = 750, BillingCycle = "Monthly", Category = "Yazılım", IsActive = true, NextBillingDate = now.AddDays(18) },
-            new Subscription { UserId = userId, Name = "MacFit Spor Salonu", Price = 1200, BillingCycle = "Monthly", Category = "Sağlık", IsActive = true, NextBillingDate = now.AddDays(22) }
+            new Subscription { UserId = userId, Name = "Netflix Premium", Price = 299, BillingCycle = "Monthly", Category = "Eğlence", IsActive = true, NextBillingDate = DateTime.SpecifyKind(now.AddDays(5), DateTimeKind.Utc) },
+            new Subscription { UserId = userId, Name = "Spotify Family", Price = 99, BillingCycle = "Monthly", Category = "Müzik", IsActive = true, NextBillingDate = DateTime.SpecifyKind(now.AddDays(12), DateTimeKind.Utc) },
+            new Subscription { UserId = userId, Name = "Claude AI Pro", Price = 750, BillingCycle = "Monthly", Category = "Yazılım", IsActive = true, NextBillingDate = DateTime.SpecifyKind(now.AddDays(18), DateTimeKind.Utc) },
+            new Subscription { UserId = userId, Name = "MacFit Spor Salonu", Price = 1200, BillingCycle = "Monthly", Category = "Sağlık", IsActive = true, NextBillingDate = DateTime.SpecifyKind(now.AddDays(22), DateTimeKind.Utc) }
         };
 
         foreach (var s in sampleSubscriptions)

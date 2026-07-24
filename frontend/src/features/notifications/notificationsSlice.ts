@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import api from "@/services/api";
+import notificationsApi from "@/api/notificationsApi";
 
 export interface SystemNotification {
   id: string;
@@ -11,9 +11,6 @@ export interface SystemNotification {
   createdAt: string;
   icon: string;
   category?: string;
-  timeAgo?: string;
-  threshold?: number;
-  read?: boolean;
 }
 
 export interface NotificationsState {
@@ -28,35 +25,47 @@ const initialState: NotificationsState = {
   error: null,
 };
 
-const MOCK_INITIAL_NOTIFS: SystemNotification[] = [
-  {
-    id: "notif-1",
-    title: "Giriş Başarılı",
-    message: "FinanceFocus hesabınıza başarıyla giriş yaptınız.",
-    type: "success",
-    isRead: false,
-    createdAt: new Date().toISOString(),
-    icon: "LogIn",
-  },
-  {
-    id: "notif-2",
-    title: "Bütçe Uyarısı",
-    message: "Fatura bütçeniz %80 sınırını aşmıştır.",
-    type: "warning",
-    isRead: false,
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-    icon: "Sliders",
-  },
-];
-
-export const fetchNotifications = createAsyncThunk("notifications/fetchNotifications", async () => {
-  try {
-    const response = await api.get<SystemNotification[]>("/notifications");
-    return response.data.length > 0 ? response.data : MOCK_INITIAL_NOTIFS;
-  } catch {
-    return MOCK_INITIAL_NOTIFS;
+const mapNotificationType = (typeNum: number): "success" | "info" | "warning" | "error" => {
+  switch (typeNum) {
+    case 0:
+      return "info";
+    case 1:
+      return "success";
+    case 2:
+      return "warning";
+    case 3:
+      return "error";
+    default:
+      return "info";
   }
-});
+};
+
+export const fetchNotifications = createAsyncThunk(
+  "notifications/fetchNotifications",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await notificationsApi.getAll();
+      if (response.success && Array.isArray(response.data)) {
+        return response.data.map((item) => ({
+          id: item.id,
+          title: item.title,
+          message: item.message,
+          type: mapNotificationType(item.type),
+          isRead: item.isRead,
+          createdAt: item.createdAt || new Date().toISOString(),
+          icon: "Bell",
+          category: item.category,
+        }));
+      }
+      return [];
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return rejectWithValue(err.message);
+      }
+      return rejectWithValue("Bildirimler yüklenemedi.");
+    }
+  },
+);
 
 export const addNotification = createAsyncThunk(
   "notifications/addNotification",
@@ -67,52 +76,51 @@ export const addNotification = createAsyncThunk(
       isRead: false,
       createdAt: new Date().toISOString(),
     };
-    try {
-      const response = await api.post<SystemNotification>("/notifications", logData);
-      return response.data;
-    } catch {
-      return logData;
-    }
+    return logData;
   },
 );
 
 export const markNotificationRead = createAsyncThunk(
   "notifications/markNotificationRead",
-  async (id: string) => {
+  async (id: string, { rejectWithValue }) => {
     try {
-      const response = await api.put<SystemNotification>(`/notifications/${id}`, { isRead: true });
-      return response.data;
-    } catch {
-      return { id, isRead: true };
+      await notificationsApi.markAsRead(id);
+      return id;
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return rejectWithValue(err.message);
+      }
+      return rejectWithValue("Bildirim okundu işaretlenemedi.");
     }
   },
 );
 
 export const markAllNotificationsRead = createAsyncThunk(
   "notifications/markAllNotificationsRead",
-  async (_, { getState }) => {
-    const state = getState() as { notifications: NotificationsState };
-    const unread = state.notifications.items.filter((item) => !item.isRead);
-
+  async (_, { rejectWithValue }) => {
     try {
-      await Promise.all(
-        unread.map((item) => api.put(`/notifications/${item.id}`, { isRead: true })),
-      );
+      await notificationsApi.markAllAsRead();
       return true;
-    } catch {
-      return true;
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return rejectWithValue(err.message);
+      }
+      return rejectWithValue("Bildirimler okundu işaretlenemedi.");
     }
   },
 );
 
 export const deleteNotification = createAsyncThunk(
   "notifications/deleteNotification",
-  async (id: string) => {
+  async (id: string, { rejectWithValue }) => {
     try {
-      await api.delete(`/notifications/${id}`);
+      await notificationsApi.delete(id);
       return id;
-    } catch {
-      return id;
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return rejectWithValue(err.message);
+      }
+      return rejectWithValue("Bildirim silinemedi.");
     }
   },
 );
@@ -143,13 +151,13 @@ export const notificationsSlice = createSlice({
       )
       .addCase(fetchNotifications.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Bildirimler yüklenemedi";
+        state.error = (action.payload as string) || "Bildirimler yüklenemedi.";
       })
       .addCase(addNotification.fulfilled, (state, action: PayloadAction<SystemNotification>) => {
         state.items.unshift(action.payload);
       })
-      .addCase(markNotificationRead.fulfilled, (state, action: PayloadAction<{ id: string }>) => {
-        const item = state.items.find((n) => n.id === action.payload.id);
+      .addCase(markNotificationRead.fulfilled, (state, action: PayloadAction<string>) => {
+        const item = state.items.find((n) => n.id === action.payload);
         if (item) item.isRead = true;
       })
       .addCase(markAllNotificationsRead.fulfilled, (state) => {

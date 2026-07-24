@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import api from "@/services/api";
+import activityApi from "@/api/activityApi";
 
 export interface ActivityLog {
   id: string;
@@ -13,13 +13,8 @@ export interface ActivityLog {
   icon: string;
   status: "success" | "warning" | "info" | "error";
   timestamp: string;
-  timeLabel?: string;
-  details?: string;
-  meta?: {
-    idLabel?: string;
-    userName?: string;
-    progress?: number;
-  };
+  activityType?: string;
+  title?: string;
 }
 
 export interface ActivityState {
@@ -34,77 +29,38 @@ const initialState: ActivityState = {
   error: null,
 };
 
-const MOCK_INITIAL_LOGS: ActivityLog[] = [
-  {
-    id: "act-1",
-    action: "Login",
-    category: "Auth",
-    description: "Kullanıcı sisteme başarıyla giriş yaptı.",
-    user: "Aygen",
-    date: "2026-07-05",
-    time: "16:00:00",
-    icon: "LogIn",
-    status: "success",
-    timestamp: "2026-07-05T16:00:00Z",
+export const fetchActivities = createAsyncThunk(
+  "activity/fetchActivities",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await activityApi.getAll();
+      if (response.success && Array.isArray(response.data)) {
+        return response.data.map((item) => ({
+          id: item.id,
+          action: item.action || item.title || "Aktivite",
+          category: item.category || "General",
+          description: item.description || "",
+          user: "Kullanıcı",
+          date: item.createdAt
+            ? item.createdAt.split("T")[0]
+            : new Date().toISOString().split("T")[0],
+          time: item.createdAt ? item.createdAt.split("T")[1]?.substring(0, 8) || "" : "",
+          icon: "Activity",
+          status: (item.status as "success" | "warning" | "info" | "error") || "info",
+          timestamp: item.createdAt || new Date().toISOString(),
+          activityType: item.activityType,
+          title: item.title,
+        }));
+      }
+      return [];
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return rejectWithValue(err.message);
+      }
+      return rejectWithValue("Aktiviteler yüklenemedi.");
+    }
   },
-  {
-    id: "act-2",
-    action: "Transaction Added",
-    category: "Transactions",
-    description: "Kira ödemesi (Gider) kaydı eklendi.",
-    user: "Aygen",
-    date: "2026-07-05",
-    time: "14:20:00",
-    icon: "PlusCircle",
-    status: "success",
-    timestamp: "2026-07-05T14:20:00Z",
-  },
-  {
-    id: "act-3",
-    action: "Budget Updated",
-    category: "Budget",
-    description: "Gıda bütçe limiti 4500 TRY olarak güncellendi.",
-    user: "Aygen",
-    date: "2026-07-05",
-    time: "11:15:00",
-    icon: "Sliders",
-    status: "info",
-    timestamp: "2026-07-05T11:15:00Z",
-  },
-  {
-    id: "act-4",
-    action: "Goal Created",
-    category: "Goals",
-    description: "Tatil birikimi finansal hedefi oluşturuldu.",
-    user: "Aygen",
-    date: "2026-07-04",
-    time: "18:45:00",
-    icon: "Award",
-    status: "success",
-    timestamp: "2026-07-04T18:45:00Z",
-  },
-  {
-    id: "act-5",
-    action: "Subscription Added",
-    category: "Subscriptions",
-    description: "Netflix abonelik takibi eklendi.",
-    user: "Aygen",
-    date: "2026-07-04",
-    time: "09:30:00",
-    icon: "CreditCard",
-    status: "success",
-    timestamp: "2026-07-04T09:30:00Z",
-  },
-];
-
-export const fetchActivities = createAsyncThunk("activity/fetchActivities", async () => {
-  try {
-    const response = await api.get<ActivityLog[]>("/activities");
-    return response.data.length > 0 ? response.data : MOCK_INITIAL_LOGS;
-  } catch {
-    return MOCK_INITIAL_LOGS;
-  }
-});
+);
 
 export const addActivityLog = createAsyncThunk(
   "activity/addActivityLog",
@@ -114,20 +70,13 @@ export const addActivityLog = createAsyncThunk(
     const time = timestamp.split("T")[1].substring(0, 8);
     const id = `act-${Math.random().toString(36).substr(2, 9)}`;
 
-    const logWithMeta: ActivityLog = {
+    return {
       ...newLog,
       id,
       date,
       time,
       timestamp,
     };
-
-    try {
-      const response = await api.post<ActivityLog>("/activities", logWithMeta);
-      return response.data;
-    } catch {
-      return logWithMeta;
-    }
   },
 );
 
@@ -154,7 +103,7 @@ export const activitySlice = createSlice({
       })
       .addCase(fetchActivities.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Aktiviteler yüklenemedi";
+        state.error = (action.payload as string) || "Aktiviteler yüklenemedi.";
       })
       .addCase(addActivityLog.fulfilled, (state, action: PayloadAction<ActivityLog>) => {
         state.logs.unshift(action.payload);

@@ -91,26 +91,28 @@ export const Reports: React.FC = () => {
   const tooltipBorder = isDark ? "#1e293b" : "#e2e8f0";
 
   const {
-    items: transactions,
-    loading: transLoading,
-    error: transError,
-  } = useAppSelector((state) => state.transactions);
+    items: transactions = [],
+    loading: transLoading = false,
+    error: transError = null,
+  } = useAppSelector((state) => state.transactions || {});
   const {
-    items: budgets,
-    loading: budgetsLoading,
-    error: budgetsError,
-  } = useAppSelector((state) => state.budget);
+    items: budgets = [],
+    loading: budgetsLoading = false,
+    error: budgetsError = null,
+  } = useAppSelector((state) => state.budget || {});
   const {
-    assets,
-    loading: portLoading,
-    error: portError,
-  } = useAppSelector((state) => state.portfolio);
-  const { loading: goalsLoading, error: goalsError } = useAppSelector((state) => state.goals);
+    assets = [],
+    loading: portLoading = false,
+    error: portError = null,
+  } = useAppSelector((state) => state.portfolio || {});
+  const { loading: goalsLoading = false, error: goalsError = null } = useAppSelector(
+    (state) => state.goals || {},
+  );
   const {
-    items: subscriptions,
-    loading: subsLoading,
-    error: subsError,
-  } = useAppSelector((state) => state.subscriptions);
+    items: subscriptions = [],
+    loading: subsLoading = false,
+    error: subsError = null,
+  } = useAppSelector((state) => state.subscriptions || {});
 
   const [filterType, setFilterType] = useState<string>("30gun");
   const [customStart, setCustomStart] = useState<string>("");
@@ -196,20 +198,28 @@ export const Reports: React.FC = () => {
   const budgetUsageData = useMemo(() => {
     return budgets.map((b) => ({
       name: b.category,
-      Harcama: b.spentAmount,
-      Limit: b.limitAmount,
+      Harcama: b.spentAmount || 0,
+      Limit: b.limitAmount || b.limit || 0,
     }));
   }, [budgets]);
 
   const subCostData = useMemo(() => {
-    const mapped = subscriptions.map((s) => ({
-      id: s.id,
-      name: s.name,
-      cost: s.cost,
-      billingCycle: s.billingCycle,
-      nextBillingDate: s.nextBillingDate,
-      category: s.category,
-    }));
+    const mapped = subscriptions.map((s) => {
+      const sObj = s as unknown as Record<string, unknown>;
+      return {
+        id: s.id,
+        name: s.name,
+        cost:
+          typeof sObj.price === "number"
+            ? sObj.price
+            : typeof sObj.cost === "number"
+              ? sObj.cost
+              : 0,
+        billingCycle: s.billingCycle,
+        nextBillingDate: s.nextBillingDate,
+        category: s.category,
+      };
+    });
     return calculateSubscriptionCategoryTotals(mapped);
   }, [subscriptions]);
 
@@ -274,7 +284,7 @@ export const Reports: React.FC = () => {
       <div className="w-full max-w-container-max mx-auto text-left py-12">
         <ErrorState
           title="Raporlar Yüklenemedi"
-          description="Grafik ve analiz verileri mock sunucudan çekilirken bir problem yaşandı. Lütfen tekrar deneyiniz."
+          description="Grafik ve analiz verileri alınırken bir problem yaşandı. Lütfen tekrar deneyiniz."
           onRetry={loadAllData}
           retryLabel="Yeniden Dene"
           retryIcon={<RotateCcw size={16} />}
@@ -356,7 +366,6 @@ export const Reports: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8 select-none">
-        {/* Toplam Gelir */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-soft-sm">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
             Toplam Gelir
@@ -437,7 +446,6 @@ export const Reports: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter select-none">
-        {/* Graph 1: Income vs Expense Trend */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-soft-sm">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5">
             <TrendingUp size={14} className="text-primary" /> Gelir vs Gider Eğilimi

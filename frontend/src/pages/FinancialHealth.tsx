@@ -1,18 +1,14 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { fetchTransactions } from "@/features/transactions/transactionsSlice";
 import { fetchBudgets } from "@/features/budget/budgetSlice";
 import { fetchPortfolio } from "@/features/portfolio/portfolioSlice";
 import { fetchGoals } from "@/features/goals/goalsSlice";
 import { fetchSubscriptions } from "@/features/subscriptions/subscriptionsSlice";
-import { selectFinancialHealthData } from "@/features/financialHealth/selectors";
-import { getHealthStatus } from "@/utils/financialHealth";
-import { formatCurrency } from "@/utils/financial";
+import { fetchFinancialHealth } from "@/features/financialHealth/financialHealthSlice";
 import { RefreshCw, Activity, Sparkles } from "lucide-react";
 import ErrorState from "@/components/feedback/ErrorState";
 import { SkeletonTable } from "@/components/ui/Skeleton";
-import { addActivityLog } from "@/features/activity/activitySlice";
-import { addNotification } from "@/features/notifications/notificationsSlice";
 import toast from "react-hot-toast";
 
 export const FinancialHealth: React.FC = () => {
@@ -33,11 +29,15 @@ export const FinancialHealth: React.FC = () => {
   const { loading: subsLoading = false, error: subsError = null } = useAppSelector(
     (state) => state.subscriptions || {},
   );
+  const {
+    healthData,
+    loading: healthLoading = false,
+    error: healthError = null,
+  } = useAppSelector((state) => state.financialHealth || {});
 
-  const loading = transLoading || budgetsLoading || portLoading || goalsLoading || subsLoading;
-  const error = transError || budgetsError || portError || goalsError || subsError;
-
-  const healthData = useAppSelector(selectFinancialHealthData);
+  const loading =
+    transLoading || budgetsLoading || portLoading || goalsLoading || subsLoading || healthLoading;
+  const error = transError || budgetsError || portError || goalsError || subsError || healthError;
 
   const loadAllData = React.useCallback(() => {
     dispatch(fetchTransactions());
@@ -45,76 +45,46 @@ export const FinancialHealth: React.FC = () => {
     dispatch(fetchPortfolio());
     dispatch(fetchGoals());
     dispatch(fetchSubscriptions());
+    dispatch(fetchFinancialHealth());
   }, [dispatch]);
 
   useEffect(() => {
     loadAllData();
   }, [loadAllData]);
 
-  useEffect(() => {
-    if (!loading && healthData.overallScore > 0) {
-      const isDropped = healthData.overallScore < 75;
-      dispatch(
-        addActivityLog({
-          action: "Financial Health Status Check",
-          category: "FinanceHealth",
-          description: isDropped
-            ? `Finansal sağlık puanı düştü! Güncel Skor: ${healthData.overallScore}.`
-            : `Finansal sağlık puanınız stabil. Güncel Skor: ${healthData.overallScore}.`,
-          user: "Aygen",
-          icon: "Activity",
-          status: isDropped ? "warning" : "success",
-        }),
-      );
-      dispatch(
-        addNotification({
-          title: "Financial Health düştü",
-          message: isDropped
-            ? `Finansal sağlık puanınız ${healthData.overallScore} seviyesine geriledi! Önerileri inceleyin.`
-            : `Finansal sağlık puanınız ${healthData.overallScore} (Stabil). Harika gidiyorsunuz!`,
-          type: isDropped ? "warning" : "success",
-          icon: "Activity",
-        }),
-      );
-    }
-  }, [loading, healthData.overallScore, dispatch]);
-
-  const insights = useMemo(() => {
-    const list: string[] = [];
-
-    if (healthData.subscriptionLoad > 7) {
-      list.push("Monthly subscriptions are higher than recommended.");
-    }
-    if (healthData.savingsRate >= 25) {
-      list.push("Your savings rate is excellent.");
-    } else {
-      list.push("Try to increase your savings rate to at least 20%.");
-    }
-    if (healthData.incomeExpenseRatio >= 75) {
-      list.push("Reduce dining and leisure expenses to balance your income/expense ratio.");
-    }
-    if (healthData.emergencyFundProgress < 50) {
-      list.push("Emergency fund should cover at least 6 months of living expenses.");
-    } else {
-      list.push("Your emergency fund safety buffer looks solid.");
-    }
-    if (healthData.budgetUsage > 100) {
-      list.push("Alert: Categorized budget limits have been breached.");
-    }
-
-    return list;
-  }, [healthData]);
+  const score = healthData?.financialHealthScore ?? 0;
+  const breakdown = healthData?.scoreBreakdown;
+  const insights = healthData?.insights || [];
 
   const handleRecalculate = () => {
     loadAllData();
     toast.success("Skor başarıyla güncellendi!");
   };
 
-  const status = getHealthStatus(healthData.overallScore);
+  const getStatusConfig = (s: number) => {
+    if (s >= 80)
+      return {
+        label: "Mükemmel",
+        color: "text-emerald-500",
+        bg: "bg-emerald-500/10",
+        fill: "#10b981",
+      };
+    if (s >= 60)
+      return { label: "İyi", color: "text-blue-500", bg: "bg-blue-500/10", fill: "#3b82f6" };
+    if (s >= 40)
+      return {
+        label: "Orta / Dikkat",
+        color: "text-amber-500",
+        bg: "bg-amber-500/10",
+        fill: "#f59e0b",
+      };
+    return { label: "Kritik", color: "text-red-500", bg: "bg-red-500/10", fill: "#ef4444" };
+  };
 
+  const status = getStatusConfig(score);
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (healthData.overallScore / 100) * circumference;
+  const strokeDashoffset = circumference - (score / 100) * circumference;
 
   if (loading) {
     return (
@@ -133,7 +103,7 @@ export const FinancialHealth: React.FC = () => {
       <div className="w-full max-w-container-max mx-auto text-left py-12">
         <ErrorState
           title="Finansal Sağlık Analizi Yüklenemedi"
-          description="Finansal sağlık metrikleri mock sunucudan çekilirken bir problem yaşandı. Lütfen tekrar deneyiniz."
+          description="Finansal sağlık metrikleri alınırken bir problem yaşandı. Lütfen internet bağlantınızı kontrol ediniz."
           onRetry={loadAllData}
           retryLabel="Yeniden Dene"
           retryIcon={<RefreshCw size={16} />}
@@ -144,7 +114,6 @@ export const FinancialHealth: React.FC = () => {
 
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
-      {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 select-none">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
@@ -171,7 +140,7 @@ export const FinancialHealth: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-8 select-none">
         <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-2xl shadow-soft-sm flex flex-col items-center justify-center text-center">
           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-6">
-            Overall Health Score
+            Genel Sağlık Skoru
           </h3>
 
           <div className="relative w-44 h-44 flex items-center justify-center">
@@ -199,7 +168,7 @@ export const FinancialHealth: React.FC = () => {
             </svg>
             <div className="absolute flex flex-col items-center justify-center">
               <span className="text-4xl font-black text-slate-850 dark:text-white leading-none">
-                {healthData.overallScore}
+                {score}
               </span>
               <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-1">
                 / 100
@@ -222,88 +191,87 @@ export const FinancialHealth: React.FC = () => {
         </div>
 
         <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Card 1: Savings Rate */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
-                Savings Rate
+                Gelir / Gider Dengesi
               </span>
               <div className="text-lg font-black text-slate-850 dark:text-white leading-none">
-                %{healthData.savingsRate}
+                {breakdown?.incomeExpenseScore?.toFixed(1) || 0} / 25
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
-              Score: {healthData.savingsRateScore}/100
+              Ağırlık: %25
             </div>
           </div>
 
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
-                Debt Ratio
+                Bütçe Uyum Puanı
               </span>
               <div className="text-lg font-black text-slate-855 dark:text-white leading-none">
-                %{healthData.debtRatio}
+                {breakdown?.budgetAdherenceScore?.toFixed(1) || 0} / 20
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
-              Score: {healthData.debtRatioScore}/100
+              Ağırlık: %20
             </div>
           </div>
 
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
-                Monthly Burn Rate
+                Tasarruf Oranı
               </span>
               <div className="text-sm font-black text-slate-855 dark:text-white leading-none">
-                {formatCurrency(healthData.monthlyBurnRate, "TRY")}
+                {breakdown?.savingsRateScore?.toFixed(1) || 0} / 20
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
-              Score: {healthData.burnRateScore}/100
+              Ağırlık: %20
             </div>
           </div>
 
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
-                Emergency Fund
+                Hedef İlerlemesi
               </span>
               <div className="text-lg font-black text-slate-855 dark:text-white leading-none">
-                %{healthData.emergencyFundProgress}
+                {breakdown?.goalProgressScore?.toFixed(1) || 0} / 15
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
-              Score: {healthData.emergencyFundScore}/100
+              Ağırlık: %15
             </div>
           </div>
 
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
-                Investment Ratio
+                Portföy Büyüklüğü
               </span>
               <div className="text-lg font-black text-slate-855 dark:text-white leading-none">
-                %{healthData.investmentRatio}
+                {breakdown?.portfolioSizeScore?.toFixed(1) || 0} / 10
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
-              Score: {healthData.investmentRatioScore}/100
+              Ağırlık: %10
             </div>
           </div>
 
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-xl shadow-soft-sm flex flex-col justify-between">
             <div>
               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
-                Budget Discipline
+                Abonelik Yükü
               </span>
               <div className="text-lg font-black text-slate-855 dark:text-white leading-none">
-                %{healthData.budgetUsage}
+                {breakdown?.subscriptionOverheadScore?.toFixed(1) || 0} / 10
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
-              Score: {healthData.budgetDisciplineScore}/100
+              Ağırlık: %10
             </div>
           </div>
         </div>
@@ -315,15 +283,26 @@ export const FinancialHealth: React.FC = () => {
           Insights)
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {insights.map((insight, idx) => (
-            <div
-              key={idx}
-              className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 flex items-start gap-2.5 text-xs font-bold leading-relaxed text-slate-750 dark:text-slate-350"
-            >
-              <Activity size={16} className="text-primary shrink-0 mt-0.5" />
-              <p>{insight}</p>
-            </div>
-          ))}
+          {insights.length === 0 ? (
+            <p className="text-xs text-slate-400 font-bold col-span-2">
+              Finansal verileriniz analiz edilerek yapay zeka tavsiyeleri oluşturulmaktadır.
+            </p>
+          ) : (
+            insights.map((item, idx) => (
+              <div
+                key={idx}
+                className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 flex items-start gap-2.5 text-xs font-bold leading-relaxed text-slate-750 dark:text-slate-350"
+              >
+                <Activity size={16} className="text-primary shrink-0 mt-0.5" />
+                <div>
+                  <h5 className="font-extrabold text-slate-855 dark:text-white">{item.title}</h5>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                    {item.message}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
