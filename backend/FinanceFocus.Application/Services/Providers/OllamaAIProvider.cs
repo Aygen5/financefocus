@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using FinanceFocus.Application.AI.Intent;
 using FinanceFocus.Application.AI.Options;
 using FinanceFocus.Application.AI.Prompts;
 using FinanceFocus.Application.DTOs.AIAssistant;
@@ -47,10 +48,11 @@ public class OllamaAIProvider : IAIProvider
     public async Task<AIChatResponseDto> ProcessChatPromptAsync(
         string userId,
         string prompt,
+        AIIntentType intent,
         IEnumerable<AIChatMessageDto>? history,
         FinancialCoreMetricsDto metrics)
     {
-        var messages = _promptBuilder.BuildOllamaChatMessages(prompt, history, metrics);
+        var messages = _promptBuilder.BuildOllamaChatMessages(prompt, intent, history, metrics);
         var baseUrl = _options.OllamaUrl.TrimEnd('/');
         var requestUrl = $"{baseUrl}/api/chat";
         var resolvedModel = await ResolveModelNameAsync(baseUrl);
@@ -63,7 +65,10 @@ public class OllamaAIProvider : IAIProvider
             options = new
             {
                 temperature = 0.0,
-                top_p = 0.1
+                top_p = 0.1,
+                top_k = 20,
+                repeat_penalty = 1.2,
+                num_predict = 150
             }
         };
 
@@ -122,11 +127,12 @@ public class OllamaAIProvider : IAIProvider
     public async IAsyncEnumerable<string> StreamChatPromptAsync(
         string userId,
         string prompt,
+        AIIntentType intent,
         IEnumerable<AIChatMessageDto>? history,
         FinancialCoreMetricsDto metrics,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var messages = _promptBuilder.BuildOllamaChatMessages(prompt, history, metrics);
+        var messages = _promptBuilder.BuildOllamaChatMessages(prompt, intent, history, metrics);
         var baseUrl = _options.OllamaUrl.TrimEnd('/');
         var requestUrl = $"{baseUrl}/api/chat";
         var resolvedModel = await ResolveModelNameAsync(baseUrl);
@@ -139,7 +145,10 @@ public class OllamaAIProvider : IAIProvider
             options = new
             {
                 temperature = 0.0,
-                top_p = 0.1
+                top_p = 0.1,
+                top_k = 20,
+                repeat_penalty = 1.2,
+                num_predict = 150
             }
         };
 

@@ -47,6 +47,7 @@ public static class ServiceExtensions
         services.AddScoped<IForecastEngineService, ForecastEngineService>();
         services.AddScoped<IFinancialHealthService, FinancialHealthService>();
         services.Configure<FinanceFocus.Application.AI.Options.AIOptions>(configuration.GetSection(FinanceFocus.Application.AI.Options.AIOptions.SectionName));
+        services.AddScoped<FinanceFocus.Application.AI.Intent.IAIIntentClassifier, FinanceFocus.Application.AI.Intent.AIIntentClassifier>();
         services.AddScoped<FinanceFocus.Application.AI.Prompts.IAIPromptBuilder, FinanceFocus.Application.AI.Prompts.AIPromptBuilder>();
         services.AddHttpClient<IAIProvider, FinanceFocus.Application.Services.Providers.OllamaAIProvider>();
         services.AddScoped<IAIAssistantService, AIAssistantService>();
