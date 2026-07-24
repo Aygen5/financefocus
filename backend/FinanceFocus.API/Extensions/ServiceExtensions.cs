@@ -34,6 +34,7 @@ public static class ServiceExtensions
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
         services.AddValidatorsFromAssemblyContaining<CreateTransactionValidator>();
 
+        services.AddScoped<IFinancialEngineService, FinancialEngineService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IBudgetService, BudgetService>();

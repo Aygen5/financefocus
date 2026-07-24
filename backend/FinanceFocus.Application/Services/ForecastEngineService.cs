@@ -3,52 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FinanceFocus.Application.Common;
-using FinanceFocus.Application.Common.Caching;
 using FinanceFocus.Application.DTOs.Budgets;
 using FinanceFocus.Application.DTOs.Forecast;
 using FinanceFocus.Application.DTOs.Goals;
-using FinanceFocus.Application.DTOs.Portfolio;
 using FinanceFocus.Application.DTOs.Subscriptions;
 using FinanceFocus.Application.Interfaces;
-using FinanceFocus.Domain.Enums;
-using FinanceFocus.Domain.UnitOfWork;
 
 namespace FinanceFocus.Application.Services;
 
 public class ForecastEngineService : IForecastEngineService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IFinancialEngineService _financialEngineService;
     private readonly IBudgetService _budgetService;
     private readonly IGoalService _goalService;
     private readonly IPortfolioService _portfolioService;
     private readonly ISubscriptionService _subscriptionService;
-    private readonly ICacheService _cacheService;
 
     public ForecastEngineService(
-        IUnitOfWork unitOfWork,
+        IFinancialEngineService financialEngineService,
         IBudgetService budgetService,
         IGoalService goalService,
         IPortfolioService portfolioService,
-        ISubscriptionService subscriptionService,
-        ICacheService cacheService)
+        ISubscriptionService subscriptionService)
     {
-        _unitOfWork = unitOfWork;
+        _financialEngineService = financialEngineService;
         _budgetService = budgetService;
         _goalService = goalService;
         _portfolioService = portfolioService;
         _subscriptionService = subscriptionService;
-        _cacheService = cacheService;
     }
 
     public async Task<Result<ForecastDto>> CalculateForecastAsync(string userId)
     {
-        var cacheKey = CacheKeyFactory.Forecast(userId);
-        var cached = await _cacheService.GetAsync<ForecastDto>(cacheKey);
-        if (cached != null)
-        {
-            return Result<ForecastDto>.Success(cached);
-        }
-
         var cashFlow = (await GetCashFlowForecastAsync(userId)).Data ?? new CashFlowForecastDto();
         var budgets = (await GetBudgetForecastsAsync(userId)).Data ?? new List<BudgetForecastDto>();
         var goals = (await GetGoalForecastsAsync(userId)).Data ?? new List<GoalForecastDto>();
@@ -67,20 +53,11 @@ public class ForecastEngineService : IForecastEngineService
             GeneratedAt = DateTime.UtcNow
         };
 
-        await _cacheService.SetAsync(cacheKey, dto, CacheDuration.Forecast);
-
         return Result<ForecastDto>.Success(dto);
     }
 
     public async Task<Result<ForecastSummaryDto>> GetForecastSummaryAsync(string userId)
     {
-        var cacheKey = CacheKeyFactory.ForecastSummary(userId);
-        var cached = await _cacheService.GetAsync<ForecastSummaryDto>(cacheKey);
-        if (cached != null)
-        {
-            return Result<ForecastSummaryDto>.Success(cached);
-        }
-
         var cashFlow = (await GetCashFlowForecastAsync(userId)).Data;
         var budgets = (await GetBudgetForecastsAsync(userId)).Data?.ToList() ?? new List<BudgetForecastDto>();
         var goals = (await GetGoalForecastsAsync(userId)).Data?.ToList() ?? new List<GoalForecastDto>();
@@ -104,27 +81,16 @@ public class ForecastEngineService : IForecastEngineService
             EstimatedPortfolioValue = portfolio?.ExpectedPortfolioValueIn12Months ?? 0m
         };
 
-        await _cacheService.SetAsync(cacheKey, summary, CacheDuration.Forecast);
-
         return Result<ForecastSummaryDto>.Success(summary);
     }
 
     public async Task<Result<CashFlowForecastDto>> GetCashFlowForecastAsync(string userId)
     {
-        var transactions = (await _unitOfWork.Transactions.GetByUserIdAsync(userId)).ToList();
-        var now = DateTime.UtcNow;
-        var monthTransactions = transactions
-            .Where(t => t.TransactionDate.Year == now.Year && t.TransactionDate.Month == now.Month)
-            .ToList();
+        var metricsResult = await _financialEngineService.CalculateCoreMetricsAsync(userId);
+        var metrics = metricsResult.Data ?? new DTOs.FinancialEngine.FinancialCoreMetricsDto();
 
-        var currentIncome = monthTransactions.Where(t => t.TransactionType == TransactionType.Income).Sum(t => t.Amount);
-        var currentExpense = monthTransactions.Where(t => t.TransactionType == TransactionType.Expense).Sum(t => t.Amount);
-
-        var totalHistIncome = transactions.Where(t => t.TransactionType == TransactionType.Income).Sum(t => t.Amount);
-        var totalHistExpense = transactions.Where(t => t.TransactionType == TransactionType.Expense).Sum(t => t.Amount);
-
-        var estIncome = currentIncome > 0 ? currentIncome : (transactions.Any() ? totalHistIncome / Math.Max(1, transactions.Count) * 30m : 50000m);
-        var estExpense = currentExpense > 0 ? Math.Round(currentExpense * 1.05m, 2) : (transactions.Any() ? totalHistExpense / Math.Max(1, transactions.Count) * 30m : 25000m);
+        var estIncome = metrics.MonthlyIncome;
+        var estExpense = Math.Round(metrics.MonthlyExpense * 1.05m, 2);
         var estSavings = estIncome - estExpense;
 
         var dto = new CashFlowForecastDto
@@ -132,7 +98,7 @@ public class ForecastEngineService : IForecastEngineService
             EstimatedMonthlyIncome = Math.Round(estIncome, 2),
             EstimatedMonthlyExpense = Math.Round(estExpense, 2),
             EstimatedMonthlySavings = Math.Round(estSavings, 2),
-            AlgorithmUsed = "WeightedMovingAverage"
+            AlgorithmUsed = "UnifiedFinancialEngine"
         };
 
         return Result<CashFlowForecastDto>.Success(dto);

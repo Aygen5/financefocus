@@ -3,78 +3,55 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FinanceFocus.Application.Common;
-using FinanceFocus.Application.Common.Caching;
 using FinanceFocus.Application.DTOs.FinancialHealth;
 using FinanceFocus.Application.Interfaces;
-using FinanceFocus.Domain.Enums;
-using FinanceFocus.Domain.UnitOfWork;
 
 namespace FinanceFocus.Application.Services;
 
 public class FinancialHealthService : IFinancialHealthService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IFinancialEngineService _financialEngineService;
     private readonly IPortfolioService _portfolioService;
     private readonly ISubscriptionService _subscriptionService;
     private readonly IBudgetService _budgetService;
     private readonly IGoalService _goalService;
-    private readonly ICacheService _cacheService;
 
     public FinancialHealthService(
-        IUnitOfWork unitOfWork,
+        IFinancialEngineService financialEngineService,
         IPortfolioService portfolioService,
         ISubscriptionService subscriptionService,
         IBudgetService budgetService,
-        IGoalService goalService,
-        ICacheService cacheService)
+        IGoalService goalService)
     {
-        _unitOfWork = unitOfWork;
+        _financialEngineService = financialEngineService;
         _portfolioService = portfolioService;
         _subscriptionService = subscriptionService;
         _budgetService = budgetService;
         _goalService = goalService;
-        _cacheService = cacheService;
     }
 
     public async Task<Result<FinancialHealthDto>> CalculateHealthScoreAsync(string userId)
     {
-        var cacheKey = CacheKeyFactory.FinancialHealth(userId);
-        var cached = await _cacheService.GetAsync<FinancialHealthDto>(cacheKey);
-        if (cached != null)
-        {
-            return Result<FinancialHealthDto>.Success(cached);
-        }
+        var metricsResult = await _financialEngineService.CalculateCoreMetricsAsync(userId);
+        var metrics = metricsResult.Data ?? new DTOs.FinancialEngine.FinancialCoreMetricsDto();
 
         var breakdown = (await GetScoreBreakdownAsync(userId)).Data ?? new ScoreBreakdownDto();
-        var totalScore = (int)Math.Round(breakdown.TotalScore, MidpointRounding.AwayFromZero);
-        totalScore = Math.Clamp(totalScore, 0, 100);
-
-        var riskLevel = GetRiskLevel(totalScore);
         var insights = (await GetInsightsAsync(userId)).Data ?? new List<FinancialInsightDto>();
 
         var dto = new FinancialHealthDto
         {
-            FinancialHealthScore = totalScore,
-            RiskLevel = riskLevel,
+            FinancialHealthScore = metrics.FinancialHealthScore,
+            RiskLevel = metrics.RiskLevel,
             ScoreBreakdown = breakdown,
             Insights = insights,
             CalculationDate = DateTime.UtcNow
         };
-
-        await _cacheService.SetAsync(cacheKey, dto, CacheDuration.FinancialHealth);
 
         return Result<FinancialHealthDto>.Success(dto);
     }
 
     public async Task<Result<FinancialHealthSummaryDto>> GetHealthSummaryAsync(string userId)
     {
-        var cacheKey = CacheKeyFactory.FinancialHealthSummary(userId);
-        var cached = await _cacheService.GetAsync<FinancialHealthSummaryDto>(cacheKey);
-        if (cached != null)
-        {
-            return Result<FinancialHealthSummaryDto>.Success(cached);
-        }
-
         var fullHealth = (await CalculateHealthScoreAsync(userId)).Data;
         var summary = new FinancialHealthSummaryDto
         {
@@ -83,42 +60,19 @@ public class FinancialHealthService : IFinancialHealthService
             TopInsights = fullHealth?.Insights.Take(5) ?? new List<FinancialInsightDto>()
         };
 
-        await _cacheService.SetAsync(cacheKey, summary, CacheDuration.FinancialHealth);
-
         return Result<FinancialHealthSummaryDto>.Success(summary);
     }
 
     public async Task<Result<ScoreBreakdownDto>> GetScoreBreakdownAsync(string userId)
     {
-        var transactions = (await _unitOfWork.Transactions.GetByUserIdAsync(userId)).ToList();
-        var now = DateTime.UtcNow;
-        var monthTransactions = transactions
-            .Where(t => t.TransactionDate.Year == now.Year && t.TransactionDate.Month == now.Month)
-            .ToList();
+        var metricsResult = await _financialEngineService.CalculateCoreMetricsAsync(userId);
+        var metrics = metricsResult.Data ?? new DTOs.FinancialEngine.FinancialCoreMetricsDto();
 
-        var income = monthTransactions.Where(t => t.TransactionType == TransactionType.Income).Sum(t => t.Amount);
-        var expense = monthTransactions.Where(t => t.TransactionType == TransactionType.Expense).Sum(t => t.Amount);
+        var income = metrics.MonthlyIncome;
+        var expense = metrics.MonthlyExpense;
 
-        decimal incomeExpenseScore;
-        if (income == 0 && expense == 0)
-        {
-            incomeExpenseScore = 15m;
-        }
-        else if (income > 0 && expense == 0)
-        {
-            incomeExpenseScore = 25m;
-        }
-        else if (income > expense)
-        {
-            incomeExpenseScore = Math.Min(25m, 15m + ((1m - (expense / income)) * 10m));
-        }
-        else
-        {
-            incomeExpenseScore = income > 0 ? Math.Max(0m, (income / expense) * 15m) : 0m;
-        }
-
-        var savingsRate = income > 0 ? ((income - expense) / income) * 100m : 0m;
-        decimal savingsRateScore = savingsRate switch
+        decimal incomeExpenseScore = income > expense ? 25m : (income > 0 ? Math.Max(0m, (income / (expense > 0 ? expense : 1m)) * 15m) : 10m);
+        decimal savingsRateScore = metrics.SavingsRate switch
         {
             >= 30m => 20m,
             >= 20m => 16m,
@@ -128,66 +82,14 @@ public class FinancialHealthService : IFinancialHealthService
         };
 
         var budgets = (await _budgetService.GetUserBudgetsAsync(userId)).Data?.ToList() ?? new List<DTOs.Budgets.BudgetDto>();
-        decimal budgetScore;
-        if (!budgets.Any())
-        {
-            budgetScore = 12m;
-        }
-        else
-        {
-            var compliantCount = budgets.Count(b => b.SpentAmount <= b.Limit);
-            budgetScore = Math.Round(((decimal)compliantCount / budgets.Count) * 15m, 2);
-        }
+        decimal budgetScore = budgets.Any() ? Math.Round(((decimal)budgets.Count(b => b.SpentAmount <= b.Limit) / budgets.Count) * 15m, 2) : 12m;
 
         var goals = (await _goalService.GetUserGoalsAsync(userId)).Data?.ToList() ?? new List<DTOs.Goals.GoalDto>();
-        decimal goalScore;
-        if (!goals.Any())
-        {
-            goalScore = 10m;
-        }
-        else
-        {
-            var avgProgress = Convert.ToDecimal(goals.Average(g => g.ProgressPercentage));
-            goalScore = Math.Min(15m, Math.Round((avgProgress / 100m) * 15m, 2));
-        }
+        decimal goalScore = goals.Any() ? Math.Min(15m, Math.Round(((decimal)goals.Average(g => g.ProgressPercentage) / 100m) * 15m, 2)) : 10m;
 
-        var subSummary = (await _subscriptionService.GetSubscriptionSummaryAsync(userId)).Data;
-        var subMonthlyCost = subSummary?.TotalMonthlyCost ?? 0m;
-        decimal subScore;
-        if (income > 0)
-        {
-            var subRatio = (subMonthlyCost / income) * 100m;
-            subScore = subRatio switch
-            {
-                <= 10m => 10m,
-                <= 20m => 7m,
-                <= 30m => 4m,
-                _ => 0m
-            };
-        }
-        else
-        {
-            subScore = subMonthlyCost == 0 ? 10m : 5m;
-        }
-
-        var portfolio = (await _portfolioService.GetPortfolioSummaryAsync(userId)).Data;
-        var totalInvestment = portfolio?.TotalInvestment ?? 0m;
-        decimal portfolioSizeScore = totalInvestment switch
-        {
-            > 100000m => 7.5m,
-            > 25000m => 5m,
-            > 0m => 3m,
-            _ => 0m
-        };
-
-        var profitPercentage = Convert.ToDecimal(portfolio?.TotalProfitLossPercentage ?? 0);
-        decimal portfolioProfitScore = profitPercentage switch
-        {
-            >= 20m => 7.5m,
-            > 0m => 5m,
-            0m => 2.5m,
-            _ => 0m
-        };
+        decimal subScore = income > 0 ? (((metrics.TotalMonthlySubscriptionCost / income) * 100m <= 10m) ? 10m : 5m) : 10m;
+        decimal portfolioSizeScore = metrics.TotalPortfolioInvestment > 100000m ? 10m : (metrics.TotalPortfolioInvestment > 25000m ? 7m : 4m);
+        decimal portfolioProfitScore = metrics.TotalPortfolioProfitLossPercentage >= 10.0 ? 10m : (metrics.TotalPortfolioProfitLossPercentage >= 0.0 ? 7m : 3m);
 
         var total = Math.Round(incomeExpenseScore + savingsRateScore + budgetScore + goalScore + subScore + portfolioSizeScore + portfolioProfitScore, 2);
 
@@ -209,45 +111,37 @@ public class FinancialHealthService : IFinancialHealthService
     public async Task<Result<IEnumerable<FinancialInsightDto>>> GetInsightsAsync(string userId)
     {
         var insights = new List<FinancialInsightDto>();
+        var metricsResult = await _financialEngineService.CalculateCoreMetricsAsync(userId);
+        var metrics = metricsResult.Data ?? new DTOs.FinancialEngine.FinancialCoreMetricsDto();
 
-        var transactions = (await _unitOfWork.Transactions.GetByUserIdAsync(userId)).ToList();
-        var now = DateTime.UtcNow;
-        var monthTransactions = transactions
-            .Where(t => t.TransactionDate.Year == now.Year && t.TransactionDate.Month == now.Month)
-            .ToList();
-
-        var income = monthTransactions.Where(t => t.TransactionType == TransactionType.Income).Sum(t => t.Amount);
-        var expense = monthTransactions.Where(t => t.TransactionType == TransactionType.Expense).Sum(t => t.Amount);
-
-        if (expense > income && income > 0)
+        if (metrics.MonthlyExpense > metrics.MonthlyIncome && metrics.MonthlyIncome > 0)
         {
             insights.Add(new FinancialInsightDto
             {
                 Title = "Bütçe Açığı Uyarısı",
-                Message = $"Bu ay harcamalarınız ({expense:N2} TL) gelirinizden ({income:N2} TL) fazla.",
+                Message = $"Bu ay harcamalarınız ({metrics.MonthlyExpense:N2} TL) gelirinizden ({metrics.MonthlyIncome:N2} TL) fazla.",
                 Type = "Warning",
                 Category = "CashFlow"
             });
         }
-        else if (income > 0)
+        else if (metrics.MonthlyIncome > 0)
         {
-            var savingsRate = ((income - expense) / income) * 100m;
-            if (savingsRate >= 20m)
+            if (metrics.SavingsRate >= 20m)
             {
                 insights.Add(new FinancialInsightDto
                 {
                     Title = "Yüksek Tasarruf Oranı",
-                    Message = $"Tebrikler! Bu ayki tasarruf oranınız %{savingsRate:N0} ile mükemmel seviyede.",
+                    Message = $"Tebrikler! Bu ayki tasarruf oranınız %{metrics.SavingsRate:N0} ile mükemmel seviyede.",
                     Type = "Success",
                     Category = "Savings"
                 });
             }
-            else if (savingsRate < 10m)
+            else
             {
                 insights.Add(new FinancialInsightDto
                 {
                     Title = "Düşük Tasarruf Oranı",
-                    Message = $"Tasarruf oranınız (%{savingsRate:N0}) ideal seviyenin (%20) altında.",
+                    Message = $"Tasarruf oranınız (%{metrics.SavingsRate:N0}) ideal seviyenin (%20) altında.",
                     Type = "Warning",
                     Category = "Savings"
                 });
@@ -273,58 +167,33 @@ public class FinancialHealthService : IFinancialHealthService
             }
         }
 
-        var portfolio = (await _portfolioService.GetPortfolioSummaryAsync(userId)).Data;
-        if (portfolio != null && portfolio.TotalInvestment > 0)
+        if (metrics.TotalPortfolioInvestment > 0)
         {
-            if (portfolio.TotalProfitLossPercentage > 0)
+            if (metrics.TotalPortfolioProfitLossPercentage > 0)
             {
                 insights.Add(new FinancialInsightDto
                 {
                     Title = "Portföy Getirisi Pozitif",
-                    Message = $"Portföyünüz toplamda %{portfolio.TotalProfitLossPercentage:N2} kârda (+{portfolio.TotalProfitLoss:N2} TL).",
+                    Message = $"Portföyünüz toplamda %{metrics.TotalPortfolioProfitLossPercentage:N2} kârda (+{metrics.TotalPortfolioProfitLoss:N2} TL).",
                     Type = "Success",
-                    Category = "Portfolio"
-                });
-            }
-            else if (portfolio.TotalProfitLossPercentage < 0)
-            {
-                insights.Add(new FinancialInsightDto
-                {
-                    Title = "Portföy Getirisi Negatif",
-                    Message = $"Portföyünüz toplamda %{Math.Abs(portfolio.TotalProfitLossPercentage):N2} zararda ({portfolio.TotalProfitLoss:N2} TL).",
-                    Type = "Warning",
                     Category = "Portfolio"
                 });
             }
         }
 
-        var subSummary = (await _subscriptionService.GetSubscriptionSummaryAsync(userId)).Data;
-        if (subSummary != null && subSummary.TotalMonthlyCost > 0 && income > 0)
+        if (metrics.TotalMonthlySubscriptionCost > 0 && metrics.MonthlyIncome > 0)
         {
-            var subRatio = (subSummary.TotalMonthlyCost / income) * 100m;
+            var subRatio = (metrics.TotalMonthlySubscriptionCost / metrics.MonthlyIncome) * 100m;
             if (subRatio >= 15m)
             {
                 insights.Add(new FinancialInsightDto
                 {
                     Title = "Abonelik Maliyet Yükü",
-                    Message = $"Abonelik giderleriniz ({subSummary.TotalMonthlyCost:N2} TL) aylık gelirinizin %{subRatio:N0}'ini oluşturuyor.",
+                    Message = $"Abonelik giderleriniz ({metrics.TotalMonthlySubscriptionCost:N2} TL) aylık gelirinizin %{subRatio:N0}'ini oluşturuyor.",
                     Type = "Info",
                     Category = "Subscriptions"
                 });
             }
-        }
-
-        var goals = (await _goalService.GetUserGoalsAsync(userId)).Data?.ToList() ?? new List<DTOs.Goals.GoalDto>();
-        if (goals.Any())
-        {
-            var avgProgress = goals.Average(g => g.ProgressPercentage);
-            insights.Add(new FinancialInsightDto
-            {
-                Title = "Finansal Hedef İlerlemesi",
-                Message = $"Hedeflerinize ortalama %{avgProgress:N0} oranında ilerliyorsunuz.",
-                Type = "Info",
-                Category = "Goals"
-            });
         }
 
         if (!insights.Any())
@@ -340,13 +209,4 @@ public class FinancialHealthService : IFinancialHealthService
 
         return Result<IEnumerable<FinancialInsightDto>>.Success(insights);
     }
-
-    private static string GetRiskLevel(int score) => score switch
-    {
-        >= 90 => "Excellent",
-        >= 75 => "Good",
-        >= 50 => "Moderate",
-        >= 25 => "Risky",
-        _ => "Critical"
-    };
 }

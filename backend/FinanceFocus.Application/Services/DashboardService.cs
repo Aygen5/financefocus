@@ -15,14 +15,13 @@ using FinanceFocus.Application.DTOs.Notifications;
 using FinanceFocus.Application.DTOs.Portfolio;
 using FinanceFocus.Application.DTOs.Subscriptions;
 using FinanceFocus.Application.Interfaces;
-using FinanceFocus.Domain.Enums;
 using FinanceFocus.Domain.UnitOfWork;
 
 namespace FinanceFocus.Application.Services;
 
 public class DashboardService : IDashboardService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IFinancialEngineService _financialEngineService;
     private readonly ITransactionService _transactionService;
     private readonly IBudgetService _budgetService;
     private readonly IGoalService _goalService;
@@ -30,26 +29,18 @@ public class DashboardService : IDashboardService
     private readonly ISubscriptionService _subscriptionService;
     private readonly INotificationService _notificationService;
     private readonly IActivityLogService _activityLogService;
-    private readonly IFinancialHealthService _financialHealthService;
-    private readonly IForecastEngineService _forecastEngineService;
-    private readonly ICacheService _cacheService;
-    private readonly IMapper _mapper;
 
     public DashboardService(
-        IUnitOfWork unitOfWork,
+        IFinancialEngineService financialEngineService,
         ITransactionService transactionService,
         IBudgetService budgetService,
         IGoalService goalService,
         IPortfolioService portfolioService,
         ISubscriptionService subscriptionService,
         INotificationService notificationService,
-        IActivityLogService activityLogService,
-        IFinancialHealthService financialHealthService,
-        IForecastEngineService forecastEngineService,
-        ICacheService cacheService,
-        IMapper mapper)
+        IActivityLogService activityLogService)
     {
-        _unitOfWork = unitOfWork;
+        _financialEngineService = financialEngineService;
         _transactionService = transactionService;
         _budgetService = budgetService;
         _goalService = goalService;
@@ -57,21 +48,10 @@ public class DashboardService : IDashboardService
         _subscriptionService = subscriptionService;
         _notificationService = notificationService;
         _activityLogService = activityLogService;
-        _financialHealthService = financialHealthService;
-        _forecastEngineService = forecastEngineService;
-        _cacheService = cacheService;
-        _mapper = mapper;
     }
 
     public async Task<Result<DashboardDto>> GetFullDashboardAsync(string userId)
     {
-        var cacheKey = CacheKeyFactory.Dashboard(userId);
-        var cached = await _cacheService.GetAsync<DashboardDto>(cacheKey);
-        if (cached != null)
-        {
-            return Result<DashboardDto>.Success(cached);
-        }
-
         var summaryResult = await GetDashboardSummaryAsync(userId);
         var summary = summaryResult.Data ?? new DashboardSummaryDto();
 
@@ -95,87 +75,49 @@ public class DashboardService : IDashboardService
             RecentActivities = recentActivities
         };
 
-        await _cacheService.SetAsync(cacheKey, dashboard, CacheDuration.Dashboard);
-
         return Result<DashboardDto>.Success(dashboard);
     }
 
     public async Task<Result<DashboardSummaryDto>> GetDashboardSummaryAsync(string userId)
     {
-        var cacheKey = CacheKeyFactory.DashboardSummary(userId);
-        var cached = await _cacheService.GetAsync<DashboardSummaryDto>(cacheKey);
-        if (cached != null)
-        {
-            return Result<DashboardSummaryDto>.Success(cached);
-        }
-
-        var transactions = (await _unitOfWork.Transactions.GetByUserIdAsync(userId)).ToList();
-
-        var totalIncome = transactions.Where(t => t.TransactionType == TransactionType.Income).Sum(t => t.Amount);
-        var totalExpense = transactions.Where(t => t.TransactionType == TransactionType.Expense).Sum(t => t.Amount);
-        var totalBalance = totalIncome - totalExpense;
-
-        var now = DateTime.UtcNow;
-        var currentMonthTransactions = transactions
-            .Where(t => t.TransactionDate.Year == now.Year && t.TransactionDate.Month == now.Month)
-            .ToList();
-
-        var monthlyIncome = currentMonthTransactions.Where(t => t.TransactionType == TransactionType.Income).Sum(t => t.Amount);
-        var monthlyExpense = currentMonthTransactions.Where(t => t.TransactionType == TransactionType.Expense).Sum(t => t.Amount);
-        var netSavings = monthlyIncome - monthlyExpense;
-        var savingsRate = monthlyIncome > 0 ? Math.Round((netSavings / monthlyIncome) * 100m, 2) : 0m;
-
-        var healthSummary = (await _financialHealthService.GetHealthSummaryAsync(userId)).Data;
-        var forecastSummary = (await _forecastEngineService.GetForecastSummaryAsync(userId)).Data;
+        var metricsResult = await _financialEngineService.CalculateCoreMetricsAsync(userId);
+        var metrics = metricsResult.Data ?? new DTOs.FinancialEngine.FinancialCoreMetricsDto();
 
         var goals = (await _goalService.GetUserGoalsAsync(userId)).Data?.ToList() ?? new List<GoalDto>();
         var activeGoalCount = goals.Count(g => g.CurrentAmount < g.TargetAmount);
         var completedGoalCount = goals.Count(g => g.CurrentAmount >= g.TargetAmount);
         var avgGoalProgress = goals.Any() ? Convert.ToDecimal(Math.Round(goals.Average(g => g.ProgressPercentage), 2)) : 0m;
 
-        var portfolioResult = await _portfolioService.GetPortfolioSummaryAsync(userId);
-        var portfolio = portfolioResult.Data ?? new PortfolioSummaryDto();
-
-        var subSummaryResult = await _subscriptionService.GetSubscriptionSummaryAsync(userId);
-        var subSummary = subSummaryResult.Data ?? new SubscriptionSummaryDto();
-
-        var unreadNotificationResult = await _notificationService.GetUnreadCountAsync(userId);
-        var unreadNotifCount = unreadNotificationResult.Data;
-
-        var activitiesResult = await _activityLogService.GetUserActivityLogsAsync(userId);
-        var totalActivities = activitiesResult.Data?.Count() ?? 0;
+        var unreadNotifCount = (await _notificationService.GetUnreadCountAsync(userId)).Data;
+        var totalActivities = (await _activityLogService.GetUserActivityLogsAsync(userId)).Data?.Count() ?? 0;
 
         var summary = new DashboardSummaryDto
         {
-            TotalBalance = totalBalance,
-            MonthlyIncome = monthlyIncome,
-            MonthlyExpense = monthlyExpense,
-            NetSavings = netSavings,
-            SavingsRate = savingsRate,
-            FinancialHealthScore = healthSummary?.FinancialHealthScore ?? 50,
-            RiskLevel = healthSummary?.RiskLevel ?? "Moderate",
-            TopInsights = healthSummary?.TopInsights ?? new List<FinancialInsightDto>(),
-            EstimatedMonthlyIncome = forecastSummary?.EstimatedMonthlyIncome ?? 0m,
-            EstimatedMonthlyExpense = forecastSummary?.EstimatedMonthlyExpense ?? 0m,
-            EstimatedSavings = forecastSummary?.EstimatedSavings ?? 0m,
-            BudgetRiskLevel = forecastSummary?.BudgetRiskLevel ?? "Low",
-            EstimatedGoalCompletionDate = forecastSummary?.EstimatedGoalCompletionDate,
-            EstimatedPortfolioValue = forecastSummary?.EstimatedPortfolioValue ?? 0m,
+            TotalBalance = metrics.TotalBalance,
+            MonthlyIncome = metrics.MonthlyIncome,
+            MonthlyExpense = metrics.MonthlyExpense,
+            NetSavings = metrics.NetSavings,
+            SavingsRate = metrics.SavingsRate,
+            FinancialHealthScore = metrics.FinancialHealthScore,
+            RiskLevel = metrics.RiskLevel,
+            EstimatedMonthlyIncome = metrics.MonthlyIncome,
+            EstimatedMonthlyExpense = metrics.MonthlyExpense,
+            EstimatedSavings = metrics.NetSavings,
+            BudgetRiskLevel = "Low",
+            EstimatedPortfolioValue = metrics.TotalPortfolioValue,
             ActiveGoalCount = activeGoalCount,
             CompletedGoalCount = completedGoalCount,
             AverageGoalProgressPercentage = avgGoalProgress,
-            PortfolioTotalInvestment = portfolio.TotalInvestment,
-            PortfolioCurrentValue = portfolio.TotalCurrentValue,
-            PortfolioTotalProfitLoss = portfolio.TotalProfitLoss,
-            PortfolioTotalProfitLossPercentage = (decimal)portfolio.TotalProfitLossPercentage,
-            ActiveSubscriptionCount = subSummary.ActiveSubscriptionCount,
-            MonthlyTotalSubscriptionCost = subSummary.TotalMonthlyCost,
-            UpcomingPaymentsCount = subSummary.UpcomingRenewalsCount,
+            PortfolioTotalInvestment = metrics.TotalPortfolioInvestment,
+            PortfolioCurrentValue = metrics.TotalPortfolioValue,
+            PortfolioTotalProfitLoss = metrics.TotalPortfolioProfitLoss,
+            PortfolioTotalProfitLossPercentage = (decimal)metrics.TotalPortfolioProfitLossPercentage,
+            ActiveSubscriptionCount = metrics.ActiveSubscriptionCount,
+            MonthlyTotalSubscriptionCost = metrics.TotalMonthlySubscriptionCost,
+            UpcomingPaymentsCount = metrics.ActiveSubscriptionCount,
             UnreadNotificationCount = unreadNotifCount,
             TotalActivityCount = totalActivities
         };
-
-        await _cacheService.SetAsync(cacheKey, summary, CacheDuration.Dashboard);
 
         return Result<DashboardSummaryDto>.Success(summary);
     }
