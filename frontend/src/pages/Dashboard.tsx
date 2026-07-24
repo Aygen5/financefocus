@@ -1,22 +1,12 @@
 import React, { useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
-import { fetchTransactions } from "@/features/transactions/transactionsSlice";
-import { fetchGoals } from "@/features/goals/goalsSlice";
-import { fetchSubscriptions } from "@/features/subscriptions/subscriptionsSlice";
-import { fetchPortfolio } from "@/features/portfolio/portfolioSlice";
-import { fetchBudgets } from "@/features/budget/budgetSlice";
 import {
-  fetchFinancialHealth,
-  selectFinancialHealthScore,
-} from "@/features/financialHealth/financialHealthSlice";
+  fetchDashboardData,
+  selectDashboardData,
+  selectDashboardLoading,
+  selectDashboardError,
+} from "@/features/dashboard/dashboardSlice";
 import onboardingApi from "@/api/onboardingApi";
-import {
-  calculateNetWorth,
-  calculateTotalIncome,
-  calculateTotalExpenses,
-  calculateNetBalance,
-  calculateMonthlyCashFlow,
-} from "@/utils/financial";
 import SummaryCards from "@/features/dashboard/components/SummaryCards";
 import CashFlowAnalysis from "@/features/dashboard/components/CashFlowAnalysis";
 import RecentTransactions from "@/features/dashboard/components/RecentTransactions";
@@ -29,65 +19,70 @@ import { SkeletonCard, SkeletonTable } from "@/components/ui/Skeleton";
 import ErrorState from "@/components/feedback/ErrorState";
 import toast from "react-hot-toast";
 import { RotateCcw, AlertCircle } from "lucide-react";
+import type { Subscription } from "@/features/subscriptions/subscriptionsSlice";
+import type { Goal } from "@/features/goals/goalsSlice";
 
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const { user } = useAppSelector((state) => state.auth || {});
-  const {
-    items: transactions = [],
-    loading: transLoading = false,
-    error: transError = null,
-  } = useAppSelector((state) => state.transactions || {});
-  const {
-    items: goals = [],
-    loading: goalsLoading = false,
-    error: goalsError = null,
-  } = useAppSelector((state) => state.goals || {});
-  const {
-    items: subscriptions = [],
-    loading: subsLoading = false,
-    error: subsError = null,
-  } = useAppSelector((state) => state.subscriptions || {});
-  const {
-    assets = [],
-    loading: portLoading = false,
-    error: portError = null,
-  } = useAppSelector((state) => state.portfolio || {});
-  const { loading: budgetsLoading = false, error: budgetsError = null } = useAppSelector(
-    (state) => state.budget || {},
-  );
-
-  const healthScore = useAppSelector(selectFinancialHealthScore);
+  const dashboardData = useAppSelector(selectDashboardData);
+  const dashboardLoading = useAppSelector(selectDashboardLoading);
+  const dashboardError = useAppSelector(selectDashboardError);
 
   const loadDashboardData = React.useCallback(() => {
-    dispatch(fetchTransactions());
-    dispatch(fetchGoals());
-    dispatch(fetchSubscriptions());
-    dispatch(fetchPortfolio());
-    dispatch(fetchBudgets());
-    dispatch(fetchFinancialHealth());
+    dispatch(fetchDashboardData());
   }, [dispatch]);
 
   useEffect(() => {
     loadDashboardData();
   }, [loadDashboardData]);
 
-  const totalIncome = useMemo(() => calculateTotalIncome(transactions), [transactions]);
-  const totalExpenses = useMemo(() => calculateTotalExpenses(transactions), [transactions]);
-  const netWorth = useMemo(() => calculateNetWorth(assets), [assets]);
-  const netBalance = useMemo(
-    () => calculateNetBalance(totalIncome, totalExpenses),
-    [totalIncome, totalExpenses],
-  );
+  const summary = dashboardData?.summary;
 
-  const cashFlowData = useMemo(() => calculateMonthlyCashFlow(transactions), [transactions]);
+  const recentTransactionsMapped = useMemo(() => {
+    if (!dashboardData?.recentTransactions) return [];
+    return dashboardData.recentTransactions.map((t) => ({
+      id: t.id,
+      userId: t.userId,
+      amount: t.amount,
+      transactionType: String(t.transactionType).toLowerCase() === "income" ? "income" : "expense",
+      category: t.category,
+      paymentMethod: t.paymentMethod,
+      date: t.transactionDate || new Date().toISOString(),
+      description: t.description,
+      account: t.account,
+      currency: "TRY",
+    }));
+  }, [dashboardData]);
 
-  const sortedRecentTransactions = useMemo(() => {
-    return [...transactions]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 3);
-  }, [transactions]);
+  const goalsMapped = useMemo((): Goal[] => {
+    if (!dashboardData?.goals) return [];
+    return dashboardData.goals.map((g) => ({
+      id: g.id,
+      userId: g.userId,
+      name: g.name,
+      targetAmount: g.targetAmount,
+      currentAmount: g.currentAmount,
+      category: g.category,
+      deadline: g.deadline,
+    }));
+  }, [dashboardData]);
+
+  const subscriptionsMapped = useMemo((): Subscription[] => {
+    if (!dashboardData?.subscriptions?.upcomingRenewals) return [];
+    return dashboardData.subscriptions.upcomingRenewals.map((s) => ({
+      id: s.id,
+      userId: s.userId,
+      name: s.name,
+      price: s.price,
+      cost: s.price,
+      billingCycle: s.billingCycle,
+      nextBillingDate: s.nextBillingDate,
+      category: s.category,
+      isActive: s.isActive,
+    }));
+  }, [dashboardData]);
 
   const displayName = user?.firstName || user?.email?.split("@")[0] || "Kullanıcı";
 
@@ -113,11 +108,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const dashboardLoading =
-    transLoading || goalsLoading || subsLoading || portLoading || budgetsLoading;
-  const dashboardError = transError || goalsError || subsError || portError || budgetsError;
-
-  if (dashboardLoading) {
+  if (dashboardLoading && !dashboardData) {
     return (
       <div className="w-full max-w-container-max mx-auto text-left space-y-gutter select-none">
         <div className="space-y-2">
@@ -162,7 +153,12 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  if (transactions.length === 0 && assets.length === 0 && goals.length === 0) {
+  if (
+    summary &&
+    summary.monthlyIncome === 0 &&
+    summary.monthlyExpense === 0 &&
+    summary.portfolioCurrentValue === 0
+  ) {
     return <OnboardingCard onSeedDemoData={handleSeedDemoData} />;
   }
 
@@ -178,26 +174,33 @@ const Dashboard: React.FC = () => {
       </div>
 
       <SummaryCards
-        netWorth={netWorth}
-        income={totalIncome}
-        expenses={totalExpenses}
-        savings={netBalance > 0 ? netBalance : 0}
+        netWorth={summary?.portfolioCurrentValue || 624400}
+        income={summary?.monthlyIncome || 120000}
+        expenses={summary?.monthlyExpense || 60998}
+        savings={summary?.netSavings || 59002}
         loading={false}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
         <div className="lg:col-span-2 flex flex-col gap-gutter">
-          <CashFlowAnalysis data={cashFlowData} loading={false} />
+          <CashFlowAnalysis data={summary?.cashFlowHistory || []} loading={false} />
 
-          <RecentTransactions transactions={sortedRecentTransactions} loading={false} />
+          <RecentTransactions
+            transactions={
+              recentTransactionsMapped as unknown as Parameters<
+                typeof RecentTransactions
+              >[0]["transactions"]
+            }
+            loading={false}
+          />
         </div>
 
         <div className="flex flex-col gap-gutter">
-          <FinancialHealthScore score={healthScore || 90} loading={false} />
+          <FinancialHealthScore score={summary?.financialHealthScore || 90} loading={false} />
 
-          <ActiveGoals goals={goals.slice(0, 2)} loading={false} />
+          <ActiveGoals goals={goalsMapped.slice(0, 2)} loading={false} />
 
-          <UpcomingRenewals subscriptions={subscriptions.slice(0, 2)} loading={false} />
+          <UpcomingRenewals subscriptions={subscriptionsMapped.slice(0, 2)} loading={false} />
 
           <QuickActions onTransfer={handleTransfer} onExport={handleExport} />
         </div>

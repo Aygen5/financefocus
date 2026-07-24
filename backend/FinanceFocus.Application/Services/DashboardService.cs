@@ -2,20 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using FinanceFocus.Application.Common;
-using FinanceFocus.Application.Common.Caching;
 using FinanceFocus.Application.DTOs.ActivityLogs;
 using FinanceFocus.Application.DTOs.Budgets;
 using FinanceFocus.Application.DTOs.Dashboard;
-using FinanceFocus.Application.DTOs.FinancialHealth;
-using FinanceFocus.Application.DTOs.Forecast;
 using FinanceFocus.Application.DTOs.Goals;
 using FinanceFocus.Application.DTOs.Notifications;
 using FinanceFocus.Application.DTOs.Portfolio;
 using FinanceFocus.Application.DTOs.Subscriptions;
 using FinanceFocus.Application.Interfaces;
-using FinanceFocus.Domain.UnitOfWork;
 
 namespace FinanceFocus.Application.Services;
 
@@ -116,7 +111,8 @@ public class DashboardService : IDashboardService
             MonthlyTotalSubscriptionCost = metrics.TotalMonthlySubscriptionCost,
             UpcomingPaymentsCount = metrics.ActiveSubscriptionCount,
             UnreadNotificationCount = unreadNotifCount,
-            TotalActivityCount = totalActivities
+            TotalActivityCount = totalActivities,
+            CashFlowHistory = metrics.CashFlowHistory
         };
 
         return Result<DashboardSummaryDto>.Success(summary);

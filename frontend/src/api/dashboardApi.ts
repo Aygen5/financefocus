@@ -15,6 +15,12 @@ export interface FinancialInsightDto {
   category: string;
 }
 
+export interface CashFlowMonthDto {
+  month: string;
+  income: number;
+  expense: number;
+}
+
 export interface DashboardSummaryDto {
   totalBalance: number;
   monthlyIncome: number;
@@ -42,6 +48,7 @@ export interface DashboardSummaryDto {
   upcomingPaymentsCount: number;
   unreadNotificationCount: number;
   totalActivityCount: number;
+  cashFlowHistory: CashFlowMonthDto[];
 }
 
 export interface DashboardDto {

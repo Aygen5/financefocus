@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FinanceFocus.Application.DTOs.FinancialEngine;
 using FinanceFocus.Application.DTOs.FinancialHealth;
 
 namespace FinanceFocus.Application.DTOs.Dashboard;
@@ -38,4 +39,6 @@ public class DashboardSummaryDto
 
     public int UnreadNotificationCount { get; set; }
     public int TotalActivityCount { get; set; }
+
+    public IEnumerable<CashFlowMonthDto> CashFlowHistory { get; set; } = new List<CashFlowMonthDto>();
 }
