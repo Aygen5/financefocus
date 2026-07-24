@@ -103,10 +103,20 @@ export const formatCompactNumber = (amount: number, locale = "tr-TR"): string =>
 };
 
 export const calculateAssetCost = (asset: FinancialAsset): number => {
-  return asset.amount * asset.avgCost;
+  const aObj = asset as unknown as Record<string, unknown>;
+  if (typeof aObj.totalInvestment === "number") return aObj.totalInvestment;
+  const cost =
+    typeof asset.avgCost === "number"
+      ? asset.avgCost
+      : typeof aObj.purchasePrice === "number"
+        ? aObj.purchasePrice
+        : 0;
+  return asset.amount * cost;
 };
 
 export const calculateAssetValue = (asset: FinancialAsset, usdRate = USD_TO_TRY_RATE): number => {
+  const aObj = asset as unknown as Record<string, unknown>;
+  if (typeof aObj.currentValue === "number") return aObj.currentValue;
   const localValue = asset.amount * asset.currentPrice;
   if (asset.currency === "USD") {
     return localValue * usdRate;
@@ -118,7 +128,7 @@ export const calculateAssetCostInBaseCurrency = (
   asset: FinancialAsset,
   usdRate = USD_TO_TRY_RATE,
 ): number => {
-  const localCost = asset.amount * asset.avgCost;
+  const localCost = calculateAssetCost(asset);
   if (asset.currency === "USD") {
     return localCost * usdRate;
   }
@@ -129,6 +139,8 @@ export const calculateAssetProfitLoss = (
   asset: FinancialAsset,
   usdRate = USD_TO_TRY_RATE,
 ): number => {
+  const aObj = asset as unknown as Record<string, unknown>;
+  if (typeof aObj.profitLoss === "number") return aObj.profitLoss;
   const currentValue = calculateAssetValue(asset, usdRate);
   const totalCost = calculateAssetCostInBaseCurrency(asset, usdRate);
   return currentValue - totalCost;
