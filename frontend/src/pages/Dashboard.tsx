@@ -5,6 +5,10 @@ import { fetchGoals } from "@/features/goals/goalsSlice";
 import { fetchSubscriptions } from "@/features/subscriptions/subscriptionsSlice";
 import { fetchPortfolio } from "@/features/portfolio/portfolioSlice";
 import { fetchBudgets } from "@/features/budget/budgetSlice";
+import {
+  fetchFinancialHealth,
+  selectFinancialHealthScore,
+} from "@/features/financialHealth/financialHealthSlice";
 import onboardingApi from "@/api/onboardingApi";
 import {
   calculateNetWorth,
@@ -12,7 +16,6 @@ import {
   calculateTotalExpenses,
   calculateNetBalance,
   calculateMonthlyCashFlow,
-  calculateFinancialHealthScore,
 } from "@/utils/financial";
 import SummaryCards from "@/features/dashboard/components/SummaryCards";
 import CashFlowAnalysis from "@/features/dashboard/components/CashFlowAnalysis";
@@ -51,11 +54,11 @@ const Dashboard: React.FC = () => {
     loading: portLoading = false,
     error: portError = null,
   } = useAppSelector((state) => state.portfolio || {});
-  const {
-    items: budgets = [],
-    loading: budgetsLoading = false,
-    error: budgetsError = null,
-  } = useAppSelector((state) => state.budget || {});
+  const { loading: budgetsLoading = false, error: budgetsError = null } = useAppSelector(
+    (state) => state.budget || {},
+  );
+
+  const healthScore = useAppSelector(selectFinancialHealthScore);
 
   const loadDashboardData = React.useCallback(() => {
     dispatch(fetchTransactions());
@@ -63,6 +66,7 @@ const Dashboard: React.FC = () => {
     dispatch(fetchSubscriptions());
     dispatch(fetchPortfolio());
     dispatch(fetchBudgets());
+    dispatch(fetchFinancialHealth());
   }, [dispatch]);
 
   useEffect(() => {
@@ -84,17 +88,6 @@ const Dashboard: React.FC = () => {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 3);
   }, [transactions]);
-
-  const healthScore = useMemo(() => {
-    const scores = calculateFinancialHealthScore(
-      transactions,
-      budgets,
-      assets,
-      goals,
-      subscriptions,
-    );
-    return scores.overall;
-  }, [transactions, budgets, assets, goals, subscriptions]);
 
   const displayName = user?.firstName || user?.email?.split("@")[0] || "Kullanıcı";
 
@@ -200,7 +193,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-gutter">
-          <FinancialHealthScore score={healthScore} loading={false} />
+          <FinancialHealthScore score={healthScore || 90} loading={false} />
 
           <ActiveGoals goals={goals.slice(0, 2)} loading={false} />
 

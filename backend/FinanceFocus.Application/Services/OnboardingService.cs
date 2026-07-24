@@ -67,131 +67,34 @@ public class OnboardingService : IOnboardingService
             await _unitOfWork.SaveChangesAsync();
         }
 
-        var now = DateTime.SpecifyKind(new DateTime(2026, 7, 24, 12, 0, 0), DateTimeKind.Utc);
-
         var sampleTransactions = new[]
         {
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Aylık Maaş Ödemesi",
-                Amount = 95000,
-                TransactionType = TransactionType.Income,
-                Category = "Maaş",
-                PaymentMethod = "Banka Transferi",
-                Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 1, 9, 0, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Freelance Danışmanlık Geliri",
-                Amount = 25000,
-                TransactionType = TransactionType.Income,
-                Category = "Freelance",
-                PaymentMethod = "Banka Transferi",
-                Account = "İş Bankası",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 10, 14, 30, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Ev Kirası Ödemesi",
-                Amount = 28000,
-                TransactionType = TransactionType.Expense,
-                Category = "Ev Kirası & Barınma",
-                PaymentMethod = "Banka Transferi",
-                Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 2, 10, 0, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Aylık Süpermarket Alışverişi",
-                Amount = 12500,
-                TransactionType = TransactionType.Expense,
-                Category = "Market & Gıda",
-                PaymentMethod = "Kredi Kartı",
-                Account = "Bonus Card",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 5, 17, 45, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Elektrik & Su Faturası",
-                Amount = 1800,
-                TransactionType = TransactionType.Expense,
-                Category = "Ev Kirası & Barınma",
-                PaymentMethod = "Otomatik Ödeme",
-                Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 8, 11, 0, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Doğalgaz Faturası",
-                Amount = 2200,
-                TransactionType = TransactionType.Expense,
-                Category = "Ev Kirası & Barınma",
-                PaymentMethod = "Otomatik Ödeme",
-                Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 12, 11, 0, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Ev İnterneti & TV Paketi",
-                Amount = 850,
-                TransactionType = TransactionType.Expense,
-                Category = "Ev Kirası & Barınma",
-                PaymentMethod = "Otomatik Ödeme",
-                Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 14, 15, 20, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "GSM Telefon Faturası",
-                Amount = 1200,
-                TransactionType = TransactionType.Expense,
-                Category = "Ev Kirası & Barınma",
-                PaymentMethod = "Otomatik Ödeme",
-                Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 15, 16, 0, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Hafta Sonu Restoran & Eğlence",
-                Amount = 6500,
-                TransactionType = TransactionType.Expense,
-                Category = "Restoran & Eğlence",
-                PaymentMethod = "Kredi Kartı",
-                Account = "Bonus Card",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 18, 20, 30, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Benzin Yakıt Alımı",
-                Amount = 4200,
-                TransactionType = TransactionType.Expense,
-                Category = "Ulaşım & Yakıt",
-                PaymentMethod = "Kredi Kartı",
-                Account = "Maximum Card",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 20, 18, 15, 0), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Aylık Dijital Abonelikler Toplamı",
-                Amount = 3748,
-                TransactionType = TransactionType.Expense,
-                Category = "Abonelikler & Yazılım",
-                PaymentMethod = "Kredi Kartı",
-                Account = "Bonus Card",
-                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 22, 10, 0, 0), DateTimeKind.Utc)
-            }
+            new Transaction { UserId = userId, Description = "Aylık Maaş Ödemesi (Şubat)", Amount = 80000, TransactionType = TransactionType.Income, Category = "Maaş", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 2, 1, 9, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Ev Kirası & Harcamalar (Şubat)", Amount = 45000, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 2, 5, 10, 0, 0), DateTimeKind.Utc) },
+
+            new Transaction { UserId = userId, Description = "Aylık Maaş Ödemesi (Mart)", Amount = 85000, TransactionType = TransactionType.Income, Category = "Maaş", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 3, 1, 9, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Ev Kirası & Harcamalar (Mart)", Amount = 48000, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 3, 5, 10, 0, 0), DateTimeKind.Utc) },
+
+            new Transaction { UserId = userId, Description = "Aylık Maaş Ödemesi (Nisan)", Amount = 85000, TransactionType = TransactionType.Income, Category = "Maaş", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 4, 1, 9, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Ev Kirası & Harcamalar (Nisan)", Amount = 50000, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 4, 5, 10, 0, 0), DateTimeKind.Utc) },
+
+            new Transaction { UserId = userId, Description = "Aylık Maaş Ödemesi (Mayıs)", Amount = 90000, TransactionType = TransactionType.Income, Category = "Maaş", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 5, 1, 9, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Ev Kirası & Harcamalar (Mayıs)", Amount = 52000, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 5, 5, 10, 0, 0), DateTimeKind.Utc) },
+
+            new Transaction { UserId = userId, Description = "Aylık Maaş Ödemesi (Haziran)", Amount = 90000, TransactionType = TransactionType.Income, Category = "Maaş", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 6, 1, 9, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Ev Kirası & Harcamalar (Haziran)", Amount = 55000, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 6, 5, 10, 0, 0), DateTimeKind.Utc) },
+
+            new Transaction { UserId = userId, Description = "Aylık Maaş Ödemesi", Amount = 95000, TransactionType = TransactionType.Income, Category = "Maaş", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 1, 9, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Freelance Danışmanlık Geliri", Amount = 25000, TransactionType = TransactionType.Income, Category = "Freelance", PaymentMethod = "Banka Transferi", Account = "İş Bankası", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 10, 14, 30, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Ev Kirası Ödemesi", Amount = 28000, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Banka Transferi", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 2, 10, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Aylık Süpermarket Alışverişi", Amount = 12500, TransactionType = TransactionType.Expense, Category = "Market & Gıda", PaymentMethod = "Kredi Kartı", Account = "Bonus Card", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 5, 17, 45, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Elektrik & Su Faturası", Amount = 1800, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Otomatik Ödeme", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 8, 11, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Doğalgaz Faturası", Amount = 2200, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Otomatik Ödeme", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 12, 11, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Ev İnterneti & TV Paketi", Amount = 850, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Otomatik Ödeme", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 14, 15, 20, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "GSM Telefon Faturası", Amount = 1200, TransactionType = TransactionType.Expense, Category = "Ev Kirası & Barınma", PaymentMethod = "Otomatik Ödeme", Account = "Garanti BBVA", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 15, 16, 0, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Hafta Sonu Restoran & Eğlence", Amount = 6500, TransactionType = TransactionType.Expense, Category = "Restoran & Eğlence", PaymentMethod = "Kredi Kartı", Account = "Bonus Card", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 18, 20, 30, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Benzin Yakıt Alımı", Amount = 4200, TransactionType = TransactionType.Expense, Category = "Ulaşım & Yakıt", PaymentMethod = "Kredi Kartı", Account = "Maximum Card", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 20, 18, 15, 0), DateTimeKind.Utc) },
+            new Transaction { UserId = userId, Description = "Aylık Dijital Abonelikler Toplamı", Amount = 3748, TransactionType = TransactionType.Expense, Category = "Abonelikler & Yazılım", PaymentMethod = "Kredi Kartı", Account = "Bonus Card", TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 22, 10, 0, 0), DateTimeKind.Utc) }
         };
 
         foreach (var t in sampleTransactions)
