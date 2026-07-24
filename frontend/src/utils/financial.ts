@@ -296,7 +296,10 @@ export const generateIncomeReport = (
   return transactions
     .filter((t) => {
       const txDate = parseISO(t.date);
-      return t.transactionType === "income" && txDate >= start && txDate <= end;
+      const isInc =
+        String(t.transactionType).toLowerCase() === "income" ||
+        (t as unknown as Record<string, unknown>).transactionType === 0;
+      return isInc && txDate >= start && txDate <= end;
     })
     .reduce((sum, t) => sum + t.amount, 0);
 };
@@ -312,7 +315,10 @@ export const generateExpenseReport = (
   return transactions
     .filter((t) => {
       const txDate = parseISO(t.date);
-      return t.transactionType === "expense" && txDate >= start && txDate <= end;
+      const isExp =
+        String(t.transactionType).toLowerCase() === "expense" ||
+        (t as unknown as Record<string, unknown>).transactionType === 1;
+      return isExp && txDate >= start && txDate <= end;
     })
     .reduce((sum, t) => sum + t.amount, 0);
 };
@@ -330,7 +336,10 @@ export const calculateMostSpentCategory = (
   transactions
     .filter((t) => {
       const txDate = parseISO(t.date);
-      return t.transactionType === "expense" && txDate >= start && txDate <= end;
+      const isExp =
+        String(t.transactionType).toLowerCase() === "expense" ||
+        (t as unknown as Record<string, unknown>).transactionType === 1;
+      return isExp && txDate >= start && txDate <= end;
     })
     .forEach((t) => {
       categoryMap[t.category] = (categoryMap[t.category] || 0) + t.amount;
@@ -344,7 +353,11 @@ export const calculateMostSpentCategory = (
 };
 
 export const calculateAverageMonthlySpending = (transactions: FinancialTransaction[]): number => {
-  const expenseTxs = transactions.filter((t) => t.transactionType === "expense");
+  const expenseTxs = transactions.filter(
+    (t) =>
+      String(t.transactionType).toLowerCase() === "expense" ||
+      (t as unknown as Record<string, unknown>).transactionType === 1,
+  );
   if (expenseTxs.length === 0) return 0;
 
   const monthsMap: { [key: string]: number } = {};
@@ -467,7 +480,10 @@ export const calculateCategoryExpenseDistribution = (
   transactions
     .filter((t) => {
       const txDate = parseISO(t.date);
-      return t.transactionType === "expense" && txDate >= start && txDate <= end;
+      const isExp =
+        String(t.transactionType).toLowerCase() === "expense" ||
+        (t as unknown as Record<string, unknown>).transactionType === 1;
+      return isExp && txDate >= start && txDate <= end;
     })
     .forEach((t) => {
       categoryMap[t.category] = (categoryMap[t.category] || 0) + t.amount;
@@ -501,9 +517,15 @@ export const calculateMonthlyCashFlow = (
     ) {
       const key = format(txDate, "yyyy-MM");
       if (monthsData[key]) {
-        if (tx.transactionType === "income") {
+        const isInc =
+          String(tx.transactionType).toLowerCase() === "income" ||
+          (tx as unknown as Record<string, unknown>).transactionType === 0;
+        const isExp =
+          String(tx.transactionType).toLowerCase() === "expense" ||
+          (tx as unknown as Record<string, unknown>).transactionType === 1;
+        if (isInc) {
           monthsData[key].income += tx.amount;
-        } else if (tx.transactionType === "expense") {
+        } else if (isExp) {
           monthsData[key].expense += tx.amount;
         }
       }
@@ -540,9 +562,15 @@ export const calculateIncomeExpenseTrend = (
       if (!dateMap[dateKey]) {
         dateMap[dateKey] = { income: 0, expense: 0 };
       }
-      if (t.transactionType === "income") {
+      const isInc =
+        String(t.transactionType).toLowerCase() === "income" ||
+        (t as unknown as Record<string, unknown>).transactionType === 0;
+      const isExp =
+        String(t.transactionType).toLowerCase() === "expense" ||
+        (t as unknown as Record<string, unknown>).transactionType === 1;
+      if (isInc) {
         dateMap[dateKey].income += t.amount;
-      } else if (t.transactionType === "expense") {
+      } else if (isExp) {
         dateMap[dateKey].expense += t.amount;
       }
     });
