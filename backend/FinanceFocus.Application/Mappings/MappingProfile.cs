@@ -1,6 +1,5 @@
 using AutoMapper;
 using FinanceFocus.Application.DTOs.ActivityLogs;
-using FinanceFocus.Application.DTOs.AI;
 using FinanceFocus.Application.DTOs.Budgets;
 using FinanceFocus.Application.DTOs.FinancialHealth;
 using FinanceFocus.Application.DTOs.Forecast;
@@ -42,8 +41,6 @@ public class MappingProfile : Profile
         CreateMap<CreateNotificationDto, Notification>();
         CreateMap<ActivityLog, ActivityLogDto>();
         CreateMap<CreateActivityLogDto, ActivityLog>();
-        CreateMap<AIConversation, AIConversationDto>();
-        CreateMap<AIConversation, ChatMessageDto>();
         CreateMap<ForecastHistory, ForecastDto>();
         CreateMap<FinancialHealthHistory, FinancialHealthDto>();
     }

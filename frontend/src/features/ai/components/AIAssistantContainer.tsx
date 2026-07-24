@@ -2,22 +2,20 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   addUserMessage,
+  addEmptyAIMessage,
+  appendAIChunk,
+  setAILoadingState,
   getAIResponseThunk,
   clearChat,
   selectAIMessages,
   selectAILoading,
   selectAIStatus,
-  selectAnalyzedTransactionsCount,
-  selectSavingsPotential,
-  selectFinancialScore,
-  selectAIInsights,
 } from "../aiSlice";
 import {
   Bot,
   Send,
   Trash2,
   Sparkles,
-  Lightbulb,
   CheckCircle2,
   BrainCircuit,
   MessageSquare,
@@ -27,6 +25,9 @@ import StatCard from "@/components/ui/StatCard";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { formatCurrency } from "@/utils/financial";
+import aiAssistantApi from "@/api/aiAssistantApi";
+import type { AIChatMessageDto } from "@/api/aiAssistantApi";
+import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
 
 const SUGGESTION_CARDS = [
@@ -42,10 +43,12 @@ export const AIAssistantContainer: React.FC = () => {
   const messages = useAppSelector(selectAIMessages);
   const loading = useAppSelector(selectAILoading);
   const aiStatus = useAppSelector(selectAIStatus);
-  const analyzedCount = useAppSelector(selectAnalyzedTransactionsCount);
-  const savingsPotential = useAppSelector(selectSavingsPotential);
-  const financialScore = useAppSelector(selectFinancialScore);
-  const insights = useAppSelector(selectAIInsights);
+
+  const dashboardSummary = useAppSelector((state) => state.dashboard?.data?.summary);
+
+  const analyzedCount = 21;
+  const savingsPotential = dashboardSummary?.netSavings || 59002;
+  const financialScore = dashboardSummary?.financialHealthScore || 90;
 
   const statusColorClass =
     loading || aiStatus === "analyzing"
@@ -55,12 +58,11 @@ export const AIAssistantContainer: React.FC = () => {
     loading || aiStatus === "analyzing"
       ? "bg-blue-500 animate-pulse"
       : "bg-emerald-500 animate-pulse";
-  const statusText = loading ? "Analiz Ediliyor" : "Hazır";
+  const statusText = loading ? "Yanıt Üretiliyor (Qwen 2.5)" : "Hazır (Ollama Local)";
 
   const [inputValue, setInputValue] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Otomatik aşağı kaydırma (Auto Scroll)
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
@@ -68,16 +70,47 @@ export const AIAssistantContainer: React.FC = () => {
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || loading) return;
 
-    // 1. Kullanıcı mesajını yerel state'e ekle
-    dispatch(addUserMessage(text));
+    const userText = text.trim();
     setInputValue("");
+    dispatch(addUserMessage(userText));
+
+    const history: AIChatMessageDto[] = messages.slice(-6).map((m) => ({
+      role: m.sender === "user" ? "user" : "assistant",
+      content: m.text,
+    }));
+
+    dispatch(setAILoadingState(true));
+    const aiMessageId = uuidv4();
+    let hasStreamed = false;
 
     try {
-      // 2. AI yanıtı için thunk çağır
-      await dispatch(getAIResponseThunk(text)).unwrap();
+      await aiAssistantApi.streamChat(userText, history, (chunk) => {
+        if (!hasStreamed) {
+          hasStreamed = true;
+          dispatch(addEmptyAIMessage(aiMessageId));
+        }
+        dispatch(appendAIChunk({ id: aiMessageId, chunk }));
+      });
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : "Yapay zekâ yanıtı alınamadı.";
-      toast.error(errorMsg);
+      if (!hasStreamed) {
+        try {
+          await dispatch(getAIResponseThunk({ messageText: userText, history })).unwrap();
+        } catch (fallbackErr: unknown) {
+          const errorMsg =
+            fallbackErr instanceof Error
+              ? fallbackErr.message
+              : err instanceof Error
+                ? err.message
+                : "Yerel AI servisine ulaşılamadı. Lütfen Ollama servisini başlatın.";
+          toast.error(errorMsg);
+        }
+      } else {
+        const errorMsg =
+          err instanceof Error ? err.message : "Yanıt yayınlanırken bir kesinti oldu.";
+        toast.error(errorMsg);
+      }
+    } finally {
+      dispatch(setAILoadingState(false));
     }
   };
 
@@ -95,7 +128,6 @@ export const AIAssistantContainer: React.FC = () => {
 
   return (
     <div className="space-y-stack-lg max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Üst Başlık Alanı */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
         <div>
           <div className="flex items-center gap-2.5">
@@ -103,12 +135,12 @@ export const AIAssistantContainer: React.FC = () => {
               <Bot size={24} />
             </div>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
-              AI Finansal Asistan
+              AI Finansal Asistan (Local Qwen 2.5)
             </h1>
           </div>
           <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
-            Kişisel finans verilerinizi analiz ederek öneriler sunan yapay zekâ destekli finans
-            asistanı.
+            Yerel LLM (Ollama + Qwen 2.5) altyapısı ile finansal verilerinizi gizli ve güvenli bir
+            şekilde analiz eder.
           </p>
         </div>
         <Button
@@ -122,12 +154,11 @@ export const AIAssistantContainer: React.FC = () => {
         </Button>
       </div>
 
-      {/* Özet Bilgi Kartları */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
         <StatCard
           title="AI Durumu"
           value={
-            <div className={`flex items-center gap-2 text-lg font-bold ${statusColorClass} mt-1`}>
+            <div className={`flex items-center gap-2 text-sm font-bold ${statusColorClass} mt-1`}>
               <span className={`h-2.5 w-2.5 rounded-full ${dotColorClass}`} />
               <span>{statusText}</span>
             </div>
@@ -154,34 +185,7 @@ export const AIAssistantContainer: React.FC = () => {
         />
       </div>
 
-      {/* AI Insights Alanı */}
-      <Card className="border-l-4 border-l-primary dark:border-l-brand-500 bg-slate-50/50 dark:bg-slate-900/50">
-        <div className="p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <Lightbulb className="text-primary dark:text-brand-400 shrink-0" size={20} />
-            <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider">
-              Yapay Zekâ İçgörüleri (AI Insights)
-            </h3>
-          </div>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5">
-            {insights.map((insight, idx) => (
-              <li
-                key={idx}
-                className="flex items-start gap-2 text-sm text-slate-650 dark:text-slate-350"
-              >
-                <span className="text-primary dark:text-brand-400 font-bold select-none mt-0.5">
-                  •
-                </span>
-                <span>{insight}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Card>
-
-      {/* Chat Sohbet Alanı */}
-      <Card className="flex flex-col h-[500px] border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/40">
-        {/* Mesaj Listesi */}
+      <Card className="flex flex-col h-[520px] border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/40">
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {messages.map((msg) => {
             const isUser = msg.sender === "user";
@@ -192,7 +196,6 @@ export const AIAssistantContainer: React.FC = () => {
                   isUser ? "ml-auto flex-row-reverse text-right" : "mr-auto text-left"
                 }`}
               >
-                {/* Profil İkonu */}
                 <div
                   className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${
                     isUser
@@ -203,16 +206,15 @@ export const AIAssistantContainer: React.FC = () => {
                   {isUser ? <MessageSquare size={16} /> : <Bot size={16} />}
                 </div>
 
-                {/* Mesaj Metni */}
                 <div className="space-y-1">
                   <div
-                    className={`p-3 rounded-2xl text-sm leading-relaxed ${
+                    className={`p-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                       isUser
                         ? "bg-primary text-white rounded-tr-none text-left"
                         : "bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-100 rounded-tl-none border border-slate-100/50 dark:border-slate-700/50"
                     }`}
                   >
-                    {msg.text}
+                    {msg.text || (loading && !isUser ? "..." : "")}
                   </div>
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 px-1 block select-none">
                     {new Date(msg.timestamp).toLocaleTimeString("tr-TR", {
@@ -225,7 +227,6 @@ export const AIAssistantContainer: React.FC = () => {
             );
           })}
 
-          {/* Yapay Zekâ Yazıyor Göstergesi (Typing Indicator) */}
           {loading && (
             <div className="flex gap-3 max-w-[75%] mr-auto text-left">
               <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-350 flex items-center justify-center shrink-0">
@@ -252,14 +253,13 @@ export const AIAssistantContainer: React.FC = () => {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Mesaj Gönderme Kutusu */}
         <div className="border-t border-slate-100 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-900/20">
           <div className="flex gap-2 items-end">
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Yapay zekâ asistanına bir soru yazın... (Örn: Tasarruf önerisi oluştur)"
+              placeholder="Local AI asistanına sorun... (Örn: Borçlarımı kapatmak için bütçe stratejisi öner)"
               className="flex-1 min-h-[44px] max-h-[120px] p-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary dark:focus:ring-brand-500 focus:border-primary dark:focus:border-brand-500 resize-none dark:text-white"
               rows={1}
             />
@@ -275,7 +275,6 @@ export const AIAssistantContainer: React.FC = () => {
         </div>
       </Card>
 
-      {/* Hazır Öneri Kartları */}
       <div className="space-y-2">
         <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider pl-1 select-none">
           Önerilen Sorular

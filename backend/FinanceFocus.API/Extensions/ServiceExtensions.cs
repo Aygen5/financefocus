@@ -29,7 +29,7 @@ namespace FinanceFocus.API.Extensions;
 
 public static class ServiceExtensions
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
         services.AddValidatorsFromAssemblyContaining<CreateTransactionValidator>();
@@ -46,7 +46,9 @@ public static class ServiceExtensions
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IForecastEngineService, ForecastEngineService>();
         services.AddScoped<IFinancialHealthService, FinancialHealthService>();
-        services.AddScoped<IAIProvider, RuleBasedAIProvider>();
+        services.Configure<FinanceFocus.Application.AI.Options.AIOptions>(configuration.GetSection(FinanceFocus.Application.AI.Options.AIOptions.SectionName));
+        services.AddScoped<FinanceFocus.Application.AI.Prompts.IAIPromptBuilder, FinanceFocus.Application.AI.Prompts.AIPromptBuilder>();
+        services.AddHttpClient<IAIProvider, FinanceFocus.Application.Services.Providers.OllamaAIProvider>();
         services.AddScoped<IAIAssistantService, AIAssistantService>();
         services.AddScoped<IBackgroundJobService, BackgroundJobService>();
         services.AddScoped<IOnboardingService, OnboardingService>();

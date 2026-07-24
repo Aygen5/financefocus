@@ -1,14 +1,9 @@
 import aiAssistantApi from "@/api/aiAssistantApi";
-import type { AIAssistantDto } from "@/api/aiAssistantApi";
+import type { AIChatMessageDto } from "@/api/aiAssistantApi";
 
 export const AIService = {
-  getFullAnalysis: async (): Promise<AIAssistantDto> => {
-    const response = await aiAssistantApi.getFullAnalysis();
-    return response.data;
-  },
-
-  getAIResponse: async (messageText: string): Promise<string> => {
-    const response = await aiAssistantApi.chat(messageText);
+  getAIResponse: async (messageText: string, history?: AIChatMessageDto[]): Promise<string> => {
+    const response = await aiAssistantApi.chat(messageText, history);
     if (response.success && response.data?.answer) {
       return response.data.answer;
     }
