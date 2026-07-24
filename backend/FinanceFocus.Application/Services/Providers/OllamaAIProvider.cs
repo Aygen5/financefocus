@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -11,6 +12,7 @@ using FinanceFocus.Application.AI.Prompts;
 using FinanceFocus.Application.DTOs.AIAssistant;
 using FinanceFocus.Application.DTOs.FinancialEngine;
 using FinanceFocus.Application.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FinanceFocus.Application.Services.Providers;
@@ -26,17 +28,20 @@ public class OllamaAIProvider : IAIProvider
     private readonly HttpClient _httpClient;
     private readonly IAIPromptBuilder _promptBuilder;
     private readonly AIOptions _options;
+    private readonly ILogger<OllamaAIProvider> _logger;
 
     public string ProviderName => $"Ollama ({_options.Model})";
 
     public OllamaAIProvider(
         HttpClient httpClient,
         IAIPromptBuilder promptBuilder,
-        IOptions<AIOptions> options)
+        IOptions<AIOptions> options,
+        ILogger<OllamaAIProvider> logger)
     {
         _httpClient = httpClient;
         _promptBuilder = promptBuilder;
         _options = options.Value;
+        _logger = logger;
     }
 
     public async Task<AIChatResponseDto> ProcessChatPromptAsync(
@@ -46,30 +51,36 @@ public class OllamaAIProvider : IAIProvider
         FinancialCoreMetricsDto metrics)
     {
         var fullPrompt = _promptBuilder.BuildFullPrompt(prompt, history, metrics);
-        var requestUrl = $"{_options.OllamaUrl.TrimEnd('/')}/api/generate";
+        var baseUrl = _options.OllamaUrl.TrimEnd('/');
+        var requestUrl = $"{baseUrl}/api/generate";
+        var resolvedModel = await ResolveModelNameAsync(baseUrl);
 
         var payload = new
         {
-            model = _options.Model,
+            model = resolvedModel,
             prompt = fullPrompt,
             stream = false
         };
 
-        var json = JsonSerializer.Serialize(payload);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var jsonPayload = JsonSerializer.Serialize(payload);
+        _logger.LogInformation("[OllamaAIProvider] Target URL: {Url}, Model: {Model}, BodyLength: {Length}", requestUrl, resolvedModel, jsonPayload.Length);
+
+        var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
         try
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.TimeoutSeconds));
             var response = await _httpClient.PostAsync(requestUrl, content, cts.Token);
+            var rawResponseBody = await response.Content.ReadAsStringAsync();
+
+            _logger.LogInformation("[OllamaAIProvider] Response Status: {Status}, BodySnippet: {Body}", response.StatusCode, rawResponseBody.Length > 200 ? rawResponseBody.Substring(0, 200) : rawResponseBody);
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new OllamaUnavailableException($"Ollama API sunucu hatası döndürdü: {response.StatusCode}");
+                throw new OllamaUnavailableException($"Ollama API HTTP {(int)response.StatusCode} {response.StatusCode} hatası döndürdü: {rawResponseBody}");
             }
 
-            var responseJson = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(responseJson);
+            using var doc = JsonDocument.Parse(rawResponseBody);
             var answerText = doc.RootElement.TryGetProperty("response", out var respElement)
                 ? respElement.GetString() ?? string.Empty
                 : string.Empty;
@@ -78,17 +89,19 @@ public class OllamaAIProvider : IAIProvider
             {
                 Answer = answerText,
                 Category = "Yerel LLM Finansal Danışmanlık",
-                ProviderUsed = ProviderName,
+                ProviderUsed = $"Ollama ({resolvedModel})",
                 RespondedAt = DateTime.UtcNow
             };
         }
         catch (HttpRequestException ex)
         {
-            throw new OllamaUnavailableException("Yerel AI servisine (Ollama) ulaşılamadı. Lütfen http://localhost:11434 adresinde Ollama servisinin çalıştığından emin olun.", ex);
+            _logger.LogError(ex, "[OllamaAIProvider] HTTP bağlantı hatası");
+            throw new OllamaUnavailableException($"Yerel AI servisine ({baseUrl}) ulaşılamadı. Hata: {ex.Message}", ex);
         }
         catch (TaskCanceledException ex)
         {
-            throw new OllamaUnavailableException("Yerel AI yanıt verme süresi zaman aşımına uğradı.", ex);
+            _logger.LogError(ex, "[OllamaAIProvider] Zaman aşımı hatası");
+            throw new OllamaUnavailableException($"Yerel AI yanıt verme süresi ({_options.TimeoutSeconds} sn) zaman aşımına uğradı.", ex);
         }
     }
 
@@ -100,19 +113,23 @@ public class OllamaAIProvider : IAIProvider
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var fullPrompt = _promptBuilder.BuildFullPrompt(prompt, history, metrics);
-        var requestUrl = $"{_options.OllamaUrl.TrimEnd('/')}/api/generate";
+        var baseUrl = _options.OllamaUrl.TrimEnd('/');
+        var requestUrl = $"{baseUrl}/api/generate";
+        var resolvedModel = await ResolveModelNameAsync(baseUrl);
 
         var payload = new
         {
-            model = _options.Model,
+            model = resolvedModel,
             prompt = fullPrompt,
             stream = true
         };
 
-        var json = JsonSerializer.Serialize(payload);
+        var jsonPayload = JsonSerializer.Serialize(payload);
+        _logger.LogInformation("[OllamaAIProvider Stream] Target URL: {Url}, Model: {Model}", requestUrl, resolvedModel);
+
         var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
         {
-            Content = new StringContent(json, Encoding.UTF8, "application/json")
+            Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json")
         };
 
         HttpResponseMessage response;
@@ -122,20 +139,24 @@ public class OllamaAIProvider : IAIProvider
         }
         catch (HttpRequestException ex)
         {
-            throw new OllamaUnavailableException("Yerel AI servisine (Ollama) ulaşılamadı. Lütfen http://localhost:11434 adresinde Ollama servisinin çalıştığından emin olun.", ex);
+            _logger.LogError(ex, "[OllamaAIProvider Stream] HTTP bağlantı hatası");
+            throw new OllamaUnavailableException($"Yerel AI servisine ({baseUrl}) ulaşılamadı. Hata: {ex.Message}", ex);
         }
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new OllamaUnavailableException($"Ollama API sunucu hatası döndürdü: {response.StatusCode}");
+            var rawError = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogError("[OllamaAIProvider Stream] Sunucu hatası HTTP {Status}: {Error}", response.StatusCode, rawError);
+            throw new OllamaUnavailableException($"Ollama API HTTP {(int)response.StatusCode} {response.StatusCode} hatası döndürdü: {rawError}");
         }
 
         using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         using var reader = new StreamReader(stream, Encoding.UTF8);
 
-        while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             var line = await reader.ReadLineAsync(cancellationToken);
+            if (line == null) break;
             if (string.IsNullOrWhiteSpace(line)) continue;
 
             string? token = null;
@@ -157,5 +178,53 @@ public class OllamaAIProvider : IAIProvider
                 yield return token;
             }
         }
+    }
+
+    private async Task<string> ResolveModelNameAsync(string baseUrl)
+    {
+        var configuredModel = _options.Model;
+        try
+        {
+            var tagsUrl = $"{baseUrl}/api/tags";
+            var tagsResponse = await _httpClient.GetAsync(tagsUrl);
+            if (tagsResponse.IsSuccessStatusCode)
+            {
+                var tagsJson = await tagsResponse.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(tagsJson);
+                if (doc.RootElement.TryGetProperty("models", out var modelsArr) && modelsArr.ValueKind == JsonValueKind.Array)
+                {
+                    var availableModels = modelsArr.EnumerateArray()
+                        .Select(m => m.TryGetProperty("name", out var n) ? n.GetString() : null)
+                        .Where(n => !string.IsNullOrEmpty(n))
+                        .ToList();
+
+                    if (availableModels.Contains(configuredModel, StringComparer.OrdinalIgnoreCase))
+                    {
+                        return configuredModel;
+                    }
+
+                    var exactOrBaseMatch = availableModels.FirstOrDefault(m =>
+                        m!.StartsWith(configuredModel, StringComparison.OrdinalIgnoreCase) ||
+                        configuredModel.StartsWith(m!, StringComparison.OrdinalIgnoreCase));
+
+                    if (exactOrBaseMatch != null)
+                    {
+                        return exactOrBaseMatch;
+                    }
+
+                    if (availableModels.Any())
+                    {
+                        _logger.LogWarning("[OllamaAIProvider] Konfigüre edilen '{Configured}' bulunamadı, mevcut ilk model '{Found}' seçildi.", configuredModel, availableModels.First());
+                        return availableModels.First()!;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "[OllamaAIProvider] Model etiketleri alınırken uyarı, varsayılan konfigürasyon modeli kullanılacak.");
+        }
+
+        return configuredModel;
     }
 }
