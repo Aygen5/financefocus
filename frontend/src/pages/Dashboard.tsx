@@ -5,6 +5,7 @@ import { fetchGoals } from "@/features/goals/goalsSlice";
 import { fetchSubscriptions } from "@/features/subscriptions/subscriptionsSlice";
 import { fetchPortfolio } from "@/features/portfolio/portfolioSlice";
 import { fetchBudgets } from "@/features/budget/budgetSlice";
+import onboardingApi from "@/api/onboardingApi";
 import {
   calculateNetWorth,
   calculateTotalIncome,
@@ -20,9 +21,9 @@ import FinancialHealthScore from "@/features/dashboard/components/FinancialHealt
 import ActiveGoals from "@/features/dashboard/components/ActiveGoals";
 import UpcomingRenewals from "@/features/dashboard/components/UpcomingRenewals";
 import QuickActions from "@/features/dashboard/components/QuickActions";
+import OnboardingCard from "@/features/dashboard/components/OnboardingCard";
 import { SkeletonCard, SkeletonTable } from "@/components/ui/Skeleton";
 import ErrorState from "@/components/feedback/ErrorState";
-import EmptyState from "@/components/feedback/EmptyState";
 import toast from "react-hot-toast";
 import { RotateCcw, AlertCircle } from "lucide-react";
 
@@ -95,7 +96,7 @@ const Dashboard: React.FC = () => {
     return scores.overall;
   }, [transactions, budgets, assets, goals, subscriptions]);
 
-  const displayName = user?.name || "Aygen";
+  const displayName = user?.firstName || user?.email?.split("@")[0] || "Kullanıcı";
 
   const handleTransfer = () => {
     toast.success("Transfer işlemi başlatıldı.");
@@ -103,6 +104,20 @@ const Dashboard: React.FC = () => {
 
   const handleExport = () => {
     window.print();
+  };
+
+  const handleSeedDemoData = async () => {
+    try {
+      const res = await onboardingApi.seedDemoData();
+      if (res.success) {
+        toast.success(res.message || "Demo verileri başarıyla oluşturuldu!");
+        loadDashboardData();
+      } else {
+        toast.error(res.message || "Demo verileri oluşturulamadı.");
+      }
+    } catch {
+      toast.error("Demo verileri yüklenirken bir hata oluştu.");
+    }
   };
 
   const dashboardLoading =
@@ -155,24 +170,14 @@ const Dashboard: React.FC = () => {
   }
 
   if (transactions.length === 0 && assets.length === 0 && goals.length === 0) {
-    return (
-      <div className="w-full max-w-container-max mx-auto text-left py-12">
-        <EmptyState
-          title="Finansal Kayıt Bulunamadı"
-          description="Sistemde henüz hesap veya işlem kaydı bulunmamaktadır. İlk finansal hareketlerinizi Transactions sayfasından ekleyebilirsiniz."
-          primaryActionLabel="İşlem Geçmişi Sayfasına Git"
-          onPrimaryActionClick={loadDashboardData}
-        />
-      </div>
-    );
+    return <OnboardingCard onSeedDemoData={handleSeedDemoData} />;
   }
 
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
-      {/* Karşılama Alanı */}
       <div className="mb-stack-lg select-none">
         <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2 tracking-tight">
-          Günaydın, {displayName}.
+          Hoş geldiniz, {displayName}.
         </h2>
         <p className="font-body-lg text-body-lg text-on-surface-variant font-medium">
           Finansal sağlığınız güçlü görünüyor. İşte mevcut durumunuzun özeti.

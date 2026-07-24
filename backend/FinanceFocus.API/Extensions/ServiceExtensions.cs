@@ -48,6 +48,7 @@ public static class ServiceExtensions
         services.AddScoped<IAIProvider, RuleBasedAIProvider>();
         services.AddScoped<IAIAssistantService, AIAssistantService>();
         services.AddScoped<IBackgroundJobService, BackgroundJobService>();
+        services.AddScoped<IOnboardingService, OnboardingService>();
 
         return services;
     }
