@@ -89,8 +89,8 @@ export const Forecast: React.FC = () => {
 
   useEffect(() => {
     if (!transLoading && transactions.length > 0) {
-      const avgInc = forecastIncome(transactions, 1)[0]?.value || 12000;
-      const avgExp = forecastExpenses(transactions, 1)[0]?.value || 6500;
+      const avgInc = forecastIncome(transactions, 1)[0]?.value || 0;
+      const avgExp = forecastExpenses(transactions, 1)[0]?.value || 0;
       const isNegativeTrend = avgExp > avgInc;
 
       dispatch(

@@ -255,13 +255,21 @@ export const calculatePortfolioSectorDistribution = (
 
 export const calculateTotalIncome = (transactions: FinancialTransaction[]): number => {
   return transactions
-    .filter((t) => t.transactionType === "income")
+    .filter(
+      (t) =>
+        String(t.transactionType).toLowerCase() === "income" ||
+        (t as unknown as Record<string, unknown>).transactionType === 0,
+    )
     .reduce((sum, t) => sum + t.amount, 0);
 };
 
 export const calculateTotalExpenses = (transactions: FinancialTransaction[]): number => {
   return transactions
-    .filter((t) => t.transactionType === "expense")
+    .filter(
+      (t) =>
+        String(t.transactionType).toLowerCase() === "expense" ||
+        (t as unknown as Record<string, unknown>).transactionType === 1,
+    )
     .reduce((sum, t) => sum + t.amount, 0);
 };
 
@@ -578,21 +586,20 @@ export const forecastIncome = (
   months: number,
 ): { month: string; value: number }[] => {
   const today = new Date();
-  const threeMonthsAgo = startOfMonth(subMonths(today, 2));
-  const recentIncomes = transactions.filter((t) => {
-    const txDate = parseISO(t.date);
-    return t.transactionType === "income" && txDate >= threeMonthsAgo;
-  });
-
-  const sum = recentIncomes.reduce((s, t) => s + t.amount, 0);
-  const avgMonthlyIncome = sum > 0 ? Math.round(sum / 3) : 12000;
+  const totalIncome = transactions
+    .filter(
+      (t) =>
+        String(t.transactionType).toLowerCase() === "income" ||
+        (t as unknown as Record<string, unknown>).transactionType === 0,
+    )
+    .reduce((s, t) => s + t.amount, 0);
 
   const result: { month: string; value: number }[] = [];
   for (let i = 1; i <= months; i++) {
     const forecastMonth = addMonths(today, i);
     result.push({
       month: format(forecastMonth, "MMM yy", { locale: tr }),
-      value: avgMonthlyIncome,
+      value: totalIncome,
     });
   }
   return result;
@@ -603,21 +610,20 @@ export const forecastExpenses = (
   months: number,
 ): { month: string; value: number }[] => {
   const today = new Date();
-  const threeMonthsAgo = startOfMonth(subMonths(today, 2));
-  const recentExpenses = transactions.filter((t) => {
-    const txDate = parseISO(t.date);
-    return t.transactionType === "expense" && txDate >= threeMonthsAgo;
-  });
-
-  const sum = recentExpenses.reduce((s, t) => s + t.amount, 0);
-  const avgMonthlyExpense = sum > 0 ? Math.round(sum / 3) : 6500;
+  const totalExpense = transactions
+    .filter(
+      (t) =>
+        String(t.transactionType).toLowerCase() === "expense" ||
+        (t as unknown as Record<string, unknown>).transactionType === 1,
+    )
+    .reduce((s, t) => s + t.amount, 0);
 
   const result: { month: string; value: number }[] = [];
   for (let i = 1; i <= months; i++) {
     const forecastMonth = addMonths(today, i);
     result.push({
       month: format(forecastMonth, "MMM yy", { locale: tr }),
-      value: avgMonthlyExpense,
+      value: totalExpense,
     });
   }
   return result;
