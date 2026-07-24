@@ -8,6 +8,11 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Custom Slate extensions for high contrast theme support
+        slate: {
+          750: "#293548",
+          850: "#172033",
+        },
         // Stitch Template Palette & Executive Precision Integration
         "on-primary-fixed-variant": "#003ea8",
         "on-error-container": "#93000a",

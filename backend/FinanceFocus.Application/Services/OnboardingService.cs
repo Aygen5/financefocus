@@ -23,10 +23,51 @@ public class OnboardingService : IOnboardingService
         var existingTrans = await _unitOfWork.Transactions.GetByUserIdAsync(userId);
         if (existingTrans.Any())
         {
-            return Result<bool>.Failure("Demo verileri zaten yüklenmiş.");
+            foreach (var t in existingTrans)
+            {
+                _unitOfWork.Transactions.Delete(t);
+            }
+
+            var existingBudgets = await _unitOfWork.Budgets.GetByUserIdAsync(userId);
+            foreach (var b in existingBudgets)
+            {
+                _unitOfWork.Budgets.Delete(b);
+            }
+
+            var existingGoals = await _unitOfWork.Goals.GetByUserIdAsync(userId);
+            foreach (var g in existingGoals)
+            {
+                _unitOfWork.Goals.Delete(g);
+            }
+
+            var existingSubs = await _unitOfWork.Subscriptions.GetByUserIdAsync(userId);
+            foreach (var s in existingSubs)
+            {
+                _unitOfWork.Subscriptions.Delete(s);
+            }
+
+            var existingAssets = await _unitOfWork.PortfolioAssets.GetByUserIdAsync(userId);
+            foreach (var a in existingAssets)
+            {
+                _unitOfWork.PortfolioAssets.Delete(a);
+            }
+
+            var existingLogs = await _unitOfWork.ActivityLogs.GetByUserIdAsync(userId);
+            foreach (var l in existingLogs)
+            {
+                _unitOfWork.ActivityLogs.Delete(l);
+            }
+
+            var existingNotifs = await _unitOfWork.Notifications.GetByUserIdAsync(userId);
+            foreach (var n in existingNotifs)
+            {
+                _unitOfWork.Notifications.Delete(n);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
         }
 
-        var now = DateTime.UtcNow;
+        var now = DateTime.SpecifyKind(new DateTime(2026, 7, 24, 12, 0, 0), DateTimeKind.Utc);
 
         var sampleTransactions = new[]
         {
@@ -34,45 +75,23 @@ public class OnboardingService : IOnboardingService
             {
                 UserId = userId,
                 Description = "Aylık Maaş Ödemesi",
-                Amount = 85000,
+                Amount = 95000,
                 TransactionType = TransactionType.Income,
                 Category = "Maaş",
                 PaymentMethod = "Banka Transferi",
                 Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-60), DateTimeKind.Utc)
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 1, 9, 0, 0), DateTimeKind.Utc)
             },
             new Transaction
             {
                 UserId = userId,
                 Description = "Freelance Danışmanlık Geliri",
-                Amount = 22000,
+                Amount = 25000,
                 TransactionType = TransactionType.Income,
                 Category = "Freelance",
                 PaymentMethod = "Banka Transferi",
                 Account = "İş Bankası",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-45), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Yatırım Temettü Ödemesi",
-                Amount = 4500,
-                TransactionType = TransactionType.Income,
-                Category = "Yatırım Geliri",
-                PaymentMethod = "Hesaba Havale",
-                Account = "Midas",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-15), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Aylık Maaş Ödemesi",
-                Amount = 85000,
-                TransactionType = TransactionType.Income,
-                Category = "Maaş",
-                PaymentMethod = "Banka Transferi",
-                Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-30), DateTimeKind.Utc)
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 10, 14, 30, 0), DateTimeKind.Utc)
             },
             new Transaction
             {
@@ -80,109 +99,98 @@ public class OnboardingService : IOnboardingService
                 Description = "Ev Kirası Ödemesi",
                 Amount = 28000,
                 TransactionType = TransactionType.Expense,
-                Category = "Kira & Barınma",
+                Category = "Ev Kirası & Barınma",
                 PaymentMethod = "Banka Transferi",
                 Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-58), DateTimeKind.Utc)
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 2, 10, 0, 0), DateTimeKind.Utc)
             },
             new Transaction
             {
                 UserId = userId,
-                Description = "Süpermarket Alışverişi",
-                Amount = 6400,
+                Description = "Aylık Süpermarket Alışverişi",
+                Amount = 12500,
                 TransactionType = TransactionType.Expense,
                 Category = "Market & Gıda",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Bonus Card",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-50), DateTimeKind.Utc)
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 5, 17, 45, 0), DateTimeKind.Utc)
             },
             new Transaction
             {
                 UserId = userId,
-                Description = "Elektrik ve Doğalgaz Faturası",
-                Amount = 2150,
+                Description = "Elektrik & Su Faturası",
+                Amount = 1800,
                 TransactionType = TransactionType.Expense,
-                Category = "Faturalar",
+                Category = "Ev Kirası & Barınma",
                 PaymentMethod = "Otomatik Ödeme",
                 Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-40), DateTimeKind.Utc)
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 8, 11, 0, 0), DateTimeKind.Utc)
             },
             new Transaction
             {
                 UserId = userId,
-                Description = "Restoran ve Dışarıda Yemek",
-                Amount = 3200,
+                Description = "Doğalgaz Faturası",
+                Amount = 2200,
+                TransactionType = TransactionType.Expense,
+                Category = "Ev Kirası & Barınma",
+                PaymentMethod = "Otomatik Ödeme",
+                Account = "Garanti BBVA",
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 12, 11, 0, 0), DateTimeKind.Utc)
+            },
+            new Transaction
+            {
+                UserId = userId,
+                Description = "Ev İnterneti & TV Paketi",
+                Amount = 850,
+                TransactionType = TransactionType.Expense,
+                Category = "Ev Kirası & Barınma",
+                PaymentMethod = "Otomatik Ödeme",
+                Account = "Garanti BBVA",
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 14, 15, 20, 0), DateTimeKind.Utc)
+            },
+            new Transaction
+            {
+                UserId = userId,
+                Description = "GSM Telefon Faturası",
+                Amount = 1200,
+                TransactionType = TransactionType.Expense,
+                Category = "Ev Kirası & Barınma",
+                PaymentMethod = "Otomatik Ödeme",
+                Account = "Garanti BBVA",
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 15, 16, 0, 0), DateTimeKind.Utc)
+            },
+            new Transaction
+            {
+                UserId = userId,
+                Description = "Hafta Sonu Restoran & Eğlence",
+                Amount = 6500,
                 TransactionType = TransactionType.Expense,
                 Category = "Restoran & Eğlence",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Bonus Card",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-35), DateTimeKind.Utc)
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 18, 20, 30, 0), DateTimeKind.Utc)
             },
             new Transaction
             {
                 UserId = userId,
                 Description = "Benzin Yakıt Alımı",
-                Amount = 2800,
+                Amount = 4200,
                 TransactionType = TransactionType.Expense,
                 Category = "Ulaşım & Yakıt",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Maximum Card",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-28), DateTimeKind.Utc)
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 20, 18, 15, 0), DateTimeKind.Utc)
             },
             new Transaction
             {
                 UserId = userId,
-                Description = "Ev Kirası Ödemesi",
-                Amount = 28000,
+                Description = "Aylık Dijital Abonelikler Toplamı",
+                Amount = 3748,
                 TransactionType = TransactionType.Expense,
-                Category = "Kira & Barınma",
-                PaymentMethod = "Banka Transferi",
-                Account = "Garanti BBVA",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-28), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Haftalık Market Alışverişi",
-                Amount = 5200,
-                TransactionType = TransactionType.Expense,
-                Category = "Market & Gıda",
+                Category = "Abonelikler & Yazılım",
                 PaymentMethod = "Kredi Kartı",
                 Account = "Bonus Card",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-20), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Teknoloji Mağazası (Kulaklık)",
-                Amount = 4500,
-                TransactionType = TransactionType.Expense,
-                Category = "Teknoloji & Elektronik",
-                PaymentMethod = "Kredi Kartı",
-                Account = "Bonus Card",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-12), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Spor Salonu Yıllık Üyelik",
-                Amount = 1200,
-                TransactionType = TransactionType.Expense,
-                Category = "Sağlık & Spor",
-                PaymentMethod = "Kredi Kartı",
-                Account = "Maximum Card",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-8), DateTimeKind.Utc)
-            },
-            new Transaction
-            {
-                UserId = userId,
-                Description = "Kahve ve Kafe Harcaması",
-                Amount = 950,
-                TransactionType = TransactionType.Expense,
-                Category = "Restoran & Eğlence",
-                PaymentMethod = "Kredi Kartı",
-                Account = "Bonus Card",
-                TransactionDate = DateTime.SpecifyKind(now.AddDays(-3), DateTimeKind.Utc)
+                TransactionDate = DateTime.SpecifyKind(new DateTime(2026, 7, 22, 10, 0, 0), DateTimeKind.Utc)
             }
         };
 
@@ -191,12 +199,14 @@ public class OnboardingService : IOnboardingService
             await _unitOfWork.Transactions.AddAsync(t);
         }
 
+        var currentMonthStart = DateTime.SpecifyKind(new DateTime(2026, 7, 1), DateTimeKind.Utc);
+
         var sampleBudgets = new[]
         {
-            new Budget { UserId = userId, Category = "Market & Gıda", Limit = 15000, Month = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc) },
-            new Budget { UserId = userId, Category = "Restoran & Eğlence", Limit = 8000, Month = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc) },
-            new Budget { UserId = userId, Category = "Ulaşım & Yakıt", Limit = 5000, Month = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc) },
-            new Budget { UserId = userId, Category = "Faturalar", Limit = 4000, Month = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc) }
+            new Budget { UserId = userId, Category = "Market & Gıda", Limit = 15000, Month = currentMonthStart },
+            new Budget { UserId = userId, Category = "Ev Kirası & Barınma", Limit = 35000, Month = currentMonthStart },
+            new Budget { UserId = userId, Category = "Restoran & Eğlence", Limit = 10000, Month = currentMonthStart },
+            new Budget { UserId = userId, Category = "Ulaşım & Yakıt", Limit = 8000, Month = currentMonthStart }
         };
 
         foreach (var b in sampleBudgets)
@@ -206,10 +216,9 @@ public class OnboardingService : IOnboardingService
 
         var sampleGoals = new[]
         {
-            new Goal { UserId = userId, Name = "Acil Durum Fonu", TargetAmount = 100000, CurrentAmount = 65000, Category = "Tasarruf", Deadline = DateTime.SpecifyKind(now.AddMonths(6), DateTimeKind.Utc) },
-            new Goal { UserId = userId, Name = "Yeni MacBook Pro", TargetAmount = 90000, CurrentAmount = 45000, Category = "Teknoloji", Deadline = DateTime.SpecifyKind(now.AddMonths(4), DateTimeKind.Utc) },
-            new Goal { UserId = userId, Name = "Yaz Tatili Bütçesi", TargetAmount = 50000, CurrentAmount = 32000, Category = "Seyahat", Deadline = DateTime.SpecifyKind(now.AddMonths(3), DateTimeKind.Utc) },
-            new Goal { UserId = userId, Name = "Yatırım Portföyü", TargetAmount = 250000, CurrentAmount = 140000, Category = "Yatırım", Deadline = DateTime.SpecifyKind(now.AddMonths(12), DateTimeKind.Utc) }
+            new Goal { UserId = userId, Name = "Ev Peşinatı Fonu", TargetAmount = 500000, CurrentAmount = 320000, Category = "Yatırım & Gayrimenkul", Deadline = DateTime.SpecifyKind(new DateTime(2027, 6, 30), DateTimeKind.Utc) },
+            new Goal { UserId = userId, Name = "Acil Durum Fonu", TargetAmount = 150000, CurrentAmount = 100000, Category = "Tasarruf", Deadline = DateTime.SpecifyKind(new DateTime(2026, 12, 31), DateTimeKind.Utc) },
+            new Goal { UserId = userId, Name = "Yaz Tatili Bütçesi", TargetAmount = 60000, CurrentAmount = 45000, Category = "Seyahat", Deadline = DateTime.SpecifyKind(new DateTime(2026, 9, 15), DateTimeKind.Utc) }
         };
 
         foreach (var g in sampleGoals)
@@ -219,10 +228,10 @@ public class OnboardingService : IOnboardingService
 
         var sampleSubscriptions = new[]
         {
-            new Subscription { UserId = userId, Name = "Netflix Premium", Price = 299, BillingCycle = "Monthly", Category = "Eğlence", IsActive = true, NextBillingDate = DateTime.SpecifyKind(now.AddDays(5), DateTimeKind.Utc) },
-            new Subscription { UserId = userId, Name = "Spotify Family", Price = 99, BillingCycle = "Monthly", Category = "Müzik", IsActive = true, NextBillingDate = DateTime.SpecifyKind(now.AddDays(12), DateTimeKind.Utc) },
-            new Subscription { UserId = userId, Name = "Claude AI Pro", Price = 750, BillingCycle = "Monthly", Category = "Yazılım", IsActive = true, NextBillingDate = DateTime.SpecifyKind(now.AddDays(18), DateTimeKind.Utc) },
-            new Subscription { UserId = userId, Name = "MacFit Spor Salonu", Price = 1200, BillingCycle = "Monthly", Category = "Sağlık", IsActive = true, NextBillingDate = DateTime.SpecifyKind(now.AddDays(22), DateTimeKind.Utc) }
+            new Subscription { UserId = userId, Name = "Spotify Family", Price = 149, BillingCycle = "Monthly", Category = "Müzik", IsActive = true, NextBillingDate = DateTime.SpecifyKind(new DateTime(2026, 8, 5), DateTimeKind.Utc) },
+            new Subscription { UserId = userId, Name = "Netflix Premium", Price = 449, BillingCycle = "Monthly", Category = "Eğlence", IsActive = true, NextBillingDate = DateTime.SpecifyKind(new DateTime(2026, 8, 10), DateTimeKind.Utc) },
+            new Subscription { UserId = userId, Name = "ChatGPT / Claude AI Pro", Price = 950, BillingCycle = "Monthly", Category = "Yazılım", IsActive = true, NextBillingDate = DateTime.SpecifyKind(new DateTime(2026, 8, 15), DateTimeKind.Utc) },
+            new Subscription { UserId = userId, Name = "MacFit Spor Salonu", Price = 2200, BillingCycle = "Monthly", Category = "Sağlık", IsActive = true, NextBillingDate = DateTime.SpecifyKind(new DateTime(2026, 8, 20), DateTimeKind.Utc) }
         };
 
         foreach (var s in sampleSubscriptions)
@@ -232,10 +241,10 @@ public class OnboardingService : IOnboardingService
 
         var sampleAssets = new[]
         {
-            new PortfolioAsset { UserId = userId, Name = "Apple Inc.", Symbol = "AAPL", Amount = 15, PurchasePrice = 175, CurrentPrice = 225, AssetType = AssetType.Stock },
-            new PortfolioAsset { UserId = userId, Name = "Bitcoin", Symbol = "BTC", Amount = 0.45m, PurchasePrice = 58000, CurrentPrice = 67000, AssetType = AssetType.Crypto },
-            new PortfolioAsset { UserId = userId, Name = "Ethereum", Symbol = "ETH", Amount = 3.5m, PurchasePrice = 2800, CurrentPrice = 3400, AssetType = AssetType.Crypto },
-            new PortfolioAsset { UserId = userId, Name = "Gram Altın", Symbol = "ALTIN", Amount = 85, PurchasePrice = 2400, CurrentPrice = 2950, AssetType = AssetType.Gold }
+            new PortfolioAsset { UserId = userId, Name = "Gram Altın", Symbol = "ALTIN", Amount = 85, PurchasePrice = 2400, CurrentPrice = 3100, AssetType = AssetType.Gold },
+            new PortfolioAsset { UserId = userId, Name = "Türk Hava Yolları", Symbol = "THYAO", Amount = 400, PurchasePrice = 240, CurrentPrice = 320, AssetType = AssetType.Stock },
+            new PortfolioAsset { UserId = userId, Name = "Apple Inc.", Symbol = "AAPL", Amount = 15, PurchasePrice = 180, CurrentPrice = 230, AssetType = AssetType.Stock },
+            new PortfolioAsset { UserId = userId, Name = "Bitcoin", Symbol = "BTC", Amount = 0.05m, PurchasePrice = 55000, CurrentPrice = 68000, AssetType = AssetType.Crypto }
         };
 
         foreach (var a in sampleAssets)
@@ -245,8 +254,8 @@ public class OnboardingService : IOnboardingService
 
         var sampleLogs = new[]
         {
-            new ActivityLog { UserId = userId, Action = "Demo Yükleme", ActivityType = "System", Title = "Demo Verileri Yüklendi", Description = "Kullanıcı ilk onboarding sürecinde demo verilerini yükledi.", Category = "Onboarding", Status = "success" },
-            new ActivityLog { UserId = userId, Action = "Bütçe Oluşturma", ActivityType = "Budget", Title = "Yeni Bütçeler Tanımlandı", Description = "Aylık mutfak ve eğlence bütçeleri oluşturuldu.", Category = "Budget", Status = "info" }
+            new ActivityLog { UserId = userId, Action = "Demo Yükleme", ActivityType = "System", Title = "2026 Production Verileri Yüklendi", Description = "Kullanıcı 2026 dönemi güncel finansal veri setini başarıyla yükledi.", Category = "Onboarding", Status = "success" },
+            new ActivityLog { UserId = userId, Action = "Bütçe Yapılandırma", ActivityType = "Budget", Title = "2026 Bütçeleri Güncellendi", Description = "Aylık mutfak, kira, eğlence ve ulaşım bütçeleri tanımlandı.", Category = "Budget", Status = "info" }
         };
 
         foreach (var l in sampleLogs)
@@ -256,8 +265,8 @@ public class OnboardingService : IOnboardingService
 
         var sampleNotifications = new[]
         {
-            new Notification { UserId = userId, Title = "Hoş Geldiniz!", Message = "FinanceFocus hesabınız başarıyla oluşturuldu. Demo verilerini inceleyebilirsiniz.", Type = NotificationType.Info, IsRead = false, Category = "System" },
-            new Notification { UserId = userId, Title = "Abonelik Hatırlatması", Message = "Netflix Premium abonelik ödemenize 5 gün kaldı.", Type = NotificationType.Warning, IsRead = false, Category = "Subscription" }
+            new Notification { UserId = userId, Title = "Hoş Geldiniz!", Message = "FinanceFocus 2026 Production sistemi hazır. Tüm verileriniz tek kaynak üzerinden senkronize edilmektedir.", Type = NotificationType.Info, IsRead = false, Category = "System" },
+            new Notification { UserId = userId, Title = "Yaklaşan Abonelik Ödemesi", Message = "Spotify Family abonelik ödemenize 12 gün kaldı.", Type = NotificationType.Warning, IsRead = false, Category = "Subscription" }
         };
 
         foreach (var n in sampleNotifications)
@@ -266,6 +275,6 @@ public class OnboardingService : IOnboardingService
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return Result<bool>.Success(true, "Demo verileri başarıyla oluşturuldu.");
+        return Result<bool>.Success(true, "2026 Production demo verileri başarıyla yüklendi.");
     }
 }
