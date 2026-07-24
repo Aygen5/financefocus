@@ -12,4 +12,5 @@ public interface IAIAssistantService
     Task<Result<AIConversationSummaryDto>> GetSummaryAsync(string userId);
     Task<Result<IEnumerable<AIAdviceDto>>> GetRiskAnalysisAsync(string userId);
     Task<Result<IEnumerable<AIAdviceDto>>> GetOpportunitiesAsync(string userId);
+    Task<Result<AIChatResponseDto>> ProcessChatMessageAsync(string userId, string prompt);
 }

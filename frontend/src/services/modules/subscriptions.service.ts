@@ -9,19 +9,24 @@ export const SubscriptionsService = {
       id: s.id,
       userId: s.userId,
       name: s.name,
-      price: s.price,
-      billingCycle: s.billingCycle,
-      nextBillingDate: s.nextBillingDate,
-      category: s.category,
-      isActive: s.isActive,
-    })) as unknown as Subscription[];
+      price: s.price || 0,
+      cost: s.price || 0,
+      billingCycle: s.billingCycle || "Monthly",
+      nextBillingDate: s.nextBillingDate || new Date().toISOString(),
+      category: s.category || "Genel",
+      isActive: s.isActive !== undefined ? s.isActive : true,
+      status: s.isActive ? "active" : "paused",
+    })) as Subscription[];
   },
 
   create: async (data: Omit<Subscription, "id" | "userId">): Promise<Subscription> => {
     const dataObj = data as Record<string, unknown>;
+    const numPrice =
+      typeof data.price === "number" ? data.price : typeof data.cost === "number" ? data.cost : 0;
+
     const payload: CreateSubscriptionDto = {
       name: data.name,
-      price: data.price,
+      price: numPrice,
       billingCycle: typeof dataObj.billingCycle === "string" ? dataObj.billingCycle : "Monthly",
       nextBillingDate:
         typeof dataObj.nextBillingDate === "string"
@@ -36,18 +41,23 @@ export const SubscriptionsService = {
       userId: response.data.userId,
       name: response.data.name,
       price: response.data.price,
+      cost: response.data.price,
       billingCycle: response.data.billingCycle,
       nextBillingDate: response.data.nextBillingDate,
       category: response.data.category,
       isActive: response.data.isActive,
-    } as unknown as Subscription;
+      status: response.data.isActive ? "active" : "paused",
+    } as Subscription;
   },
 
   update: async (id: string, data: Partial<Subscription>): Promise<Subscription> => {
     const dataObj = data as Record<string, unknown>;
+    const numPrice =
+      typeof data.price === "number" ? data.price : typeof data.cost === "number" ? data.cost : 0;
+
     const payload: CreateSubscriptionDto = {
       name: data.name || "",
-      price: data.price || 0,
+      price: numPrice,
       billingCycle: typeof dataObj.billingCycle === "string" ? dataObj.billingCycle : "Monthly",
       nextBillingDate:
         typeof dataObj.nextBillingDate === "string"
@@ -62,11 +72,13 @@ export const SubscriptionsService = {
       userId: response.data.userId,
       name: response.data.name,
       price: response.data.price,
+      cost: response.data.price,
       billingCycle: response.data.billingCycle,
       nextBillingDate: response.data.nextBillingDate,
       category: response.data.category,
       isActive: response.data.isActive,
-    } as unknown as Subscription;
+      status: response.data.isActive ? "active" : "paused",
+    } as Subscription;
   },
 
   delete: async (id: string): Promise<void> => {

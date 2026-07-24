@@ -14,4 +14,5 @@ public interface IAIProvider
     Task<AIConversationSummaryDto> GenerateSummaryAsync(string userId, DashboardDto dashboard, FinancialHealthDto health, ForecastDto forecast);
     Task<IEnumerable<AIAdviceDto>> GenerateRiskAnalysisAsync(string userId, DashboardDto dashboard, FinancialHealthDto health, ForecastDto forecast);
     Task<IEnumerable<AIAdviceDto>> GenerateOpportunitiesAsync(string userId, DashboardDto dashboard, FinancialHealthDto health, ForecastDto forecast);
+    Task<AIChatResponseDto> ProcessChatPromptAsync(string userId, string prompt, DashboardDto dashboard, FinancialHealthDto health, ForecastDto forecast);
 }

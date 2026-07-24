@@ -41,8 +41,9 @@ export interface FinancialSubscription {
   id: string;
   userId?: string;
   name: string;
-  cost: number;
-  billingCycle: "monthly" | "yearly";
+  price?: number;
+  cost?: number;
+  billingCycle: string;
   nextBillingDate: string;
   category: string;
   color?: string;
@@ -57,17 +58,24 @@ export interface FinancialGoal {
 
 const USD_TO_TRY_RATE = 34.0;
 
+const getSubCost = (sub: FinancialSubscription): number => {
+  if (typeof sub.price === "number" && !isNaN(sub.price)) return sub.price;
+  if (typeof sub.cost === "number" && !isNaN(sub.cost)) return sub.cost;
+  return 0;
+};
+
 export const formatCurrency = (amount: number, _currency = "TRY", _locale = "tr-TR"): string => {
   try {
+    const num = isNaN(amount) || amount === null || amount === undefined ? 0 : amount;
     return new Intl.NumberFormat("tr-TR", {
       style: "currency",
       currency: "TRY",
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(amount);
+    }).format(num);
   } catch (error) {
     console.error("Format Currency Error:", error);
-    return `${amount.toFixed(2)} ₺`;
+    return `0.00 ₺`;
   }
 };
 
@@ -355,10 +363,11 @@ export const calculateMonthlySubscriptionTotal = (
   subscriptions: FinancialSubscription[],
 ): number => {
   return subscriptions.reduce((sum, sub) => {
-    if (sub.billingCycle === "yearly") {
-      return sum + sub.cost / 12;
+    const costVal = getSubCost(sub);
+    if (sub.billingCycle?.toLowerCase() === "yearly") {
+      return sum + costVal / 12;
     }
-    return sum + sub.cost;
+    return sum + costVal;
   }, 0);
 };
 
@@ -366,10 +375,11 @@ export const calculateYearlySubscriptionTotal = (
   subscriptions: FinancialSubscription[],
 ): number => {
   return subscriptions.reduce((sum, sub) => {
-    if (sub.billingCycle === "monthly") {
-      return sum + sub.cost * 12;
+    const costVal = getSubCost(sub);
+    if (sub.billingCycle?.toLowerCase() === "monthly") {
+      return sum + costVal * 12;
     }
-    return sum + sub.cost;
+    return sum + costVal;
   }, 0);
 };
 
@@ -386,9 +396,12 @@ export const calculateMostExpensiveSubscription = (
 ): FinancialSubscription | null => {
   if (subscriptions.length === 0) return null;
   return subscriptions.reduce((mostExpensive, current) => {
-    const currentMonthly = current.billingCycle === "yearly" ? current.cost / 12 : current.cost;
+    const currentCost = getSubCost(current);
+    const currentMonthly =
+      current.billingCycle?.toLowerCase() === "yearly" ? currentCost / 12 : currentCost;
+    const mostCost = getSubCost(mostExpensive);
     const mostExpensiveMonthly =
-      mostExpensive.billingCycle === "yearly" ? mostExpensive.cost / 12 : mostExpensive.cost;
+      mostExpensive.billingCycle?.toLowerCase() === "yearly" ? mostCost / 12 : mostCost;
     return currentMonthly > mostExpensiveMonthly ? current : mostExpensive;
   });
 };
@@ -411,7 +424,8 @@ export const calculateSubscriptionCategoryTotals = (
   const categoryMap: { [key: string]: number } = {};
 
   subscriptions.forEach((sub) => {
-    const monthlyCost = sub.billingCycle === "yearly" ? sub.cost / 12 : sub.cost;
+    const costVal = getSubCost(sub);
+    const monthlyCost = sub.billingCycle?.toLowerCase() === "yearly" ? costVal / 12 : costVal;
     categoryMap[sub.category] = (categoryMap[sub.category] || 0) + monthlyCost;
   });
 
@@ -669,7 +683,7 @@ export const calculateBudgetHealth = (budgets: FinancialBudget[]): number => {
   if (avgUsage <= 85) return 100;
   if (avgUsage <= 100) return 85;
   if (avgUsage <= 120) return 60;
-  return 30; // Ciddi bütçe aşımı
+  return 30;
 };
 
 export const calculateInvestmentHealth = (assets: FinancialAsset[]): number => {
@@ -698,11 +712,11 @@ export const calculateSubscriptionHealth = (
   if (ratio <= 5) return 85;
   if (ratio <= 10) return 65;
   if (ratio <= 15) return 45;
-  return 25; // Ciddi yük
+  return 25;
 };
 
 export const calculateGoalHealth = (goals: FinancialGoal[]): number => {
-  if (goals.length === 0) return 80; // baseline
+  if (goals.length === 0) return 80;
 
   let totalProgress = 0;
   goals.forEach((g) => {

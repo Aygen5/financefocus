@@ -6,10 +6,12 @@ export interface Subscription {
   id: string;
   userId?: string;
   name: string;
+  price: number;
   cost: number;
-  billingCycle: "monthly" | "yearly";
+  billingCycle: string;
   nextBillingDate: string;
   category: string;
+  isActive?: boolean;
   billingType?: string;
   autoRenew?: boolean;
   startDate?: string;

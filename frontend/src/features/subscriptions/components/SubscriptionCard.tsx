@@ -19,8 +19,10 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
   onDelete,
   onView,
 }) => {
-  const monthlyCost =
-    subscription.billingCycle === "yearly" ? subscription.cost / 12 : subscription.cost;
+  const priceVal = Number(subscription.price ?? subscription.cost ?? 0);
+  const isYearly = subscription.billingCycle?.toLowerCase() === "yearly";
+  const monthlyCost = isYearly ? priceVal / 12 : priceVal;
+
   const daysRemaining = calculateDaysDifference(subscription.nextBillingDate);
   const isUrgent = daysRemaining >= 0 && daysRemaining <= 3;
 
@@ -75,7 +77,6 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       )}
 
       <div>
-        {/* Header Icon, Name & Category */}
         <div className="flex items-start gap-3.5 mb-4">
           <div
             className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg ${getCategoryColor(
@@ -94,7 +95,6 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
           </div>
         </div>
 
-        {/* Pricing Info */}
         <div className="bg-slate-50 dark:bg-slate-850 p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between mb-4">
           <div>
             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block mb-0.5">
@@ -109,7 +109,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
               Periyot
             </span>
             <span className="text-[11px] font-extrabold text-slate-500 dark:text-slate-450 uppercase">
-              {subscription.billingCycle === "yearly" ? "Yıllık" : "Aylık"}
+              {isYearly ? "Yıllık" : "Aylık"}
             </span>
           </div>
         </div>

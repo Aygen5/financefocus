@@ -102,6 +102,13 @@ public class AIAssistantService : IAIAssistantService
         return Result<IEnumerable<AIAdviceDto>>.Success(opportunities);
     }
 
+    public async Task<Result<AIChatResponseDto>> ProcessChatMessageAsync(string userId, string prompt)
+    {
+        var (dashboard, health, forecast) = await FetchAllContextDataAsync(userId);
+        var response = await _aiProvider.ProcessChatPromptAsync(userId, prompt, dashboard, health, forecast);
+        return Result<AIChatResponseDto>.Success(response);
+    }
+
     private async Task<(DashboardDto dashboard, FinancialHealthDto health, ForecastDto forecast)> FetchAllContextDataAsync(string userId)
     {
         var dashboardRes = await _dashboardService.GetFullDashboardAsync(userId);

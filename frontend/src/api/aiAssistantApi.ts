@@ -26,9 +26,23 @@ export interface AIAssistantDto {
   generatedAt: string;
 }
 
+export interface AIChatResponseDto {
+  answer: string;
+  category: string;
+  providerUsed: string;
+  respondedAt: string;
+}
+
 export const aiAssistantApi = {
   getFullAnalysis: async (): Promise<ApiResponse<AIAssistantDto>> => {
     const res = await axiosClient.get<ApiResponse<AIAssistantDto>>("/aiassistant");
+    return res.data;
+  },
+
+  chat: async (prompt: string): Promise<ApiResponse<AIChatResponseDto>> => {
+    const res = await axiosClient.post<ApiResponse<AIChatResponseDto>>("/aiassistant/chat", {
+      prompt,
+    });
     return res.data;
   },
 

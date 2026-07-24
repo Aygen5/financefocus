@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Asp.Versioning;
+using FinanceFocus.Application.DTOs.AIAssistant;
 using FinanceFocus.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,13 @@ public class AIAssistantController : BaseApiController
     public async Task<IActionResult> GetFullAnalysis()
     {
         var result = await _aiAssistantService.GetFullAnalysisAsync(CurrentUserId);
+        return ActionResultFrom(result);
+    }
+
+    [HttpPost("chat")]
+    public async Task<IActionResult> Chat([FromBody] AIChatRequestDto request)
+    {
+        var result = await _aiAssistantService.ProcessChatMessageAsync(CurrentUserId, request.Prompt);
         return ActionResultFrom(result);
     }
 
