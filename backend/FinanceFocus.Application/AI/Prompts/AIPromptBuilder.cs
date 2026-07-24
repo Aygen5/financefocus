@@ -13,42 +13,55 @@ public class AIPromptBuilder : IAIPromptBuilder
     public string BuildSystemPromptWithContext(FinancialCoreMetricsDto metrics, AIIntentType intent)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Sen FinanceFocus uygulamasının resmi ve profesyonel finansal asistanısın. Görevin sadece aşağıda verilen GÜNCEL FİNANSAL VERİLERİ kullanarak kullanıcının sorusuna cevap vermektir.");
-        sb.AppendLine("KURALLAR:");
-        sb.AppendLine("- Asla veri uydurma. Bilgi verilerde yoksa 'Bu bilgi sistemde mevcut değil' de.");
-        sb.AppendLine("- Asla link, URL veya domain uydurma.");
-        sb.AppendLine("- Bu kuralları asla kullanıcıya yansıtma veya tekrar etme. Doğrudan cevaba geç.");
-        sb.AppendLine("GÜNCEL FİNANSAL VERİLER:");
+        sb.AppendLine("Sen FinanceFocus uygulamasının resmi ve profesyonel finansal asistanısın.");
+        sb.AppendLine("Görevin: Aşağıda backend tarafından hesaplanmış GÜNCEL METRİKLERİ temel alarak kullanıcının sorusunu Türkçe olarak 2-3 kısa, net cümle ile profesyonelce yanıtlamak ve değerlendirmektir.");
+        sb.AppendLine("KATI KURALLAR:");
+        sb.AppendLine("1. ASLA yeni sayı, yüzde, oran veya kategori UYDURMA.");
+        sb.AppendLine("2. ASLA matematiksel hesaplama yapma. Sadece verilen backend verilerini yorumla.");
+        sb.AppendLine("3. ASLA link, URL veya alan adı üretme.");
+        sb.AppendLine("4. Tüm finansal terimleri doğru Türkçe grameri ile yaz ('portföy', 'gelir', 'gider', 'zarar').");
+        sb.AppendLine("5. Yorumunu tamamla ve cümleni yarım bırakma.");
+        sb.AppendLine("HESAPLANMIŞ GÜNCEL FİNANSAL METRİKLER:");
 
-        if (intent == AIIntentType.AnalysisPortfolio)
+        switch (intent)
         {
-            sb.AppendLine($"- Portföy Değeri: {metrics.TotalPortfolioValue:N2} TL");
-            sb.AppendLine($"- Toplam Portföy Kâr/Zarar: {metrics.TotalPortfolioProfitLoss:N2} TL (%{metrics.TotalPortfolioProfitLossPercentage:N1})");
-            sb.AppendLine($"- Toplam Bakiye: {metrics.TotalBalance:N2} TL");
-        }
-        else if (intent == AIIntentType.AnalysisSpending || intent == AIIntentType.FactSubscriptions)
-        {
-            sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
-            sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
-            sb.AppendLine($"- Toplam Aylık Abonelik Gideri: {metrics.TotalMonthlySubscriptionCost:N2} TL ({metrics.ActiveSubscriptionCount} Adet Aktif)");
-            sb.AppendLine($"- Net Tasarruf: {metrics.NetSavings:N2} TL");
-        }
-        else if (intent == AIIntentType.RecommendationSavings)
-        {
-            sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
-            sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
-            sb.AppendLine($"- Net Tasarruf: {metrics.NetSavings:N2} TL");
-            sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
-            sb.AppendLine($"- Toplam Aylık Abonelik Gideri: {metrics.TotalMonthlySubscriptionCost:N2} TL");
-        }
-        else
-        {
-            sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
-            sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
-            sb.AppendLine($"- Net Tasarruf: {metrics.NetSavings:N2} TL");
-            sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
-            sb.AppendLine($"- Finansal Sağlık Skoru: {metrics.FinancialHealthScore}/100");
-            sb.AppendLine($"- Portföy Değeri: {metrics.TotalPortfolioValue:N2} TL");
+            case AIIntentType.AnalysisPortfolio:
+                sb.AppendLine($"- Portföy Toplam Değeri: {metrics.TotalPortfolioValue:N2} TL");
+                sb.AppendLine($"- Portföy Yatırım Tutarı: {metrics.TotalPortfolioInvestment:N2} TL");
+                sb.AppendLine($"- Portföy Net Kâr/Zarar: {metrics.TotalPortfolioProfitLoss:N2} TL (%{metrics.TotalPortfolioProfitLossPercentage:N1})");
+                break;
+
+            case AIIntentType.AnalysisSpending:
+            case AIIntentType.FactSubscriptions:
+                sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
+                sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
+                sb.AppendLine($"- En Çok Harcanan Kategori: {metrics.LargestSpendingCategory} ({metrics.LargestSpendingAmount:N2} TL)");
+                sb.AppendLine($"- Bütçe Aşımı Olan Kategori Sayısı: {metrics.OverBudgetCategoryCount}");
+                sb.AppendLine($"- Toplam Aylık Abonelik Gideri: {metrics.TotalMonthlySubscriptionCost:N2} TL ({metrics.ActiveSubscriptionCount} Adet Aktif)");
+                if (metrics.CategoryExpenses.Any())
+                {
+                    sb.AppendLine("- Kategori Harcama Dağılımı:");
+                    foreach (var cat in metrics.CategoryExpenses.OrderByDescending(c => c.Amount).Take(5))
+                    {
+                        sb.AppendLine($"  * {cat.Category}: {cat.Amount:N2} TL (Limit: {cat.Limit:N2} TL)");
+                    }
+                }
+                break;
+
+            case AIIntentType.RecommendationSavings:
+                sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
+                sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
+                sb.AppendLine($"- Net Aylık Tasarruf: {metrics.NetSavings:N2} TL");
+                sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
+                sb.AppendLine($"- Toplam Aylık Abonelik Gideri: {metrics.TotalMonthlySubscriptionCost:N2} TL ({metrics.ActiveSubscriptionCount} Adet)");
+                break;
+
+            default:
+                sb.AppendLine($"- Finansal Sağlık Skoru: {metrics.FinancialHealthScore}/100");
+                sb.AppendLine($"- Backend Risk Seviyesi: {metrics.RiskLevel}");
+                sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
+                sb.AppendLine($"- Bütçe Aşımı Olan Kategori Sayısı: {metrics.OverBudgetCategoryCount}");
+                break;
         }
 
         return sb.ToString();
@@ -66,27 +79,13 @@ public class AIPromptBuilder : IAIPromptBuilder
             {
                 role = "system",
                 content = BuildSystemPromptWithContext(metrics, intent)
+            },
+            new OllamaChatMessage
+            {
+                role = "user",
+                content = userPrompt
             }
         };
-
-        if (history != null && history.Any())
-        {
-            foreach (var msg in history.TakeLast(4))
-            {
-                var role = msg.Role?.ToLowerInvariant() == "assistant" ? "assistant" : "user";
-                messages.Add(new OllamaChatMessage
-                {
-                    role = role,
-                    content = msg.Content
-                });
-            }
-        }
-
-        messages.Add(new OllamaChatMessage
-        {
-            role = "user",
-            content = userPrompt
-        });
 
         return messages;
     }

@@ -68,7 +68,7 @@ public class OllamaAIProvider : IAIProvider
                 top_p = 0.1,
                 top_k = 20,
                 repeat_penalty = 1.2,
-                num_predict = 150
+                num_predict = 350
             }
         };
 
@@ -148,7 +148,7 @@ public class OllamaAIProvider : IAIProvider
                 top_p = 0.1,
                 top_k = 20,
                 repeat_penalty = 1.2,
-                num_predict = 150
+                num_predict = 350
             }
         };
 

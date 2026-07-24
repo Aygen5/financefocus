@@ -11,22 +11,28 @@ public class AIIntentClassifier : IAIIntentClassifier
             return AIIntentType.GeneralAdvisory;
         }
 
-        var q = prompt.ToLowerInvariant().Trim();
+        var q = Normalize(prompt);
 
         bool isAnalytical = q.Contains("analiz") ||
-                           q.Contains("öner") ||
+                           q.Contains("oner") ||
                            q.Contains("tavsiye") ||
-                           q.Contains("nasıl") ||
-                           q.Contains("iyileştir") ||
+                           q.Contains("nasil") ||
+                           q.Contains("iyilestir") ||
                            q.Contains("yorumla") ||
-                           q.Contains("değerlendir") ||
+                           q.Contains("degerlendir") ||
                            q.Contains("strateji") ||
-                           q.Contains("yol haritası") ||
+                           q.Contains("yol haritasi") ||
+                           q.Contains("risk") ||
                            q.Contains("potansiyel");
 
-        if (q.Contains("portföy") || q.Contains("varlık"))
+        if (q.Contains("portfoy") || q.Contains("varlik"))
         {
             return isAnalytical ? AIIntentType.AnalysisPortfolio : AIIntentType.FactPortfolio;
+        }
+
+        if (q.Contains("butce"))
+        {
+            return isAnalytical ? AIIntentType.RecommendationSavings : AIIntentType.AnalysisSpending;
         }
 
         if (q.Contains("abonelik") || q.Contains("sabit gider"))
@@ -34,7 +40,7 @@ public class AIIntentClassifier : IAIIntentClassifier
             return isAnalytical ? AIIntentType.AnalysisSpending : AIIntentType.FactSubscriptions;
         }
 
-        if (q.Contains("sağlık") || q.Contains("skor") || q.Contains("puan"))
+        if (q.Contains("saglik") || q.Contains("skor") || q.Contains("puan") || q.Contains("risk"))
         {
             return isAnalytical ? AIIntentType.GeneralAdvisory : AIIntentType.FactHealthScore;
         }
@@ -49,16 +55,24 @@ public class AIIntentClassifier : IAIIntentClassifier
             return isAnalytical ? AIIntentType.AnalysisSpending : AIIntentType.FactExpense;
         }
 
-        if (q.Contains("gelir") || q.Contains("kazanç") || q.Contains("maaş"))
+        if (q.Contains("gelir") || q.Contains("kazanc") || q.Contains("maas"))
         {
             return isAnalytical ? AIIntentType.AnalysisSpending : AIIntentType.FactIncome;
         }
 
-        if (isAnalytical)
-        {
-            return AIIntentType.GeneralAdvisory;
-        }
-
         return AIIntentType.GeneralAdvisory;
+    }
+
+    private static string Normalize(string input)
+    {
+        return input.ToLowerInvariant()
+            .Replace("ö", "o")
+            .Replace("ü", "u")
+            .Replace("ş", "s")
+            .Replace("ç", "c")
+            .Replace("ı", "i")
+            .Replace("ğ", "g")
+            .Replace("İ", "i")
+            .Trim();
     }
 }

@@ -132,6 +132,11 @@ public class FinancialEngineService : IFinancialEngineService
             _ => "Critical"
         };
 
+        var topCat = categoryExpenses.OrderByDescending(c => c.Amount).FirstOrDefault();
+        var largestCategory = topCat?.Category ?? "Yok";
+        var largestCategoryAmount = topCat?.Amount ?? 0m;
+        var overBudgetCount = categoryExpenses.Count(c => c.Limit > 0 && c.Amount > c.Limit);
+
         var dto = new FinancialCoreMetricsDto
         {
             TotalBalance = totalBalance,
@@ -147,6 +152,9 @@ public class FinancialEngineService : IFinancialEngineService
             ActiveSubscriptionCount = activeSubCount,
             FinancialHealthScore = totalHealthScore,
             RiskLevel = riskLevel,
+            LargestSpendingCategory = largestCategory,
+            LargestSpendingAmount = largestCategoryAmount,
+            OverBudgetCategoryCount = overBudgetCount,
             CashFlowHistory = cashFlowHistory,
             CategoryExpenses = categoryExpenses,
             CalculatedAt = DateTime.UtcNow

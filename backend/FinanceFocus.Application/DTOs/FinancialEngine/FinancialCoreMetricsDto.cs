@@ -33,6 +33,9 @@ public class FinancialCoreMetricsDto
     public int ActiveSubscriptionCount { get; set; }
     public int FinancialHealthScore { get; set; }
     public string RiskLevel { get; set; } = "Moderate";
+    public string LargestSpendingCategory { get; set; } = "Yok";
+    public decimal LargestSpendingAmount { get; set; }
+    public int OverBudgetCategoryCount { get; set; }
     public List<CashFlowMonthDto> CashFlowHistory { get; set; } = new List<CashFlowMonthDto>();
     public List<CategorySpendingDto> CategoryExpenses { get; set; } = new List<CategorySpendingDto>();
     public DateTime CalculatedAt { get; set; } = DateTime.UtcNow;
