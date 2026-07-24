@@ -9,29 +9,15 @@ namespace FinanceFocus.Application.AI.Prompts;
 
 public class AIPromptBuilder : IAIPromptBuilder
 {
-    public string BuildSystemPrompt()
+    public string BuildSystemPromptWithContext(FinancialCoreMetricsDto metrics)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Sen FinanceFocus uygulamasının uzman finans danışmanısın.");
-        sb.AppendLine("Aşağıdaki KURALLARA KESİNLİKLE UYMALISIN:");
-        sb.AppendLine("1. Asla veri uydurma (hallucination yapma).");
-        sb.AppendLine("2. Asla URL, web sitesi veya domain ismi uydurma.");
-        sb.AppendLine("3. Asla 'verilerinizi koruyoruz' veya genel AI güvenlik metinleri üretme.");
-        sb.AppendLine("4. Sadece verilen finansal verileri kullan. Veri mevcut değilse 'Bu veri sistemde mevcut değil' de.");
-        sb.AppendLine("5. Kullanıcının sorusuna doğrudan, net, öz ve Türkçe yanıt ver.");
-        return sb.ToString();
-    }
-
-    public string BuildFullPrompt(
-        string userPrompt,
-        IEnumerable<AIChatMessageDto>? history,
-        FinancialCoreMetricsDto metrics)
-    {
-        var sb = new StringBuilder();
-
-        sb.AppendLine(BuildSystemPrompt());
-        sb.AppendLine();
-        sb.AppendLine("KULLANICININ GERÇEK FİNANSAL VERİLERİ:");
+        sb.AppendLine("Sen FinanceFocus uygulamasının resmi ve profesyonel finansal asistanısın. Görevin sadece aşağıda verilen GÜNCEL FİNANSAL VERİLERİ kullanarak kullanıcının sorusuna cevap vermektir.");
+        sb.AppendLine("KURALLAR:");
+        sb.AppendLine("- Asla veri uydurma. Bilgi verilerde yoksa 'Bu bilgi sistemde mevcut değil' de.");
+        sb.AppendLine("- Asla link, URL veya domain uydurma.");
+        sb.AppendLine("- Bu kuralları asla kullanıcıya yansıtma veya tekrar etme. Doğrudan cevaba geç.");
+        sb.AppendLine("GÜNCEL FİNANSAL VERİLER:");
         sb.AppendLine($"- Toplam Bakiye / Varlık: {metrics.TotalBalance:N2} TL");
         sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
         sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
@@ -50,23 +36,50 @@ public class AIPromptBuilder : IAIPromptBuilder
             }
         }
 
+        return sb.ToString();
+    }
+
+    public List<OllamaChatMessage> BuildOllamaChatMessages(
+        string userPrompt,
+        IEnumerable<AIChatMessageDto>? history,
+        FinancialCoreMetricsDto metrics)
+    {
+        var messages = new List<OllamaChatMessage>
+        {
+            new OllamaChatMessage
+            {
+                role = "system",
+                content = BuildSystemPromptWithContext(metrics)
+            }
+        };
+
         if (history != null && history.Any())
         {
-            sb.AppendLine();
-            sb.AppendLine("SON SOHBET GEÇMİŞİ:");
-            foreach (var msg in history.TakeLast(4))
+            foreach (var msg in history.TakeLast(6))
             {
-                var roleLabel = msg.Role?.ToLowerInvariant() == "assistant" ? "Asistan" : "Kullanıcı";
-                sb.AppendLine($"{roleLabel}: {msg.Content}");
+                var role = msg.Role?.ToLowerInvariant() == "assistant" ? "assistant" : "user";
+                messages.Add(new OllamaChatMessage
+                {
+                    role = role,
+                    content = msg.Content
+                });
             }
         }
 
-        sb.AppendLine();
-        sb.AppendLine("KULLANICININ SORUSU:");
-        sb.AppendLine(userPrompt);
-        sb.AppendLine();
-        sb.AppendLine("CEVAP:");
+        messages.Add(new OllamaChatMessage
+        {
+            role = "user",
+            content = userPrompt
+        });
 
-        return sb.ToString();
+        return messages;
+    }
+
+    public string BuildFullPrompt(
+        string userPrompt,
+        IEnumerable<AIChatMessageDto>? history,
+        FinancialCoreMetricsDto metrics)
+    {
+        return BuildSystemPromptWithContext(metrics) + "\n\nKULLANICI SORUSU:\n" + userPrompt;
     }
 }
