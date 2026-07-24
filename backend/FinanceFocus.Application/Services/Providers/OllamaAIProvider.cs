@@ -55,15 +55,32 @@ public class OllamaAIProvider : IAIProvider
         var requestUrl = $"{baseUrl}/api/generate";
         var resolvedModel = await ResolveModelNameAsync(baseUrl);
 
+        _logger.LogInformation("========== FINANCIAL ENGINE METRICS ==========");
+        _logger.LogInformation("Monthly Income: {Income}", metrics.MonthlyIncome);
+        _logger.LogInformation("Monthly Expense: {Expense}", metrics.MonthlyExpense);
+        _logger.LogInformation("Net Savings: {Savings}", metrics.NetSavings);
+        _logger.LogInformation("Savings Rate: {Rate}%", metrics.SavingsRate);
+        _logger.LogInformation("Health Score: {Score}", metrics.FinancialHealthScore);
+        _logger.LogInformation("Portfolio Value: {Port}", metrics.TotalPortfolioValue);
+        _logger.LogInformation("Subscriptions: {Subs}", metrics.TotalMonthlySubscriptionCost);
+
+        _logger.LogInformation("========== FINAL PROMPT ==========\n{Prompt}\n=================================", fullPrompt);
+
         var payload = new
         {
             model = resolvedModel,
             prompt = fullPrompt,
-            stream = false
+            stream = false,
+            options = new
+            {
+                temperature = 0.0,
+                top_p = 0.1,
+                num_predict = 512
+            }
         };
 
-        var jsonPayload = JsonSerializer.Serialize(payload);
-        _logger.LogInformation("[OllamaAIProvider] Target URL: {Url}, Model: {Model}, BodyLength: {Length}", requestUrl, resolvedModel, jsonPayload.Length);
+        var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true });
+        _logger.LogInformation("[OllamaAIProvider] FULL REQUEST JSON:\n{Json}", jsonPayload);
 
         var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
@@ -73,7 +90,8 @@ public class OllamaAIProvider : IAIProvider
             var response = await _httpClient.PostAsync(requestUrl, content, cts.Token);
             var rawResponseBody = await response.Content.ReadAsStringAsync();
 
-            _logger.LogInformation("[OllamaAIProvider] Response Status: {Status}, BodySnippet: {Body}", response.StatusCode, rawResponseBody.Length > 200 ? rawResponseBody.Substring(0, 200) : rawResponseBody);
+            _logger.LogInformation("[OllamaAIProvider] HTTP Response Status: {Status}", response.StatusCode);
+            _logger.LogInformation("[OllamaAIProvider] RAW OLLAMA RESPONSE BODY:\n{Body}", rawResponseBody);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -87,7 +105,7 @@ public class OllamaAIProvider : IAIProvider
 
             return new AIChatResponseDto
             {
-                Answer = answerText,
+                Answer = answerText.Trim(),
                 Category = "Yerel LLM Finansal Danışmanlık",
                 ProviderUsed = $"Ollama ({resolvedModel})",
                 RespondedAt = DateTime.UtcNow
@@ -117,15 +135,23 @@ public class OllamaAIProvider : IAIProvider
         var requestUrl = $"{baseUrl}/api/generate";
         var resolvedModel = await ResolveModelNameAsync(baseUrl);
 
+        _logger.LogInformation("========== FINAL PROMPT (STREAM) ==========\n{Prompt}\n=================================", fullPrompt);
+
         var payload = new
         {
             model = resolvedModel,
             prompt = fullPrompt,
-            stream = true
+            stream = true,
+            options = new
+            {
+                temperature = 0.0,
+                top_p = 0.1,
+                num_predict = 512
+            }
         };
 
-        var jsonPayload = JsonSerializer.Serialize(payload);
-        _logger.LogInformation("[OllamaAIProvider Stream] Target URL: {Url}, Model: {Model}", requestUrl, resolvedModel);
+        var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true });
+        _logger.LogInformation("[OllamaAIProvider Stream] FULL REQUEST JSON:\n{Json}", jsonPayload);
 
         var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
         {
