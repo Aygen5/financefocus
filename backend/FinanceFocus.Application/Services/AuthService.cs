@@ -4,6 +4,7 @@ using FinanceFocus.Application.Common;
 using FinanceFocus.Application.DTOs.Auth;
 using FinanceFocus.Application.Interfaces;
 using FinanceFocus.Domain.Entities;
+using FinanceFocus.Domain.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 
 namespace FinanceFocus.Application.Services;
@@ -12,11 +13,19 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IOnboardingService _onboardingService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AuthService(UserManager<AppUser> userManager, IJwtTokenGenerator jwtTokenGenerator)
+    public AuthService(
+        UserManager<AppUser> userManager,
+        IJwtTokenGenerator jwtTokenGenerator,
+        IOnboardingService onboardingService,
+        IUnitOfWork unitOfWork)
     {
         _userManager = userManager;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _onboardingService = onboardingService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<AuthResponseDto>> RegisterAsync(RegisterDto dto)
@@ -43,6 +52,8 @@ public class AuthService : IAuthService
             return Result<AuthResponseDto>.Failure("Kayıt işlemi başarısız.", errors);
         }
 
+        await _onboardingService.SeedDemoDataAsync(user.Id);
+
         var token = _jwtTokenGenerator.GenerateToken(user);
         var userDto = MapToUserDto(user);
 
@@ -67,6 +78,12 @@ public class AuthService : IAuthService
         if (!isPasswordValid)
         {
             return Result<AuthResponseDto>.Failure("Geçersiz e-posta veya şifre.");
+        }
+
+        var userTransactions = await _unitOfWork.Transactions.GetByUserIdAsync(user.Id);
+        if (!userTransactions.Any())
+        {
+            await _onboardingService.SeedDemoDataAsync(user.Id);
         }
 
         var token = _jwtTokenGenerator.GenerateToken(user);
