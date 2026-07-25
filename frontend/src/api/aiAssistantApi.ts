@@ -70,12 +70,17 @@ export const aiAssistantApi = {
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
+    let buffer = "";
 
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
-      const text = decoder.decode(value, { stream: true });
-      const lines = text.split("\n");
+      if (done) {
+        buffer += decoder.decode();
+        break;
+      }
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
       for (const line of lines) {
         if (line.startsWith("data: ")) {
           const chunk = line.slice(6);
@@ -85,6 +90,10 @@ export const aiAssistantApi = {
           if (errLine) throw new Error(errLine.slice(6));
         }
       }
+    }
+    if (buffer.startsWith("data: ")) {
+      const chunk = buffer.slice(6);
+      if (chunk) onChunk(chunk);
     }
   },
 };

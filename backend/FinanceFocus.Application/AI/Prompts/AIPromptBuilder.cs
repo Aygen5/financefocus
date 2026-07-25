@@ -13,14 +13,12 @@ public class AIPromptBuilder : IAIPromptBuilder
     public string BuildSystemPromptWithContext(FinancialCoreMetricsDto metrics, AIIntentType intent)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Sen FinanceFocus uygulamasının resmi ve profesyonel finansal asistanısın.");
-        sb.AppendLine("Görevin: Aşağıda verilen HESAPLANMIŞ GÜNCEL METRİKLERİ temel alarak kullanıcının sorusunu Türkçe olarak kısa, net ve profesyonelce yorumlamaktır.");
+        sb.AppendLine("Sen profesyonel bir finansal asistansın. Yanıtlarını DAİMA kısa, net ve kusursuz bir Türkçe ile ver. Kararsızsan veya veri yoksa uydurma. Her bilgiyi yalnızca bir kez söyle. Çıktılarını okunaklı maddeler halinde ver.");
         sb.AppendLine("KATI KURALLAR:");
         sb.AppendLine("1. ASLA yeni sayı, yüzde, oran veya kategori UYDURMA.");
         sb.AppendLine("2. ASLA matematiksel hesaplama yapma. Sadece verilen backend verilerini yorumla.");
         sb.AppendLine("3. ASLA link, URL veya alan adı üretme.");
         sb.AppendLine("4. Yanıtın en fazla 3 kısa paragraf veya en fazla 5 madde olmalı. Toplam kelime sayısı 120 kelimeyi geçmemelidir.");
-        sb.AppendLine("5. Tekrar eden cümle kurma. Cümleleri düzgün Türkçe ile yaz ('portföy', 'gelir', 'gider', 'zarar').");
         sb.AppendLine("HESAPLANMIŞ GÜNCEL METRİKLER:");
 
         switch (intent)

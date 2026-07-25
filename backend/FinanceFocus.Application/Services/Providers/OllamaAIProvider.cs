@@ -64,11 +64,11 @@ public class OllamaAIProvider : IAIProvider
             stream = false,
             options = new
             {
-                temperature = 0.0,
-                top_p = 0.1,
+                temperature = 0.1,
+                top_p = 0.85,
                 top_k = 20,
-                repeat_penalty = 1.2,
-                num_predict = 350
+                repeat_penalty = 1.15,
+                num_predict = 1024
             }
         };
 
@@ -144,11 +144,11 @@ public class OllamaAIProvider : IAIProvider
             stream = true,
             options = new
             {
-                temperature = 0.0,
-                top_p = 0.1,
+                temperature = 0.1,
+                top_p = 0.85,
                 top_k = 20,
-                repeat_penalty = 1.2,
-                num_predict = 350
+                repeat_penalty = 1.15,
+                num_predict = 1024
             }
         };
 

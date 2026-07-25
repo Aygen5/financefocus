@@ -110,15 +110,21 @@ public class AIAssistantService : IAIAssistantService
                 return true;
 
             case AIIntentType.ExpenseComparisonQuestion:
-                factResponse = $"Aylık geliriniz ({metrics.MonthlyIncome:N0} TL), aylık giderinizin ({metrics.MonthlyExpense:N0} TL) **{metrics.IncomeToExpenseRatio:N1} katıdır**.";
+                var isHigher = metrics.MonthlyIncome >= metrics.MonthlyExpense;
+                var compPrefix = isHigher ? "Evet, geliriniz giderinizden" : "Hayır, geliriniz giderinizden azdır ve";
+                factResponse = $"{compPrefix} yaklaşık **{metrics.IncomeToExpenseRatio:N1} kat** daha fazladır (Gelir: {metrics.MonthlyIncome:N0} TL, Gider: {metrics.MonthlyExpense:N0} TL).";
                 return true;
 
             case AIIntentType.SavingsRateQuestion:
-                factResponse = $"Aylık tasarruf oranınız **%{metrics.SavingsRate:N0}** seviyesindedir (Finansal standartlarda %20 ve üzeri mükemmel kabul edilir).";
+                var isGood = metrics.SavingsRate >= 20m;
+                var evalText = isGood ? "mükemmel bir seviyededir" : "geliştirilmeye açık bir seviyededir";
+                factResponse = $"Evet, %{metrics.SavingsRate:N0} tasarruf oranınız {evalText} (Finansal standartlarda %20 ve üzeri başarılı kabul edilir).";
                 return true;
 
             case AIIntentType.LargestExpenseQuestion:
-                factResponse = $"Bu ay en çok harcama yaptığınız kategori **{metrics.LargestSpendingCategory}** kategorisidir (Harcama Tutarı: **{metrics.LargestSpendingAmount:N2} TL**).";
+                var hasOverBudget = metrics.OverBudgetCategoryCount > 0;
+                var overText = hasOverBudget ? "Evet, bütçe aşımınız bulunmaktadır." : "Hayır, bütçenizi aşmadınız.";
+                factResponse = $"{overText} Bu ay en yüksek harcamanız **{metrics.LargestSpendingCategory}** kategorisindedir (Harcama Tutarı: **{metrics.LargestSpendingAmount:N2} TL**).";
                 return true;
 
             case AIIntentType.SubscriptionQuestion:
@@ -134,7 +140,7 @@ public class AIAssistantService : IAIAssistantService
                 return true;
 
             case AIIntentType.GeneralConversation:
-                factResponse = "Merhaba! Ben FinanceFocus Akıllı Finansal Asistanıyım. Geliriniz, giderleriniz, tasarruflarınız veya portföyünüz hakkında size nasıl yardımcı olabilirim?";
+                factResponse = "Ben FinanceFocus finansal asistanıyım. Sadece gelir, gider, bütçe, tasarruf ve portföy gibi finansal konularınızda yardımcı olabilirim.";
                 return true;
 
             default:
