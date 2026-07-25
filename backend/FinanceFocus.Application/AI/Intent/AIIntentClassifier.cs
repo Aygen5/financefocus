@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace FinanceFocus.Application.AI.Intent;
 
@@ -13,29 +14,42 @@ public class AIIntentClassifier : IAIIntentClassifier
 
         var q = Normalize(prompt);
 
+        if (q.Contains("abone") && (q.Contains("pahal") || q.Contains("yuksek") || q.Contains("en") || q.Contains("fazla")))
+        {
+            return AIIntentType.FactTopSubscription;
+        }
+
+        if ((q.Contains("kategori") || q.Contains("harca") || q.Contains("gider")) && (q.Contains("en") || q.Contains("fazla") || q.Contains("yuksek") || q.Contains("cok")))
+        {
+            if (!q.Contains("analiz") && !q.Contains("yorum") && !q.Contains("oner"))
+            {
+                return AIIntentType.FactTopCategory;
+            }
+        }
+
         bool isAnalytical = q.Contains("analiz") ||
                            q.Contains("oner") ||
                            q.Contains("tavsiye") ||
                            q.Contains("nasil") ||
                            q.Contains("iyilestir") ||
                            q.Contains("yorumla") ||
-                           q.Contains("degerlendir") ||
+                           q.Contains("degerlen") ||
                            q.Contains("strateji") ||
-                           q.Contains("yol haritasi") ||
+                           q.Contains("yol harita") ||
                            q.Contains("risk") ||
                            q.Contains("potansiyel");
 
-        if (q.Contains("portfoy") || q.Contains("varlik"))
+        if (q.Contains("portf") || q.Contains("varlik"))
         {
             return isAnalytical ? AIIntentType.AnalysisPortfolio : AIIntentType.FactPortfolio;
         }
 
-        if (q.Contains("butce"))
+        if (q.Contains("butc"))
         {
             return isAnalytical ? AIIntentType.RecommendationSavings : AIIntentType.AnalysisSpending;
         }
 
-        if (q.Contains("abonelik") || q.Contains("sabit gider"))
+        if (q.Contains("abone") || q.Contains("sabit gider"))
         {
             return isAnalytical ? AIIntentType.AnalysisSpending : AIIntentType.FactSubscriptions;
         }
@@ -45,12 +59,12 @@ public class AIIntentClassifier : IAIIntentClassifier
             return isAnalytical ? AIIntentType.GeneralAdvisory : AIIntentType.FactHealthScore;
         }
 
-        if (q.Contains("tasarruf"))
+        if (q.Contains("tasarr"))
         {
             return isAnalytical ? AIIntentType.RecommendationSavings : AIIntentType.FactSavings;
         }
 
-        if (q.Contains("gider") || q.Contains("harcama") || q.Contains("masraf"))
+        if (q.Contains("gider") || q.Contains("harca") || q.Contains("masraf"))
         {
             return isAnalytical ? AIIntentType.AnalysisSpending : AIIntentType.FactExpense;
         }
@@ -65,14 +79,27 @@ public class AIIntentClassifier : IAIIntentClassifier
 
     private static string Normalize(string input)
     {
-        return input.ToLowerInvariant()
-            .Replace("ö", "o")
-            .Replace("ü", "u")
-            .Replace("ş", "s")
-            .Replace("ç", "c")
-            .Replace("ı", "i")
-            .Replace("ğ", "g")
-            .Replace("İ", "i")
-            .Trim();
+        var lower = input.ToLowerInvariant();
+        var sb = new System.Text.StringBuilder();
+        foreach (char c in lower)
+        {
+            switch (c)
+            {
+                case 'ö': sb.Append('o'); break;
+                case 'ü': sb.Append('u'); break;
+                case 'ş': sb.Append('s'); break;
+                case 'ç': sb.Append('c'); break;
+                case 'ı': sb.Append('i'); break;
+                case 'ğ': sb.Append('g'); break;
+                case 'İ': sb.Append('i'); break;
+                default:
+                    if (c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == ' ')
+                        sb.Append(c);
+                    else
+                        sb.Append(' ');
+                    break;
+            }
+        }
+        return sb.ToString().Trim();
     }
 }

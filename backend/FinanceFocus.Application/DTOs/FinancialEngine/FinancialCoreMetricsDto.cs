@@ -31,6 +31,8 @@ public class FinancialCoreMetricsDto
     public double TotalPortfolioProfitLossPercentage { get; set; }
     public decimal TotalMonthlySubscriptionCost { get; set; }
     public int ActiveSubscriptionCount { get; set; }
+    public string MostExpensiveSubscriptionName { get; set; } = "Yok";
+    public decimal MostExpensiveSubscriptionPrice { get; set; }
     public int FinancialHealthScore { get; set; }
     public string RiskLevel { get; set; } = "Moderate";
     public string LargestSpendingCategory { get; set; } = "Yok";

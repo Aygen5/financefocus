@@ -8,6 +8,8 @@ public enum AIIntentType
     FactPortfolio,
     FactSubscriptions,
     FactHealthScore,
+    FactTopCategory,
+    FactTopSubscription,
     AnalysisSpending,
     AnalysisPortfolio,
     RecommendationSavings,

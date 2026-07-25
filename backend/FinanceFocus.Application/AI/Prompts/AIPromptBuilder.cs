@@ -14,14 +14,14 @@ public class AIPromptBuilder : IAIPromptBuilder
     {
         var sb = new StringBuilder();
         sb.AppendLine("Sen FinanceFocus uygulamasının resmi ve profesyonel finansal asistanısın.");
-        sb.AppendLine("Görevin: Aşağıda backend tarafından hesaplanmış GÜNCEL METRİKLERİ temel alarak kullanıcının sorusunu Türkçe olarak 2-3 kısa, net cümle ile profesyonelce yanıtlamak ve değerlendirmektir.");
+        sb.AppendLine("Görevin: Aşağıda verilen HESAPLANMIŞ GÜNCEL METRİKLERİ temel alarak kullanıcının sorusunu Türkçe olarak kısa, net ve profesyonelce yorumlamaktır.");
         sb.AppendLine("KATI KURALLAR:");
         sb.AppendLine("1. ASLA yeni sayı, yüzde, oran veya kategori UYDURMA.");
         sb.AppendLine("2. ASLA matematiksel hesaplama yapma. Sadece verilen backend verilerini yorumla.");
         sb.AppendLine("3. ASLA link, URL veya alan adı üretme.");
-        sb.AppendLine("4. Tüm finansal terimleri doğru Türkçe grameri ile yaz ('portföy', 'gelir', 'gider', 'zarar').");
-        sb.AppendLine("5. Yorumunu tamamla ve cümleni yarım bırakma.");
-        sb.AppendLine("HESAPLANMIŞ GÜNCEL FİNANSAL METRİKLER:");
+        sb.AppendLine("4. Yanıtın en fazla 3 kısa paragraf veya en fazla 5 madde olmalı. Toplam kelime sayısı 120 kelimeyi geçmemelidir.");
+        sb.AppendLine("5. Tekrar eden cümle kurma. Cümleleri düzgün Türkçe ile yaz ('portföy', 'gelir', 'gider', 'zarar').");
+        sb.AppendLine("HESAPLANMIŞ GÜNCEL METRİKLER:");
 
         switch (intent)
         {
@@ -32,12 +32,8 @@ public class AIPromptBuilder : IAIPromptBuilder
                 break;
 
             case AIIntentType.AnalysisSpending:
-            case AIIntentType.FactSubscriptions:
-                sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
-                sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
                 sb.AppendLine($"- En Çok Harcanan Kategori: {metrics.LargestSpendingCategory} ({metrics.LargestSpendingAmount:N2} TL)");
                 sb.AppendLine($"- Bütçe Aşımı Olan Kategori Sayısı: {metrics.OverBudgetCategoryCount}");
-                sb.AppendLine($"- Toplam Aylık Abonelik Gideri: {metrics.TotalMonthlySubscriptionCost:N2} TL ({metrics.ActiveSubscriptionCount} Adet Aktif)");
                 if (metrics.CategoryExpenses.Any())
                 {
                     sb.AppendLine("- Kategori Harcama Dağılımı:");
@@ -53,14 +49,11 @@ public class AIPromptBuilder : IAIPromptBuilder
                 sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
                 sb.AppendLine($"- Net Aylık Tasarruf: {metrics.NetSavings:N2} TL");
                 sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
-                sb.AppendLine($"- Toplam Aylık Abonelik Gideri: {metrics.TotalMonthlySubscriptionCost:N2} TL ({metrics.ActiveSubscriptionCount} Adet)");
                 break;
 
             default:
                 sb.AppendLine($"- Finansal Sağlık Skoru: {metrics.FinancialHealthScore}/100");
                 sb.AppendLine($"- Backend Risk Seviyesi: {metrics.RiskLevel}");
-                sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
-                sb.AppendLine($"- Bütçe Aşımı Olan Kategori Sayısı: {metrics.OverBudgetCategoryCount}");
                 break;
         }
 

@@ -137,6 +137,10 @@ public class FinancialEngineService : IFinancialEngineService
         var largestCategoryAmount = topCat?.Amount ?? 0m;
         var overBudgetCount = categoryExpenses.Count(c => c.Limit > 0 && c.Amount > c.Limit);
 
+        var topSub = subscriptions.Where(s => s.IsActive).OrderByDescending(s => s.Price).FirstOrDefault();
+        var topSubName = topSub?.Name ?? "Yok";
+        var topSubPrice = topSub?.Price ?? 0m;
+
         var dto = new FinancialCoreMetricsDto
         {
             TotalBalance = totalBalance,
@@ -150,6 +154,8 @@ public class FinancialEngineService : IFinancialEngineService
             TotalPortfolioProfitLossPercentage = portProfitLossPct,
             TotalMonthlySubscriptionCost = subTotalCost,
             ActiveSubscriptionCount = activeSubCount,
+            MostExpensiveSubscriptionName = topSubName,
+            MostExpensiveSubscriptionPrice = topSubPrice,
             FinancialHealthScore = totalHealthScore,
             RiskLevel = riskLevel,
             LargestSpendingCategory = largestCategory,

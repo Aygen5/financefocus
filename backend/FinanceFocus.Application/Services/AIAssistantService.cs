@@ -99,6 +99,14 @@ public class AIAssistantService : IAIAssistantService
                 factResponse = $"Toplam aylık abonelik gideriniz **{metrics.TotalMonthlySubscriptionCost:N2} TL**'dir ({metrics.ActiveSubscriptionCount} adet aktif abonelik).";
                 return true;
 
+            case AIIntentType.FactTopCategory:
+                factResponse = $"Bu ay en çok harcama yaptığınız kategori **{metrics.LargestSpendingCategory}** kategorisidir (Harcama Tutarı: **{metrics.LargestSpendingAmount:N2} TL**).";
+                return true;
+
+            case AIIntentType.FactTopSubscription:
+                factResponse = $"En yüksek tutarlı aktif aboneliğiniz **{metrics.MostExpensiveSubscriptionName}** aboneliğidir (Aylık Tutarı: **{metrics.MostExpensiveSubscriptionPrice:N2} TL**).";
+                return true;
+
             case AIIntentType.FactHealthScore:
                 factResponse = $"Finansal sağlık skorunuz 100 üzerinden **{metrics.FinancialHealthScore}**'dir (Risk Seviyesi: {metrics.RiskLevel}).";
                 return true;
