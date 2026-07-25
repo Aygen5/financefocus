@@ -8,7 +8,7 @@ import { loginSchema } from "@/features/auth/auth.types";
 import type { LoginFormData } from "@/features/auth/auth.types";
 import { addActivityLog } from "@/features/activity/activitySlice";
 import { addNotification } from "@/features/notifications/notificationsSlice";
-import { Mail, Lock, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, Loader2, ArrowLeft, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 import z from "zod";
 
@@ -26,6 +26,7 @@ const Login: React.FC = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isForgotSuccess, setIsForgotSuccess] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -254,15 +255,23 @@ const Login: React.FC = () => {
               </div>
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                className={`block w-full pl-10 pr-3 py-2 border rounded-xl font-body-md text-body-md text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 transition-all ${
+                className={`block w-full pl-10 pr-10 py-2 border rounded-xl font-body-md text-body-md text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 transition-all ${
                   errors.password
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                     : "border-slate-250 dark:border-slate-800 focus:border-primary focus:ring-primary/20"
                 }`}
                 {...register("password")}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                aria-label={showPassword ? "Şifreyi Gizle" : "Şifreyi Göster"}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
             {errors.password && (
               <span className="text-[11px] font-bold text-red-500 mt-1 block">

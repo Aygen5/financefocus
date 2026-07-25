@@ -21,12 +21,12 @@ export const applyTheme = (mode: ThemeMode) => {
 };
 
 const getSavedTheme = (): ThemeMode => {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") return "dark";
   const saved = localStorage.getItem("theme_mode") as ThemeMode;
   if (saved === "light" || saved === "dark" || saved === "system") {
     return saved;
   }
-  return "system";
+  return "dark";
 };
 
 const initialMode = getSavedTheme();

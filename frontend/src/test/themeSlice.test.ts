@@ -4,7 +4,7 @@ import type { ThemeState } from "../store/themeSlice";
 
 describe("themeSlice Redux Tests", () => {
   const initialState: ThemeState = {
-    mode: "system",
+    mode: "dark",
   };
 
   beforeEach(() => {
@@ -13,7 +13,7 @@ describe("themeSlice Redux Tests", () => {
 
   it("should return the initial state", () => {
     expect(themeReducer(undefined, { type: "unknown" })).toEqual({
-      mode: "system",
+      mode: "dark",
     });
   });
 
