@@ -4,12 +4,14 @@ import { Provider } from "react-redux";
 import { store, useAppSelector } from "@/store";
 import { router } from "@/routes";
 import { Toaster } from "react-hot-toast";
+import { applyTheme } from "@/store/themeSlice";
+import { useIdleTimeout } from "@/hooks/useIdleTimeout";
 import "./App.css";
 
-import { applyTheme } from "@/store/themeSlice";
-
-const ThemeInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AppInitializers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const themeMode = useAppSelector((state) => state.theme.mode);
+
+  useIdleTimeout();
 
   useEffect(() => {
     applyTheme(themeMode);
@@ -33,7 +35,7 @@ const ThemeInitializer: React.FC<{ children: React.ReactNode }> = ({ children })
 function App() {
   return (
     <Provider store={store}>
-      <ThemeInitializer>
+      <AppInitializers>
         <RouterProvider router={router} />
         <Toaster
           position="top-right"
@@ -46,7 +48,7 @@ function App() {
             },
           }}
         />
-      </ThemeInitializer>
+      </AppInitializers>
     </Provider>
   );
 }
