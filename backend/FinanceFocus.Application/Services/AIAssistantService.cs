@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FinanceFocus.Application.AI.Intent;
@@ -15,6 +16,21 @@ public class AIAssistantService : IAIAssistantService
     private readonly IFinancialEngineService _financialEngineService;
     private readonly IAIIntentClassifier _intentClassifier;
     private readonly IAIProvider _aiProvider;
+
+    private static readonly string[] LeakageKeywords = new[]
+    {
+        "asla yeni sayi",
+        "asla yeni sayı",
+        "backend",
+        "hesaplanmis guncel",
+        "hesaplanmış güncel",
+        "kurallar",
+        "system",
+        "prompt",
+        "verilen metrikler",
+        "guncel metrikler",
+        "güncel metrikler"
+    };
 
     public AIAssistantService(
         IFinancialEngineService financialEngineService,
@@ -50,6 +66,8 @@ public class AIAssistantService : IAIAssistantService
             request.History,
             metrics);
 
+        chatResponse.Answer = SanitizeAndValidateResponse(chatResponse.Answer, metrics);
+
         return Result<AIChatResponseDto>.Success(chatResponse);
     }
 
@@ -79,40 +97,70 @@ public class AIAssistantService : IAIAssistantService
         factResponse = string.Empty;
         switch (intent)
         {
-            case AIIntentType.FactIncome:
+            case AIIntentType.IncomeQuestion:
                 factResponse = $"Aylık geliriniz **{metrics.MonthlyIncome:N2} TL**'dir.";
                 return true;
 
-            case AIIntentType.FactExpense:
+            case AIIntentType.ExpenseQuestion:
                 factResponse = $"Aylık gideriniz **{metrics.MonthlyExpense:N2} TL**'dir.";
                 return true;
 
-            case AIIntentType.FactSavings:
-                factResponse = $"Net aylık tasarrufunuz **{metrics.NetSavings:N2} TL**'dir (Tasarruf Oranınız: **%{metrics.SavingsRate:N0}**).";
+            case AIIntentType.SavingsQuestion:
+                factResponse = $"Net aylık tasarrufunuz **{metrics.NetSavings:N2} TL**'dir.";
                 return true;
 
-            case AIIntentType.FactPortfolio:
-                factResponse = $"Toplam portföy değeriniz **{metrics.TotalPortfolioValue:N2} TL**'dir (Kâr/Zarar: **{metrics.TotalPortfolioProfitLoss:N2} TL**).";
+            case AIIntentType.ExpenseComparisonQuestion:
+                factResponse = $"Aylık geliriniz ({metrics.MonthlyIncome:N0} TL), aylık giderinizin ({metrics.MonthlyExpense:N0} TL) **{metrics.IncomeToExpenseRatio:N1} katıdır**.";
                 return true;
 
-            case AIIntentType.FactSubscriptions:
-                factResponse = $"Toplam aylık abonelik gideriniz **{metrics.TotalMonthlySubscriptionCost:N2} TL**'dir ({metrics.ActiveSubscriptionCount} adet aktif abonelik).";
+            case AIIntentType.SavingsRateQuestion:
+                factResponse = $"Aylık tasarruf oranınız **%{metrics.SavingsRate:N0}** seviyesindedir (Finansal standartlarda %20 ve üzeri mükemmel kabul edilir).";
                 return true;
 
-            case AIIntentType.FactTopCategory:
+            case AIIntentType.LargestExpenseQuestion:
                 factResponse = $"Bu ay en çok harcama yaptığınız kategori **{metrics.LargestSpendingCategory}** kategorisidir (Harcama Tutarı: **{metrics.LargestSpendingAmount:N2} TL**).";
                 return true;
 
-            case AIIntentType.FactTopSubscription:
+            case AIIntentType.SubscriptionQuestion:
                 factResponse = $"En yüksek tutarlı aktif aboneliğiniz **{metrics.MostExpensiveSubscriptionName}** aboneliğidir (Aylık Tutarı: **{metrics.MostExpensiveSubscriptionPrice:N2} TL**).";
                 return true;
 
-            case AIIntentType.FactHealthScore:
-                factResponse = $"Finansal sağlık skorunuz 100 üzerinden **{metrics.FinancialHealthScore}**'dir (Risk Seviyesi: {metrics.RiskLevel}).";
+            case AIIntentType.SubscriptionAnalysisQuestion:
+                factResponse = $"Toplam **{metrics.ActiveSubscriptionCount}** adet aktif aboneliğiniz bulunmakta olup aylık maliyeti **{metrics.TotalMonthlySubscriptionCost:N2} TL**'dir (Gelirinizin **%{metrics.SubscriptionToIncomePercentage:N1}**'i). En yüksek giderli aboneliğiniz **{metrics.MostExpensiveSubscriptionName}**'dir.";
+                return true;
+
+            case AIIntentType.PortfolioValueQuestion:
+                factResponse = $"Toplam portföy değeriniz **{metrics.TotalPortfolioValue:N2} TL**'dir (Yatırım Tutarı: **{metrics.TotalPortfolioInvestment:N2} TL**, Net Kâr: **{metrics.TotalPortfolioProfitLoss:N2} TL** / **%{metrics.TotalPortfolioProfitLossPercentage:N1}**).";
+                return true;
+
+            case AIIntentType.GeneralConversation:
+                factResponse = "Merhaba! Ben FinanceFocus Akıllı Finansal Asistanıyım. Geliriniz, giderleriniz, tasarruflarınız veya portföyünüz hakkında size nasıl yardımcı olabilirim?";
                 return true;
 
             default:
                 return false;
         }
+    }
+
+    private static string SanitizeAndValidateResponse(string rawAnswer, FinancialCoreMetricsDto metrics)
+    {
+        if (string.IsNullOrWhiteSpace(rawAnswer))
+        {
+            return $"Finansal sağlık skorunuz **{metrics.FinancialHealthScore}/100** ve risk seviyeniz **{metrics.RiskLevel}** olarak değerlendirilmiştir.";
+        }
+
+        var lower = rawAnswer.ToLowerInvariant();
+        if (LeakageKeywords.Any(k => lower.Contains(k)))
+        {
+            return $"Finansal özetiniz: Aylık Tasarruf Oranınız **%{metrics.SavingsRate:N0}**, Portföy Değeriniz **{metrics.TotalPortfolioValue:N2} TL** ve Finansal Sağlık Skorunuz **{metrics.FinancialHealthScore}/100**'dür.";
+        }
+
+        var lines = rawAnswer.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(l => l.Trim())
+            .Distinct()
+            .ToList();
+
+        var sanitized = string.Join("\n\n", lines);
+        return string.IsNullOrWhiteSpace(sanitized) ? rawAnswer : sanitized;
     }
 }

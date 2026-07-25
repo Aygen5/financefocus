@@ -25,11 +25,13 @@ public class FinancialCoreMetricsDto
     public decimal MonthlyExpense { get; set; }
     public decimal NetSavings { get; set; }
     public decimal SavingsRate { get; set; }
+    public decimal IncomeToExpenseRatio { get; set; }
     public decimal TotalPortfolioValue { get; set; }
     public decimal TotalPortfolioInvestment { get; set; }
     public decimal TotalPortfolioProfitLoss { get; set; }
     public double TotalPortfolioProfitLossPercentage { get; set; }
     public decimal TotalMonthlySubscriptionCost { get; set; }
+    public decimal SubscriptionToIncomePercentage { get; set; }
     public int ActiveSubscriptionCount { get; set; }
     public string MostExpensiveSubscriptionName { get; set; } = "Yok";
     public decimal MostExpensiveSubscriptionPrice { get; set; }

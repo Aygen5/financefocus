@@ -2,18 +2,19 @@ namespace FinanceFocus.Application.AI.Intent;
 
 public enum AIIntentType
 {
-    FactIncome,
-    FactExpense,
-    FactSavings,
-    FactPortfolio,
-    FactSubscriptions,
-    FactHealthScore,
-    FactTopCategory,
-    FactTopSubscription,
-    AnalysisSpending,
-    AnalysisPortfolio,
-    RecommendationSavings,
-    GeneralAdvisory
+    IncomeQuestion,
+    ExpenseQuestion,
+    SavingsQuestion,
+    SavingsRateQuestion,
+    ExpenseComparisonQuestion,
+    LargestExpenseQuestion,
+    PortfolioValueQuestion,
+    PortfolioAnalysisQuestion,
+    SubscriptionQuestion,
+    SubscriptionAnalysisQuestion,
+    RiskQuestion,
+    BudgetAdviceQuestion,
+    GeneralConversation
 }
 
 public interface IAIIntentClassifier

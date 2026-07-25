@@ -141,6 +141,9 @@ public class FinancialEngineService : IFinancialEngineService
         var topSubName = topSub?.Name ?? "Yok";
         var topSubPrice = topSub?.Price ?? 0m;
 
+        var incExpRatio = monthlyExpense > 0 ? Math.Round(monthlyIncome / monthlyExpense, 2) : (monthlyIncome > 0 ? 99m : 0m);
+        var subIncPct = monthlyIncome > 0 ? Math.Round((subTotalCost / monthlyIncome) * 100m, 1) : 0m;
+
         var dto = new FinancialCoreMetricsDto
         {
             TotalBalance = totalBalance,
@@ -148,11 +151,13 @@ public class FinancialEngineService : IFinancialEngineService
             MonthlyExpense = monthlyExpense,
             NetSavings = netSavings,
             SavingsRate = savingsRate,
+            IncomeToExpenseRatio = incExpRatio,
             TotalPortfolioValue = portValue,
             TotalPortfolioInvestment = portInvestment,
             TotalPortfolioProfitLoss = portProfitLoss,
             TotalPortfolioProfitLossPercentage = portProfitLossPct,
             TotalMonthlySubscriptionCost = subTotalCost,
+            SubscriptionToIncomePercentage = subIncPct,
             ActiveSubscriptionCount = activeSubCount,
             MostExpensiveSubscriptionName = topSubName,
             MostExpensiveSubscriptionPrice = topSubPrice,

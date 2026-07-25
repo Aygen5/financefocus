@@ -1,5 +1,4 @@
 using System;
-using System.Text.RegularExpressions;
 
 namespace FinanceFocus.Application.AI.Intent;
 
@@ -9,96 +8,106 @@ public class AIIntentClassifier : IAIIntentClassifier
     {
         if (string.IsNullOrWhiteSpace(prompt))
         {
-            return AIIntentType.GeneralAdvisory;
+            return AIIntentType.GeneralConversation;
         }
 
         var q = Normalize(prompt);
 
-        if (q.Contains("abone") && (q.Contains("pahal") || q.Contains("yuksek") || q.Contains("en") || q.Contains("fazla")))
+        if (q.Contains("merhaba") || q.Contains("selam") || q.Contains("hava nasil") || q.Contains("gunaydin") || q.Contains("iyi gunler"))
         {
-            return AIIntentType.FactTopSubscription;
+            return AIIntentType.GeneralConversation;
         }
 
-        if ((q.Contains("kategori") || q.Contains("harca") || q.Contains("gider")) && (q.Contains("en") || q.Contains("fazla") || q.Contains("yuksek") || q.Contains("cok")))
+        if (q.Contains("gelirim giderim") || (q.Contains("gelir") && q.Contains("gider") && (q.Contains("kati") || q.Contains("orani") || q.Contains("karsilastir"))))
+        {
+            return AIIntentType.ExpenseComparisonQuestion;
+        }
+
+        if (q.Contains("tasarruf oran") || (q.Contains("tasarruf") && (q.Contains("iyi mi") || q.Contains("nasil") || q.Contains("orani"))))
+        {
+            return AIIntentType.SavingsRateQuestion;
+        }
+
+        if (q.Contains("abone") && (q.Contains("azalt") || q.Contains("iptal") || q.Contains("fazla mi") || q.Contains("cok mu")))
+        {
+            return AIIntentType.SubscriptionAnalysisQuestion;
+        }
+
+        if (q.Contains("abone") && (q.Contains("pahal") || q.Contains("yuksek") || q.Contains("hangisi") || q.Contains("en")))
+        {
+            return AIIntentType.SubscriptionQuestion;
+        }
+
+        if ((q.Contains("kategori") || q.Contains("harcadim") || q.Contains("market") || q.Contains("gida") || q.Contains("gider")) && (q.Contains("en") || q.Contains("fazla") || q.Contains("yuksek") || q.Contains("cok")))
         {
             if (!q.Contains("analiz") && !q.Contains("yorum") && !q.Contains("oner"))
             {
-                return AIIntentType.FactTopCategory;
+                return AIIntentType.LargestExpenseQuestion;
             }
         }
 
-        bool isAnalytical = q.Contains("analiz") ||
-                           q.Contains("oner") ||
-                           q.Contains("tavsiye") ||
-                           q.Contains("nasil") ||
-                           q.Contains("iyilestir") ||
-                           q.Contains("yorumla") ||
-                           q.Contains("degerlen") ||
-                           q.Contains("strateji") ||
-                           q.Contains("yol harita") ||
-                           q.Contains("risk") ||
-                           q.Contains("potansiyel");
-
         if (q.Contains("portf") || q.Contains("varlik"))
         {
-            return isAnalytical ? AIIntentType.AnalysisPortfolio : AIIntentType.FactPortfolio;
+            if (q.Contains("yorum") || q.Contains("analiz") || q.Contains("degerlen") || q.Contains("nasil"))
+            {
+                return AIIntentType.PortfolioAnalysisQuestion;
+            }
+            return AIIntentType.PortfolioValueQuestion;
         }
 
-        if (q.Contains("butc"))
+        if (q.Contains("risk") || q.Contains("saglik") || q.Contains("skor"))
         {
-            return isAnalytical ? AIIntentType.RecommendationSavings : AIIntentType.AnalysisSpending;
-        }
-
-        if (q.Contains("abone") || q.Contains("sabit gider"))
-        {
-            return isAnalytical ? AIIntentType.AnalysisSpending : AIIntentType.FactSubscriptions;
-        }
-
-        if (q.Contains("saglik") || q.Contains("skor") || q.Contains("puan") || q.Contains("risk"))
-        {
-            return isAnalytical ? AIIntentType.GeneralAdvisory : AIIntentType.FactHealthScore;
+            return AIIntentType.RiskQuestion;
         }
 
         if (q.Contains("tasarr"))
         {
-            return isAnalytical ? AIIntentType.RecommendationSavings : AIIntentType.FactSavings;
+            if (q.Contains("net") || q.Contains("kac") || q.Contains("ne kadar"))
+            {
+                return AIIntentType.SavingsQuestion;
+            }
+            return AIIntentType.BudgetAdviceQuestion;
         }
 
-        if (q.Contains("gider") || q.Contains("harca") || q.Contains("masraf"))
+        if (q.Contains("gider") || q.Contains("harca"))
         {
-            return isAnalytical ? AIIntentType.AnalysisSpending : AIIntentType.FactExpense;
+            if (q.Contains("analiz") || q.Contains("yorum") || q.Contains("nasil") || q.Contains("tekrar"))
+            {
+                return AIIntentType.BudgetAdviceQuestion;
+            }
+            return AIIntentType.ExpenseQuestion;
         }
 
-        if (q.Contains("gelir") || q.Contains("kazanc") || q.Contains("maas"))
+        if (q.Contains("gelir"))
         {
-            return isAnalytical ? AIIntentType.AnalysisSpending : AIIntentType.FactIncome;
+            if (q.Contains("analiz") || q.Contains("yorum"))
+            {
+                return AIIntentType.BudgetAdviceQuestion;
+            }
+            return AIIntentType.IncomeQuestion;
         }
 
-        return AIIntentType.GeneralAdvisory;
+        if (q.Contains("analiz") || q.Contains("yorum") || q.Contains("oner") || q.Contains("iyilestir") || q.Contains("tekrar"))
+        {
+            return AIIntentType.BudgetAdviceQuestion;
+        }
+
+        return AIIntentType.GeneralConversation;
     }
 
     private static string Normalize(string input)
     {
-        var lower = input.ToLowerInvariant();
+        var raw = input.ToLowerInvariant()
+            .Replace("Ã¶", "o").Replace("Ã¼", "u").Replace("ÅŸ", "s").Replace("Ã§", "c").Replace("Ä±", "i").Replace("ÄŸ", "g")
+            .Replace("ö", "o").Replace("ü", "u").Replace("ş", "s").Replace("ç", "c").Replace("ı", "i").Replace("ğ", "g").Replace("i̇", "i");
+
         var sb = new System.Text.StringBuilder();
-        foreach (char c in lower)
+        foreach (char c in raw)
         {
-            switch (c)
-            {
-                case 'ö': sb.Append('o'); break;
-                case 'ü': sb.Append('u'); break;
-                case 'ş': sb.Append('s'); break;
-                case 'ç': sb.Append('c'); break;
-                case 'ı': sb.Append('i'); break;
-                case 'ğ': sb.Append('g'); break;
-                case 'İ': sb.Append('i'); break;
-                default:
-                    if (c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == ' ')
-                        sb.Append(c);
-                    else
-                        sb.Append(' ');
-                    break;
-            }
+            if (c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == ' ')
+                sb.Append(c);
+            else
+                sb.Append(' ');
         }
         return sb.ToString().Trim();
     }

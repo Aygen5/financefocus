@@ -25,13 +25,17 @@ public class AIPromptBuilder : IAIPromptBuilder
 
         switch (intent)
         {
-            case AIIntentType.AnalysisPortfolio:
+            case AIIntentType.PortfolioAnalysisQuestion:
                 sb.AppendLine($"- Portföy Toplam Değeri: {metrics.TotalPortfolioValue:N2} TL");
                 sb.AppendLine($"- Portföy Yatırım Tutarı: {metrics.TotalPortfolioInvestment:N2} TL");
                 sb.AppendLine($"- Portföy Net Kâr/Zarar: {metrics.TotalPortfolioProfitLoss:N2} TL (%{metrics.TotalPortfolioProfitLossPercentage:N1})");
                 break;
 
-            case AIIntentType.AnalysisSpending:
+            case AIIntentType.BudgetAdviceQuestion:
+                sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
+                sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
+                sb.AppendLine($"- Net Aylık Tasarruf: {metrics.NetSavings:N2} TL");
+                sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
                 sb.AppendLine($"- En Çok Harcanan Kategori: {metrics.LargestSpendingCategory} ({metrics.LargestSpendingAmount:N2} TL)");
                 sb.AppendLine($"- Bütçe Aşımı Olan Kategori Sayısı: {metrics.OverBudgetCategoryCount}");
                 if (metrics.CategoryExpenses.Any())
@@ -44,11 +48,17 @@ public class AIPromptBuilder : IAIPromptBuilder
                 }
                 break;
 
-            case AIIntentType.RecommendationSavings:
-                sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
-                sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
-                sb.AppendLine($"- Net Aylık Tasarruf: {metrics.NetSavings:N2} TL");
+            case AIIntentType.SubscriptionAnalysisQuestion:
+                sb.AppendLine($"- Toplam Aylık Abonelik Gideri: {metrics.TotalMonthlySubscriptionCost:N2} TL ({metrics.ActiveSubscriptionCount} Adet)");
+                sb.AppendLine($"- Abonelik / Gelir Oranı: %{metrics.SubscriptionToIncomePercentage:N1}");
+                sb.AppendLine($"- En Pahalısı: {metrics.MostExpensiveSubscriptionName} ({metrics.MostExpensiveSubscriptionPrice:N2} TL)");
+                break;
+
+            case AIIntentType.RiskQuestion:
+                sb.AppendLine($"- Finansal Sağlık Skoru: {metrics.FinancialHealthScore}/100");
+                sb.AppendLine($"- Backend Risk Seviyesi: {metrics.RiskLevel}");
                 sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
+                sb.AppendLine($"- Bütçe Aşımı Olan Kategori Sayısı: {metrics.OverBudgetCategoryCount}");
                 break;
 
             default:
@@ -88,6 +98,6 @@ public class AIPromptBuilder : IAIPromptBuilder
         IEnumerable<AIChatMessageDto>? history,
         FinancialCoreMetricsDto metrics)
     {
-        return BuildSystemPromptWithContext(metrics, AIIntentType.GeneralAdvisory) + "\n\nKULLANICI SORUSU:\n" + userPrompt;
+        return BuildSystemPromptWithContext(metrics, AIIntentType.GeneralConversation) + "\n\nKULLANICI SORUSU:\n" + userPrompt;
     }
 }
