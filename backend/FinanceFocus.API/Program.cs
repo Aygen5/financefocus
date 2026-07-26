@@ -35,7 +35,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddHealthChecksConfiguration();
-builder.Services.AddHangfireConfiguration(builder.Configuration);
+builder.Services.AddHangfireConfiguration(builder.Configuration, builder.Environment);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddRateLimitingConfiguration();
 builder.Services.AddApiVersioningConfiguration();
@@ -58,7 +58,7 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "FinanceFocus API v1");
     });
 }
-else
+else if (!app.Environment.IsEnvironment("Testing"))
 {
     app.UseHsts();
     app.UseHttpsRedirection();
@@ -70,10 +70,13 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseHangfireDashboard("/hangfire", new DashboardOptions
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
-});
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
+    });
+}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -81,16 +84,19 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await DbInitializer.SeedAsync(userManager, roleManager);
 
-    var jobScheduler = scope.ServiceProvider.GetRequiredService<IJobScheduler>();
-    jobScheduler.AddOrUpdateRecurring<IBackgroundJobService>(
-        "subscription-payment-reminder",
-        job => job.ProcessSubscriptionRemindersAsync(),
-        "0 8 * * *");
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        var jobScheduler = scope.ServiceProvider.GetRequiredService<IJobScheduler>();
+        jobScheduler.AddOrUpdateRecurring<IBackgroundJobService>(
+            "subscription-payment-reminder",
+            job => job.ProcessSubscriptionRemindersAsync(),
+            "0 8 * * *");
 
-    jobScheduler.AddOrUpdateRecurring<IBackgroundJobService>(
-        "goal-progress-reminder",
-        job => job.ProcessGoalProgressRemindersAsync(),
-        "0 9 * * *");
+        jobScheduler.AddOrUpdateRecurring<IBackgroundJobService>(
+            "goal-progress-reminder",
+            job => job.ProcessGoalProgressRemindersAsync(),
+            "0 9 * * *");
+    }
 }
 
 app.MapHealthChecks("/health/ready", new HealthCheckOptions

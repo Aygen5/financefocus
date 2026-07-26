@@ -98,31 +98,32 @@ public static class ServiceExtensions
         return services;
     }
 
-    public static IServiceCollection AddHangfireConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddHangfireConfiguration(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        var env = configuration["ASPNETCORE_ENVIRONMENT"] ?? configuration["DOTNET_ENVIRONMENT"];
-
         services.AddHangfire(config =>
         {
             config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                   .UseSimpleAssemblyNameTypeSerializer()
                   .UseRecommendedSerializerSettings();
 
-            if (string.Equals(env, "Testing", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(connectionString))
+            if (environment.IsEnvironment("Testing"))
             {
                 config.UseMemoryStorage();
             }
             else
             {
+                var connectionString = configuration.GetConnectionString("DefaultConnection");
                 config.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString));
             }
         });
 
-        services.AddHangfireServer(options =>
+        if (!environment.IsEnvironment("Testing"))
         {
-            options.WorkerCount = Environment.ProcessorCount * 2;
-        });
+            services.AddHangfireServer(options =>
+            {
+                options.WorkerCount = Environment.ProcessorCount * 2;
+            });
+        }
 
         return services;
     }
