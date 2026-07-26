@@ -71,3 +71,27 @@ export const mockSubscription: SubscriptionDto = {
   monthlyEquivalentPrice: 200,
   userId: "1",
 };
+
+export function createMockUser(override?: Partial<UserDto>): UserDto {
+  return { ...mockUser, ...override };
+}
+
+export function createMockTransaction(override?: Partial<TransactionDto>): TransactionDto {
+  return { ...mockTransaction, ...override };
+}
+
+export function createMockBudget(override?: Partial<BudgetDto>): BudgetDto {
+  return { ...mockBudget, ...override };
+}
+
+export function createMockGoal(override?: Partial<GoalDto>): GoalDto {
+  return { ...mockGoal, ...override };
+}
+
+export function createMockSubscription(override?: Partial<SubscriptionDto>): SubscriptionDto {
+  return { ...mockSubscription, ...override };
+}
+
+export function createMockPortfolioAsset(override?: Partial<PortfolioAssetDto>): PortfolioAssetDto {
+  return { ...mockPortfolioAsset, ...override };
+}
