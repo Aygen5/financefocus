@@ -32,7 +32,7 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAutoMapper(typeof(MappingProfile).Assembly);
+        services.AddAutoMapper(cfg => cfg.AddMaps(typeof(MappingProfile).Assembly));
         services.AddValidatorsFromAssemblyContaining<CreateTransactionValidator>();
 
         services.AddScoped<IFinancialEngineService, FinancialEngineService>();
