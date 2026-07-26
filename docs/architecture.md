@@ -1,12 +1,12 @@
-# FinanceFocus Backend Architecture
+# FinanceFocus Architecture & Engineering Standards
 
 ## Mimari Yaklaşım
 
-FinanceFocus Backend, uzun vadede sürdürülebilir, genişletilebilir ve production ortamına uygun olacak şekilde tasarlanacaktır.
+FinanceFocus, uzun vadede sürdürülebilir, genişletilebilir ve production ortamına uygun olacak şekilde tasarlanmıştır.
 
 Proje yalnızca çalışan endpointler üretmeyi hedeflemez.
 
-Her katmanın tek bir sorumluluğu olacak ve katmanlar birbirinden mümkün olduğunca bağımsız tutulacaktır.
+Her katmanın tek bir sorumluluğu vardır ve katmanlar birbirinden bağımsız tutulmuştur.
 
 Temel hedef; değişikliklerin diğer katmanları etkilemeden yapılabilmesi ve yeni özelliklerin mevcut mimariyi bozmadan eklenebilmesidir.
 
@@ -14,29 +14,23 @@ Temel hedef; değişikliklerin diğer katmanları etkilemeden yapılabilmesi ve 
 
 # Kullanılacak Mimari
 
-Backend aşağıdaki mimariyi kullanacaktır.
+Backend Clean Architecture prensiplerini kullanmaktadır:
 
 ```
 Presentation (API)
-
-↓
-
-Application
-
-↓
-
-Domain
-
-↓
-
+      ↓
+ Application
+      ↓
+   Domain
+      ↓
 Infrastructure
 ```
 
-Bağımlılık yönü her zaman yukarıdan aşağıya olacaktır.
+Bağımlılık yönü her zaman yukarıdan aşağıya doğrudur.
 
-Domain katmanı hiçbir dış teknolojiye bağımlı olmayacaktır.
+Domain katmanı hiçbir dış teknolojiye bağımlı değildir.
 
-Infrastructure katmanı ise yalnızca Domain ve Application katmanlarını kullanacaktır.
+Infrastructure katmanı ise yalnızca Domain ve Application katmanlarını kullanır.
 
 ---
 
@@ -46,8 +40,7 @@ Infrastructure katmanı ise yalnızca Domain ve Application katmanlarını kulla
 
 API katmanı uygulamanın dış dünyaya açılan kapısıdır.
 
-Görevleri;
-
+Görevleri:
 - Controller'ları barındırmak
 - HTTP Request almak
 - HTTP Response döndürmek
@@ -65,46 +58,29 @@ API katmanında business logic yazılmaz.
 
 Application katmanı sistemin iş akışlarını yönetir.
 
-Görevleri;
-
+Görevleri:
 - DTO'lar
 - Service Interface'leri
-- Business Service'leri
+- Business Service'leri (FinancialEngine, FinancialHealth, Subscription, Portfolio vb.)
 - AutoMapper Profilleri
 - Validation işlemleri
 - Result yapısı
 - ApiResponse yapısı
 
-Business kuralları burada uygulanacaktır.
-
-Database işlemleri doğrudan yapılmayacaktır.
-
-Repository Interface'leri kullanılacaktır.
+Business kuralları burada uygulanır. Database işlemleri doğrudan yapılmaz; Repository Interface'leri kullanılır.
 
 ---
 
 ## Domain
 
-Domain projenin kalbidir.
+Domain projenin kalbidir. Bu katman hiçbir framework'e bağımlı değildir.
 
-Bu katman hiçbir framework'e bağımlı olmayacaktır.
-
-Görevleri;
-
+Görevleri:
 - Entity sınıfları
 - Enum'lar
 - Repository Interface'leri
 - UnitOfWork Interface'i
 - Domain kuralları
-
-Domain içerisinde;
-
-- Entity Framework
-- PostgreSQL
-- JWT
-- ASP.NET Core
-
-bulunmayacaktır.
 
 ---
 
@@ -112,26 +88,19 @@ bulunmayacaktır.
 
 Infrastructure dış teknolojilerle iletişim kuran katmandır.
 
-Görevleri;
-
-- Entity Framework Core
-- DbContext
+Görevleri:
+- Entity Framework Core (FinanceFocusDbContext)
+- DbContext & Migrations
 - Repository implementasyonları
 - Unit Of Work
-- Identity
-- JWT üretimi
+- Identity & JWT üretimi
 - PostgreSQL bağlantısı
-- Docker
-- Seed Data
-- Migration'lar
-
-Bu katman Domain'deki interface'leri implemente edecektir.
+- Docker konfigürasyonu
+- Cache Service (MemoryCache)
 
 ---
 
 # Kullanılacak Tasarım Desenleri
-
-Projede aşağıdaki tasarım desenleri kullanılacaktır.
 
 - Clean Architecture
 - Repository Pattern
@@ -139,185 +108,72 @@ Projede aşağıdaki tasarım desenleri kullanılacaktır.
 - Dependency Injection
 - DTO Pattern
 - Result Pattern
-
-CQRS ve MediatR bu projede kullanılmayacaktır.
-
-Amaç; okunabilirliği yüksek ve öğrenmesi kolay bir mimari oluşturmaktır.
+- Test Fixture Factory Pattern
 
 ---
 
-# Veri Akışı
+# Kimlik Doğrulama & Yetkilendirme
 
-Bir isteğin sistem içerisindeki akışı aşağıdaki şekilde olacaktır.
-
-Frontend
-
-↓
-
-Controller
-
-↓
-
-Application Service
-
-↓
-
-Repository Interface
-
-↓
-
-Repository
-
-↓
-
-Entity Framework Core
-
-↓
-
-PostgreSQL
-
-↓
-
-Repository
-
-↓
-
-Application Service
-
-↓
-
-Controller
-
-↓
-
-Frontend
-
-Business kararları yalnızca Application katmanında verilecektir.
+- ASP.NET Core Identity & JWT Authentication.
+- Claims: UserId, Email, Role, FirstName, LastName.
+- Roller: Admin, User.
 
 ---
 
-# Kimlik Doğrulama
+# 🧪 Test Mimarisi ve Stratejisi
 
-Authentication için;
+FinanceFocus, piramit test yaklaşımına (Testing Pyramid) uygun olarak 4 farklı test katmanıyla korunmaktadır:
 
-- ASP.NET Core Identity
-- JWT Authentication
+```
+      / \
+     /E2E\       <- Playwright (Frontend Uçtan Uca)
+    /-----\
+   /API/Int\     <- WebApplicationFactory & EF Core InMemory
+  /---------\
+ /Unit Tests \   <- Backend xUnit + Moq / Frontend Vitest
+/-------------\
+```
 
-kullanılacaktır.
+### 1. Backend Birim Testleri (Backend Unit Tests)
+- **Konum:** `backend/FinanceFocus.Tests/`
+- **Teknolojiler:** xUnit, Moq, FluentAssertions.
+- **Kapsam:** Finansal hesaplama motoru (`FinancialEngineService`), Sağlık skoru ve risk seviyesi eşlemesi (`FinancialHealthScore`), Bütçe aşım analizi (`BudgetAnalysis`), Abonelik aylık eşdeğer fiyatlandırması (`SubscriptionService`), Portföy ağırlıklı ortalama alım maliyeti (`PortfolioService`) ve Hedef ilerleme yüzdesi (`GoalProgress`).
+- **Prensip:** Sıfır veritabanı bağımlılığı ile sadece saf iş mantığı doğrulanır.
 
-JWT içerisine;
+### 2. Backend Entegrasyon ve API Testleri (Backend Integration & API Tests)
+- **Konum:** `backend/FinanceFocus.Tests/IntegrationTests/` & `TestHelpers/FinanceFocusTestFactory.cs`
+- **Teknolojiler:** ASP.NET Core `Microsoft.AspNetCore.Mvc.Testing` (`WebApplicationFactory<Program>`), EF Core In-Memory Database.
+- **Kapsam:** Auth, Transactions, Budgets, Goals, Portfolio, Financial Health HTTP endpoint'lerinin HTTP 200 OK, 201 Created, 400 Bad Request, 401 Unauthorized davranışlarının uçtan uca doğrulanması.
 
-- UserId
-- Email
-- Role
+### 3. Frontend Birim ve Bileşen Testleri (Frontend Unit Tests)
+- **Konum:** `frontend/src/test/`
+- **Teknolojiler:** Vitest, React Testing Library, jsdom, Redux Toolkit.
+- **Kapsam:** Redux slice'ları (`themeSlice`, `transactionsSlice`), Temel UI bileşenleri (`Button`, `Card`, `Input`, `Modal`, `DataTable`), Dashboard özet kartları, 20 dakikalık pasiflik oturum kapatma hook'u (`useIdleTimeout`).
 
-claim olarak eklenecektir.
+### 4. Strongly Typed Test Fixtures & Partial<T> Factory Pattern
+- **Konum:** `frontend/src/test/fixtures.ts`
+- **Yaklaşım:** Test nesnelerinde `any` veya tip bastırma kullanılmaz. `createMockUser()`, `createMockBudget()`, `createMockTransaction()` gibi factory fonksiyonları `Partial<T>` override desteği sunarak esnek ve tip güvenli test verisi üretir.
 
-Gerekli durumlarda;
-
-- FirstName
-- LastName
-
-claim'leri de eklenecektir.
-
-Refresh Token yapısı proje sonunda değerlendirilecektir.
-
----
-
-# Yetkilendirme
-
-API endpointleri gerektiğinde Authorize attribute'u ile korunacaktır.
-
-Roller;
-
-- Admin
-- User
-
-olarak başlayacaktır.
-
-Yeni roller gerektiğinde genişletilebilir olacaktır.
+### 5. End-to-End (E2E) Testleri
+- **Konum:** `frontend/e2e/` & `frontend/playwright.config.ts`
+- **Teknoloji:** Playwright Test.
+- **Kapsam:** Kullanıcı giriş/kayıt akışları, korumalı sayfa yönlendirmeleri, Dark Mode varsayılan tema ve şifre göster/gizle ikonu gibi kritiği yüksek kullanıcı senaryoları.
 
 ---
 
-# DTO Kullanımı
+# 🛡️ Kalite Kapıları ve Enterprise CI/CD Pipeline
 
-Entity nesneleri doğrudan API'den döndürülmeyecektir.
+Projede yapılan her commit ve Pull Request, GitHub Actions (`.github/workflows/ci-cd.yml`) üzerinde aşağıdaki kalite kapılarından (Quality Gates) geçer:
 
-Tüm veri alışverişi DTO'lar üzerinden yapılacaktır.
-
-Entity ↔ DTO dönüşümleri AutoMapper ile gerçekleştirilecektir.
-
----
-
-# Repository Yapısı
-
-Her Entity için ayrı repository oluşturulacaktır.
-
-Ortak CRUD işlemleri Generic Repository üzerinden sağlanacaktır.
-
-Entity'ye özel sorgular ilgili repository içerisinde tanımlanacaktır.
-
-Örnek;
-
-- GetUserPortfolioAsync()
-- GetMonthlyTransactionsAsync()
-- GetUnreadNotificationsAsync()
-
----
-
-# Unit Of Work
-
-Repository'ler tek başına SaveChanges çağırmayacaktır.
-
-Database'e kayıt işlemi yalnızca UnitOfWork üzerinden gerçekleştirilecektir.
-
-Bu sayede aynı işlem içerisinde birden fazla repository güvenli şekilde kullanılabilecektir.
-
----
-
-# Validation
-
-İstek doğrulamaları FluentValidation ile yapılacaktır.
-
-Controller içerisinde manuel validation yazılmayacaktır.
-
----
-
-# Exception Yönetimi
-
-Try-Catch blokları mümkün olduğunca azaltılacaktır.
-
-Global Exception Handler kullanılacaktır.
-
-Kullanıcıya standart ApiResponse formatında hata döndürülecektir.
-
----
-
-# Kod Standartları
-
-Kod yazılırken aşağıdaki prensiplere uyulacaktır.
-
-- SOLID
-- Clean Code
-- Async/Await
-- Dependency Injection
-- Nullable Reference Types
-- Constructor Injection
-- Küçük ve okunabilir metotlar
-- Tek sorumluluk prensibi
+1. **Backend Code Style Format Check:** `dotnet format --verify-no-changes` ile kod stili doğrulanır.
+2. **Frontend Lint Verification:** `npm run lint` ile ESLint kuralları denetlenir.
+3. **Backend Automated Tests & Code Coverage:** `dotnet test --collect:"XPlat Code Coverage"` çalıştırılır; Cobertura XML raporu GitHub Artifacts olarak saklanır.
+4. **Frontend Automated Tests & Code Coverage:** Vitest V8 motoru ile kapsama raporları üretilip `frontend-code-coverage` artifact'ı olarak yüklenir.
+5. **Security Vulnerability Scans:** `dotnet list package --vulnerable` ve `npm audit --audit-level=high` ile bağımlılık güvenlik taraması yapılır.
+6. **Docker Multi-Stage Build Verification:** Backend Docker imajının sorunsuz derlendiği doğrulanır.
 
 ---
 
 # Hedef
 
-Bu mimarinin amacı;
-
-- okunabilir,
-- test edilebilir,
-- genişletilebilir,
-- sürdürülebilir,
-- production ortamına uygun
-
-bir backend oluşturmaktır.
-
-Yeni modüller eklenirken mevcut mimari bozulmamalıdır.
+Bu mimarinin amacı; okunabilir, test edilebilir, genişletilebilir, sürdürülebilir ve üretim (production) ortamına tam hazır bir finans platformu sunmaktır.

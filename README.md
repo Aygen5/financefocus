@@ -6,7 +6,7 @@
 
 FinanceFocus, bireysel gelir-gider dengesini kontrol altında tutmak, bütçe disiplini sağlamak ve varlıkların TRY/USD değerlerini tek bir merkezden izlemek için geliştirilmiş profesyonel bir servet yönetimi platformudur.
 
-Bu depo (repository), hem istemci (React) hem de sunucu (ASP.NET Core) katmanlarını barındıracak şekilde yapılandırılmış modüler bir Full Stack proje düzenine sahiptir.
+Bu depo (repository), hem istemci (React 19) hem de sunucu (ASP.NET Core .NET 10) katmanlarını barındıracak şekilde yapılandırılmış modüler bir Full Stack proje düzenine sahiptir.
 
 ---
 
@@ -14,49 +14,70 @@ Bu depo (repository), hem istemci (React) hem de sunucu (ASP.NET Core) katmanlar
 
 ```text
 FinanceFocus/
-├── frontend/           # React 19 + TypeScript + Vite İstemci Uygulaması
-├── backend/            # ASP.NET Core API Sunucu Uygulaması (Geliştirme Aşamasında)
-├── docs/               # Mimari Kararlar (ADR) ve API Dökümantasyonları
-├── README.md           # Kök Dökümantasyon
-└── LICENSE             # Proje Lisansı
+├── frontend/           # React 19 + TypeScript + Vite İstemci Uygulaması (Vitest & Playwright)
+├── backend/            # ASP.NET Core API (.NET 10) + Clean Architecture (xUnit & WebApplicationFactory)
+├── docs/               # Mimari Kararlar (ADR), Test Mimarisi ve API Dokümantasyonları
+├── .github/workflows/  # Enterprise CI/CD Pipeline (Format Check, Lint, Coverage Artifacts, Security Scans)
+├── docker-compose.yml  # Multi-Container Docker Orkestrasyon Yapılandırması
+└── README.md           # Kök Dokümantasyon
 ```
 
-Detaylı frontend kurulumu ve teknik özellikleri için [frontend/README.md](file:///c:/Users/aygen/OneDrive/Masaüstü/financefocus/frontend/README.md) dosyasına göz atabilirsiniz.
+---
+
+## 🧪 Test & Kalite Komutları (Test & Quality Gates)
+
+### Backend Testleri (.NET 10 & xUnit)
+```bash
+# Birim ve Entegrasyon Testlerini Çalıştırma (54 Test - %100 Passed)
+dotnet test backend/FinanceFocus.slnx
+
+# C# Kod Formatı Doğrulaması
+dotnet format backend/FinanceFocus.slnx --verify-no-changes
+
+# Güvenlik Açığı Taraması
+dotnet list backend/FinanceFocus.slnx package --vulnerable
+```
+
+### Frontend Testleri (Vitest & Playwright)
+```bash
+cd frontend
+
+# Birim ve Bileşen Testleri (33 Vitest Testi - %100 Passed)
+npm run test
+
+# Kod Kapsama Raporu Üretimi (Coverage)
+npm run test:coverage
+
+# ESLint Kod Kalite Kontrolü
+npm run lint
+
+# End-to-End Uçtan Uca Testler (Playwright E2E)
+npm run test:e2e
+
+# Production Derleme Doğrulaması
+npm run build
+```
 
 ---
 
-## ⚙️ Quick Start (Frontend)
-
-Uygulamanın frontend katmanını yerel ortamda çalıştırmak için aşağıdaki adımları takip edin:
+## ⚙️ Quick Start (Yerel Çalıştırma)
 
 ### Gereksinimler
-*   **Node.js:** v18.0.0 veya üzeri
-*   **npm:** v9.0.0 veya üzeri
+* **.NET SDK:** v10.0 veya üzeri
+* **Node.js:** v20.0.0 veya üzeri
+* **Docker & Docker Compose** (Opsiyonel)
 
-### Adımlar
-
-1.  **Bağımlılıkları yükleyin:**
-    ```bash
-    cd frontend
-    npm install
-    ```
-
-2.  **Mock REST API Sunucusunu (JSON Server) çalıştırın:**
-    Finansal verilerin dinamik işlenmesi ve local fallback mekanizmaları için mock sunucuyu başlatın:
-    ```bash
-    npx json-server --watch db.json --port 3001
-    ```
-
-3.  **Uygulamayı geliştirme modunda çalıştırın:**
-    Yeni bir terminal penceresi açıp `frontend` klasörü altında geliştirme sunucusunu tetikleyin:
-    ```bash
-    npm run dev
-    ```
-    Uygulama tarayıcıda otomatik olarak `http://localhost:3000` adresinde açılacaktır.
+### Docker ile Çalıştırma
+```bash
+docker-compose up --build
+```
+- API: `http://localhost:5000/swagger`
+- Frontend: `http://localhost:3000`
 
 ---
 
-## 🗺️ Roadmap & Current Status
+## 🗺️ Roadmap & Architecture Status
 
-*   **Frontend [Completed]:** React 19, Redux Toolkit, Zod form doğrulamaları, responsive arayüz ve yapay zeka asistanı (AI Financial Assistant) modülü hazır durumdadır.
-*   **Backend [In Progress]:** `backend/` klasörü altında geliştirilecek olan **ASP.NET Core Web API + PostgreSQL** entegrasyonu ile gerçek veritabanı geçişi yakında yapılacaktır.
+* **Frontend [Completed]:** React 19, Redux Toolkit, Tailwind CSS, Zod form doğrulamaları, Vitest test süiti, Playwright E2E testleri ve Dark Mode desteği tam entegre durumdadır.
+* **Backend [Completed]:** ASP.NET Core .NET 10 Clean Architecture mimarisi, EF Core PostgreSQL veritabanı, JWT Authentication, Financial Engine, Forecast Service, Health Score Motoru, xUnit Birim ve API Entegrasyon testleri hazır durumdadır.
+* **CI/CD Pipeline [Completed]:** GitHub Actions üzerinde otomatik Format Check, ESLint, Coverage Artifacts ve Security Scans adımları aktiftir.

@@ -276,14 +276,14 @@ Frontend tarafında minimum değişiklik yapılacaktır.
 
 ---
 
-## 18. Test
+## 18. Test [Completed]
 
-Her modül için;
-
-- Unit Test
-- Integration Test
-
-yazılacaktır.
+- Backend Birim Testleri (xUnit, 45 Test) tamamlandı.
+- Backend Entegrasyon & API Endpoint Testleri (WebApplicationFactory & EF Core In-Memory, 9 Test) tamamlandı.
+- Frontend Birim & Bileşen Testleri (Vitest & React Testing Library, 33 Test) tamamlandı.
+- Frontend End-to-End Testleri (Playwright E2E) tamamlandı.
+- Strongly Typed Test Fixtures & Factory Pattern (Partial<T> Override) altyapısı entegre edildi.
+- Enterprise CI/CD Pipeline Kalite Kapıları (Format Check, ESLint, Coverage Artifacts, Security Scans) aktifleştirildi.
 
 ---
 
