@@ -67,3 +67,9 @@ frontend/dist-ssr/
 frontend/coverage/
 frontend/.env
 frontend/.env.*
+
+# AI and Temporary Work Files
+_temp_stitch/
+.agents/
+AGENTS.md
+
