@@ -30,7 +30,7 @@ public class GlobalExceptionHandler : IExceptionHandler
     {
         var correlationId = httpContext.Items["X-Correlation-ID"]?.ToString() ?? httpContext.TraceIdentifier;
 
-        _logger.LogError(exception, "Unhandled exception occurred. TraceId: {TraceId}, Message: {Message}", 
+        _logger.LogError(exception, "Unhandled exception occurred. TraceId: {TraceId}, Message: {Message}",
             correlationId, exception.Message);
 
         var (statusCode, title, type, extensions) = MapException(exception);

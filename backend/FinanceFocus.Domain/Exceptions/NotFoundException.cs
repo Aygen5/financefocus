@@ -6,7 +6,7 @@ public class NotFoundException : DomainException
     {
     }
 
-    public NotFoundException(string name, object key) 
+    public NotFoundException(string name, object key)
         : base($"'{name}' entity with key ({key}) was not found.")
     {
     }

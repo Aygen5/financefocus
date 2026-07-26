@@ -2,6 +2,7 @@ using System;
 using FinanceFocus.Domain.Common;
 
 namespace FinanceFocus.Domain.Entities;
+
 public class ForecastHistory : BaseEntity
 {
     public DateTime ForecastDate { get; set; } = DateTime.UtcNow;

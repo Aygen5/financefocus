@@ -55,7 +55,7 @@ public class BackgroundJobService : IBackgroundJobService
             }
 
             stopwatch.Stop();
-            _logger.LogInformation("Hangfire Job COMPLETED: ProcessSubscriptionReminders in {ElapsedMs}ms. Processed {Count} subscriptions.", 
+            _logger.LogInformation("Hangfire Job COMPLETED: ProcessSubscriptionReminders in {ElapsedMs}ms. Processed {Count} subscriptions.",
                 stopwatch.ElapsedMilliseconds, upcoming.Count);
         }
         catch (Exception ex)
@@ -90,7 +90,7 @@ public class BackgroundJobService : IBackgroundJobService
             }
 
             stopwatch.Stop();
-            _logger.LogInformation("Hangfire Job COMPLETED: ProcessGoalProgressReminders in {ElapsedMs}ms. Processed {Count} completed goals.", 
+            _logger.LogInformation("Hangfire Job COMPLETED: ProcessGoalProgressReminders in {ElapsedMs}ms. Processed {Count} completed goals.",
                 stopwatch.ElapsedMilliseconds, completedGoals.Count);
         }
         catch (Exception ex)

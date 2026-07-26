@@ -31,11 +31,24 @@ jobs:
     - name: Restore Backend Dependencies
       run: dotnet restore backend/FinanceFocus.slnx
 
+    - name: Format Check (.NET Code Style)
+      run: dotnet format backend/FinanceFocus.slnx --verify-no-changes
+
     - name: Build Backend Solution
       run: dotnet build backend/FinanceFocus.slnx --configuration Release --no-restore
 
-    - name: Run Automated Unit Tests
-      run: dotnet test backend/FinanceFocus.slnx --configuration Release --no-build --verbosity normal
+    - name: Run Backend Unit Tests & Collect Coverage
+      run: dotnet test backend/FinanceFocus.slnx --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+    - name: Upload Backend Coverage Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-code-coverage
+        path: backend/**/TestResults/**/coverage.cobertura.xml
+        if-no-files-found: ignore
+
+    - name: Security Scan (.NET Dependencies)
+      run: dotnet list backend/FinanceFocus.slnx package --vulnerable || true
 
   frontend-ci:
     name: Frontend CI & Build Verification
@@ -54,6 +67,29 @@ jobs:
 
     - name: Install Frontend Dependencies
       run: npm ci
+      working-directory: ./frontend
+
+    - name: Run Frontend Lint Check
+      run: npm run lint
+      working-directory: ./frontend
+
+    - name: Run Frontend Unit Tests
+      run: npm run test -- --run
+      working-directory: ./frontend
+
+    - name: Run Frontend Coverage
+      run: npm run test:coverage
+      working-directory: ./frontend
+
+    - name: Upload Frontend Coverage Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-code-coverage
+        path: frontend/coverage/
+        if-no-files-found: ignore
+
+    - name: Security Scan (npm Audit)
+      run: npm audit --audit-level=high || true
       working-directory: ./frontend
 
     - name: Build Frontend Application

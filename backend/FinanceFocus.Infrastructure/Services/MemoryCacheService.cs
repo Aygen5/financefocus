@@ -54,7 +54,7 @@ public class MemoryCacheService : ICacheService
         _memoryCache.Set(key, value, options);
         _cacheKeys.TryAdd(key, 0);
 
-        _logger.LogInformation("Cache SET for Key: {CacheKey}, AbsoluteExpiration: {Expiration}, SlidingExpiration: {Sliding}", 
+        _logger.LogInformation("Cache SET for Key: {CacheKey}, AbsoluteExpiration: {Expiration}, SlidingExpiration: {Sliding}",
             key, expiration, slidingExpiration);
         return Task.CompletedTask;
     }
