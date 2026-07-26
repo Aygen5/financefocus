@@ -3,14 +3,18 @@ logs
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# Internal Documentation (Kept local/private)
+docs/
 
 # Node modules & build artifacts
 node_modules/
 dist/
 dist-ssr/
+build/
+publish/
 *.local
 
 # .NET build outputs
@@ -24,8 +28,26 @@ dist-ssr/
 .env
 .env.*
 
-# Testing
+# Testing & Coverage Artifacts
 coverage/
+TestResults/
+playwright-report/
+blob-report/
+test-results/
+
+# Temporary & Certificate Files
+tmp/
+temp/
+*.tmp
+*.bak
+*.pfx
+*.pem
+*.key
+*.crt
+*.snk
+*.db
+*.sqlite
+*.mdb
 
 # IDE files
 .vscode/*
