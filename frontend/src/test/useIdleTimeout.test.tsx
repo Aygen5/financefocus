@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
 import themeReducer from "../store/themeSlice";
+import { mockUser } from "./fixtures";
 
 describe("useIdleTimeout Hook Tests", () => {
   beforeEach(() => {
@@ -26,9 +27,7 @@ describe("useIdleTimeout Hook Tests", () => {
       },
       preloadedState: {
         auth: {
-          user: isAuthenticated
-            ? { id: "1", email: "test@example.com", firstName: "Test", lastName: "User" }
-            : null,
+          user: isAuthenticated ? mockUser : null,
           token: isAuthenticated ? "mock-jwt-token" : null,
           isAuthenticated,
           loading: false,

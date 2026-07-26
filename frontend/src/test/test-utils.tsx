@@ -45,7 +45,7 @@ export function renderWithProviders(
         dashboard: dashboardReducer,
         ai: aiReducer,
       },
-      preloadedState: preloadedState as undefined,
+      preloadedState,
     }),
     route = "/",
     ...renderOptions
