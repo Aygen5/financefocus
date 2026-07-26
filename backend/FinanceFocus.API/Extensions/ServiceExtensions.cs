@@ -14,6 +14,7 @@ using FinanceFocus.Infrastructure.Services;
 using FinanceFocus.Infrastructure.UnitOfWork;
 using FluentValidation;
 using Hangfire;
+using Hangfire.MemoryStorage;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -100,11 +101,23 @@ public static class ServiceExtensions
     public static IServiceCollection AddHangfireConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddHangfire(config => config
-            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-            .UseSimpleAssemblyNameTypeSerializer()
-            .UseRecommendedSerializerSettings()
-            .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)));
+        var env = configuration["ASPNETCORE_ENVIRONMENT"] ?? configuration["DOTNET_ENVIRONMENT"];
+
+        services.AddHangfire(config =>
+        {
+            config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                  .UseSimpleAssemblyNameTypeSerializer()
+                  .UseRecommendedSerializerSettings();
+
+            if (string.Equals(env, "Testing", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(connectionString))
+            {
+                config.UseMemoryStorage();
+            }
+            else
+            {
+                config.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString));
+            }
+        });
 
         services.AddHangfireServer(options =>
         {
