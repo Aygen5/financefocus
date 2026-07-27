@@ -4,9 +4,9 @@ services:
     container_name: financefocus-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: financefocus_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres_secure_password_2026!
+      POSTGRES_DB: ${POSTGRES_DB:-financefocus_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_secure_password_2026!}
     ports:
       - "5432:5432"
     volumes:
@@ -14,7 +14,7 @@ services:
     networks:
       - financefocus-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d financefocus_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-financefocus_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,8 +28,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Host=financefocus-postgres;Database=financefocus_db;Username=postgres;Password=postgres_secure_password_2026!
-      - JwtSettings__SecretKey=FinanceFocusSuperSecretProductionLevelJwtSigningKey2026!
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection:-Host=financefocus-postgres;Database=financefocus_db;Username=postgres;Password=postgres_secure_password_2026!}
+      - JwtSettings__SecretKey=${JwtSettings__SecretKey:-FinanceFocusSuperSecretProductionLevelJwtSigningKey2026!}
       - JwtSettings__Issuer=FinanceFocusAPI
       - JwtSettings__Audience=FinanceFocusClient
     depends_on:

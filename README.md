@@ -52,6 +52,19 @@ docker-compose up --build
 * **API Swagger:** `http://localhost:5000/swagger`
 * **Frontend UI:** `http://localhost:3000`
 
+### Local Development & Secrets Configuration
+Yerel geliştirme ortamında gizli bilgileri (`ConnectionStrings`, `JwtSettings`) yönetmek için `dotnet user-secrets` kullanabilirsiniz:
+
+```bash
+cd backend/FinanceFocus.API
+
+# PostgreSQL Bağlantı Cümlesi
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=financefocus_db;Username=postgres;Password=YOUR_LOCAL_PASSWORD"
+
+# JWT Imzalama Anahtarı
+dotnet user-secrets set "JwtSettings:SecretKey" "YOUR_STRONG_DEVELOPMENT_JWT_SECRET_KEY_2026!"
+```
+
 ---
 
 ## 📚 Dokümantasyon
