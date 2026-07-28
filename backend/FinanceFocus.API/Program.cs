@@ -10,6 +10,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore; 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -80,6 +81,11 @@ if (!app.Environment.IsEnvironment("Testing"))
 
 using (var scope = app.Services.CreateScope())
 {
+    // 2. BURA EKLENDİ: Önce migration'ları veritabanına uygula (tablolar oluşsun)
+    var dbContext = scope.ServiceProvider.GetRequiredService<FinanceFocusDbContext>();
+    await dbContext.Database.MigrateAsync();
+
+    // Tablolar oluştuktan sonra Seed işlemi güvenle çalışır
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await DbInitializer.SeedAsync(userManager, roleManager);
