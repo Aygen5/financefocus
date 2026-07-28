@@ -122,8 +122,8 @@ export const Forecast: React.FC = () => {
     const histIncomes = forecastIncome(transactions, 1);
     const histExpenses = forecastExpenses(transactions, 1);
 
-    const avgIncome = histIncomes[0]?.value || 12000;
-    const avgExpense = histExpenses[0]?.value || 6500;
+    const avgIncome = histIncomes[0]?.value || 0;
+    const avgExpense = histExpenses[0]?.value || 0;
 
     const expectedIncome = avgIncome * months;
     const expectedExpense = avgExpense * months;

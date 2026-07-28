@@ -122,15 +122,21 @@ public class FinancialEngineService : IFinancialEngineService
         decimal portSizeScore = portInvestment > 100000m ? 10m : (portInvestment > 25000m ? 7m : 4m);
         decimal portProfScore = portProfitLossPct >= 10.0 ? 10m : (portProfitLossPct >= 0 ? 7m : 3m);
 
-        int totalHealthScore = (int)Math.Clamp(Math.Round(incExpScore + savRateScore + budgetScore + goalScore + subScore + portSizeScore + portProfScore), 0, 100);
-        string riskLevel = totalHealthScore switch
-        {
-            >= 90 => "Excellent",
-            >= 75 => "Good",
-            >= 50 => "Moderate",
-            >= 25 => "Risky",
-            _ => "Critical"
-        };
+        bool hasAnyData = transactions.Any() || subscriptions.Any() || portfolioAssets.Any() || budgets.Any() || goals.Any();
+        int totalHealthScore = hasAnyData
+            ? (int)Math.Clamp(Math.Round(incExpScore + savRateScore + budgetScore + goalScore + subScore + portSizeScore + portProfScore), 0, 100)
+            : 0;
+
+        string riskLevel = !hasAnyData
+            ? "N/A"
+            : totalHealthScore switch
+            {
+                >= 90 => "Excellent",
+                >= 75 => "Good",
+                >= 50 => "Moderate",
+                >= 25 => "Risky",
+                _ => "Critical"
+            };
 
         var topCat = categoryExpenses.OrderByDescending(c => c.Amount).FirstOrDefault();
         var largestCategory = topCat?.Category ?? "Yok";

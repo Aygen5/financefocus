@@ -52,8 +52,6 @@ public class AuthService : IAuthService
             return Result<AuthResponseDto>.Failure("Kayıt işlemi başarısız.", errors);
         }
 
-        await _onboardingService.SeedDemoDataAsync(user.Id);
-
         var token = _jwtTokenGenerator.GenerateToken(user);
         var userDto = MapToUserDto(user);
 
@@ -78,12 +76,6 @@ public class AuthService : IAuthService
         if (!isPasswordValid)
         {
             return Result<AuthResponseDto>.Failure("Geçersiz e-posta veya şifre.");
-        }
-
-        var userTransactions = await _unitOfWork.Transactions.GetByUserIdAsync(user.Id);
-        if (!userTransactions.Any())
-        {
-            await _onboardingService.SeedDemoDataAsync(user.Id);
         }
 
         var token = _jwtTokenGenerator.GenerateToken(user);

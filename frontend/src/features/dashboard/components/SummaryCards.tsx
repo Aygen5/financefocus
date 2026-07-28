@@ -24,8 +24,8 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
         title="Net Varlık"
         value={formatCurrency(netWorth, "TRY", "tr-TR")}
         loading={loading}
-        change={2.4}
-        changeLabel="geçen aya göre"
+        change={netWorth > 0 ? 2.4 : undefined}
+        changeLabel={netWorth > 0 ? "geçen aya göre" : undefined}
         icon={<Landmark size={18} className="text-primary" />}
       />
 

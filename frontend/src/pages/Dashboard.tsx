@@ -153,31 +153,37 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  if (
+  const isNewUser = Boolean(
     summary &&
     summary.monthlyIncome === 0 &&
     summary.monthlyExpense === 0 &&
-    summary.portfolioCurrentValue === 0
-  ) {
-    return <OnboardingCard onSeedDemoData={handleSeedDemoData} />;
-  }
+    summary.portfolioCurrentValue === 0,
+  );
 
   return (
-    <div className="w-full max-w-container-max mx-auto text-left">
+    <div className="w-full max-w-container-max mx-auto text-left space-y-gutter">
+      {isNewUser && (
+        <div className="mb-6">
+          <OnboardingCard onSeedDemoData={handleSeedDemoData} />
+        </div>
+      )}
+
       <div className="mb-stack-lg select-none">
         <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2 tracking-tight">
           Hoş geldiniz, {displayName}.
         </h2>
         <p className="font-body-lg text-body-lg text-on-surface-variant font-medium">
-          Finansal sağlığınız güçlü görünüyor. İşte mevcut durumunuzun özeti.
+          {isNewUser
+            ? "Hesabınız oluşturuldu. İlk işlemlerinizi ekleyerek finansal takibe başlayın."
+            : "Finansal sağlığınız güçlü görünüyor. İşte mevcut durumunuzun özeti."}
         </p>
       </div>
 
       <SummaryCards
-        netWorth={summary?.portfolioCurrentValue || 624400}
-        income={summary?.monthlyIncome || 120000}
-        expenses={summary?.monthlyExpense || 60998}
-        savings={summary?.netSavings || 59002}
+        netWorth={summary?.portfolioCurrentValue ?? 0}
+        income={summary?.monthlyIncome ?? 0}
+        expenses={summary?.monthlyExpense ?? 0}
+        savings={summary?.netSavings ?? 0}
         loading={false}
       />
 
@@ -196,7 +202,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-gutter">
-          <FinancialHealthScore score={summary?.financialHealthScore || 90} loading={false} />
+          <FinancialHealthScore score={summary?.financialHealthScore ?? 0} loading={false} />
 
           <ActiveGoals goals={goalsMapped.slice(0, 2)} loading={false} />
 

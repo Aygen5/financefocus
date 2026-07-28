@@ -84,6 +84,33 @@ export const calculateFinancialHealth = (
   goals: HealthGoal[],
   subscriptions: HealthSubscription[],
 ): FinancialHealthBreakdown => {
+  if (
+    transactions.length === 0 &&
+    budgets.length === 0 &&
+    assets.length === 0 &&
+    goals.length === 0 &&
+    subscriptions.length === 0
+  ) {
+    return {
+      overallScore: 0,
+      savingsRateScore: 0,
+      debtRatioScore: 0,
+      burnRateScore: 0,
+      emergencyFundScore: 0,
+      investmentRatioScore: 0,
+      budgetDisciplineScore: 0,
+      subscriptionLoadScore: 0,
+      savingsRate: 0,
+      debtRatio: 0,
+      monthlyBurnRate: 0,
+      emergencyFundProgress: 0,
+      investmentRatio: 0,
+      budgetUsage: 0,
+      subscriptionLoad: 0,
+      incomeExpenseRatio: 0,
+    };
+  }
+
   const totalIncome = calculateTotalIncome(transactions);
   const totalExpense = calculateTotalExpenses(transactions);
 

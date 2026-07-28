@@ -790,6 +790,23 @@ export const calculateFinancialHealthScore = (
   goal: number;
   subscription: number;
 } => {
+  if (
+    transactions.length === 0 &&
+    budgets.length === 0 &&
+    assets.length === 0 &&
+    goals.length === 0 &&
+    subscriptions.length === 0
+  ) {
+    return {
+      overall: 0,
+      savings: 0,
+      budget: 0,
+      investment: 0,
+      goal: 0,
+      subscription: 0,
+    };
+  }
+
   const totalIncome = calculateTotalIncome(transactions);
   const totalExpense = calculateTotalExpenses(transactions);
 

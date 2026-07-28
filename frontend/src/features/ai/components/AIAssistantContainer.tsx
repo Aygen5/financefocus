@@ -46,9 +46,9 @@ export const AIAssistantContainer: React.FC = () => {
 
   const dashboardSummary = useAppSelector((state) => state.dashboard?.data?.summary);
 
-  const analyzedCount = 21;
-  const savingsPotential = dashboardSummary?.netSavings || 59002;
-  const financialScore = dashboardSummary?.financialHealthScore || 90;
+  const analyzedCount = dashboardSummary?.totalActivityCount ?? 0;
+  const savingsPotential = dashboardSummary?.netSavings ?? 0;
+  const financialScore = dashboardSummary?.financialHealthScore ?? 0;
 
   const statusColorClass =
     loading || aiStatus === "analyzing"

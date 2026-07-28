@@ -189,10 +189,10 @@ export const Reports: React.FC = () => {
       netSavings,
       savingsRate,
       avgSpending,
-      mostSpentCategory: mostSpent ? mostSpent.name : "Ev Kirası & Barınma",
-      mostSpentAmount: mostSpent ? mostSpent.amount : 28000,
-      mostProfitableAsset: mostProfitable ? mostProfitable.name : "Gram Altın",
-      mostProfitableValue: mostProfitable ? mostProfitable.profit : 59500,
+      mostSpentCategory: mostSpent ? mostSpent.name : "Yok",
+      mostSpentAmount: mostSpent ? mostSpent.amount : 0,
+      mostProfitableAsset: mostProfitable ? mostProfitable.name : "Yok",
+      mostProfitableValue: mostProfitable ? mostProfitable.profit : 0,
     };
   }, [transactions, assets, dateRange, filterType, dashboardData]);
 
