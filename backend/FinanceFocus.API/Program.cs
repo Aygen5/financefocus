@@ -81,14 +81,12 @@ if (!app.Environment.IsEnvironment("Testing"))
 
 using (var scope = app.Services.CreateScope())
 {
-    
     var dbContext = scope.ServiceProvider.GetRequiredService<FinanceFocusDbContext>();
     if (dbContext.Database.IsRelational())
     {
         await dbContext.Database.MigrateAsync();
     }
 
-   
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await DbInitializer.SeedAsync(userManager, roleManager);
