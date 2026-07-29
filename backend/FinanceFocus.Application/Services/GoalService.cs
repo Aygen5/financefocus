@@ -76,11 +76,27 @@ public class GoalService : IGoalService
 
         var goal = _mapper.Map<Goal>(dto);
         goal.UserId = userId;
+        goal.Deadline = DateTime.SpecifyKind(dto.Deadline, DateTimeKind.Utc);
 
         await _unitOfWork.Goals.AddAsync(goal);
+
+        var log = new ActivityLog
+        {
+            UserId = userId,
+            Action = "Hedef Oluşturma",
+            ActivityType = "Goal",
+            Title = $"{dto.Name} Hedefi Ekledi",
+            Description = $"{dto.Name} için {dto.TargetAmount:N2} ₺ hedef belirlendi.",
+            Category = dto.Category ?? "Goal",
+            Status = "success",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(log);
+
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
 
         var resultDto = _mapper.Map<GoalDto>(goal);
         return Result<GoalDto>.Success(resultDto, "Hedef başarıyla oluşturuldu.");
@@ -107,12 +123,28 @@ public class GoalService : IGoalService
         }
 
         _mapper.Map(dto, goal);
+        goal.Deadline = DateTime.SpecifyKind(dto.Deadline, DateTimeKind.Utc);
         goal.UpdatedAt = DateTime.UtcNow;
 
         _unitOfWork.Goals.Update(goal);
+
+        var log = new ActivityLog
+        {
+            UserId = userId,
+            Action = "Hedef Güncelleme",
+            ActivityType = "Goal",
+            Title = $"{dto.Name} Hedefi Güncellendi",
+            Description = $"{dto.Name} hedef detayları güncellendi.",
+            Category = dto.Category ?? "Goal",
+            Status = "info",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(log);
+
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
 
         var resultDto = _mapper.Map<GoalDto>(goal);
         return Result<GoalDto>.Success(resultDto, "Hedef başarıyla güncellendi.");
@@ -127,9 +159,24 @@ public class GoalService : IGoalService
         }
 
         _unitOfWork.Goals.Delete(goal);
+
+        var log = new ActivityLog
+        {
+            UserId = userId,
+            Action = "Hedef Silme",
+            ActivityType = "Goal",
+            Title = $"{goal.Name} Hedefi Silindi",
+            Description = $"{goal.Name} hedefi sistemden kaldırıldı.",
+            Category = goal.Category ?? "Goal",
+            Status = "warning",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(log);
+
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
 
         return Result.Success("Hedef başarıyla silindi.");
     }

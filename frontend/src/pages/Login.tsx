@@ -270,7 +270,7 @@ const Login: React.FC = () => {
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
                 aria-label={showPassword ? "Şifreyi Gizle" : "Şifreyi Göster"}
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
               </button>
             </div>
             {errors.password && (

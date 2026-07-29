@@ -10,8 +10,11 @@ import {
   selectGoalsError,
 } from "../goalsSlice";
 import type { FinancialGoal } from "../goalsSlice";
-import { addActivityLog } from "@/features/activity/activitySlice";
+import { addActivityLog, fetchActivities } from "@/features/activity/activitySlice";
 import { addNotification } from "@/features/notifications/notificationsSlice";
+import { fetchDashboardData } from "@/features/dashboard/dashboardSlice";
+import { fetchFinancialHealth } from "@/features/financialHealth/financialHealthSlice";
+import { fetchForecastData } from "@/features/forecast/forecastSlice";
 import toast from "react-hot-toast";
 
 export const useGoals = () => {
@@ -26,6 +29,13 @@ export const useGoals = () => {
 
   const handleRetry = () => {
     dispatch(fetchGoals());
+  };
+
+  const refetchCrossSlices = () => {
+    dispatch(fetchDashboardData());
+    dispatch(fetchFinancialHealth());
+    dispatch(fetchForecastData());
+    dispatch(fetchActivities());
   };
 
   const handleAddGoal = async (data: Omit<FinancialGoal, "id" | "userId">) => {
@@ -50,6 +60,7 @@ export const useGoals = () => {
             icon: "Award",
           }),
         );
+        refetchCrossSlices();
         toast.success("Finansal hedef başarıyla eklendi.");
         return true;
       } else {
@@ -90,6 +101,7 @@ export const useGoals = () => {
             icon: "Award",
           }),
         );
+        refetchCrossSlices();
         toast.success("Hedef başarıyla güncellendi.");
         return true;
       } else {
@@ -124,6 +136,7 @@ export const useGoals = () => {
             icon: "Trash2",
           }),
         );
+        refetchCrossSlices();
         toast.success("Hedef başarıyla silindi.");
         return true;
       } else {
