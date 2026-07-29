@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   fetchPortfolio,
+  addPortfolioAsset,
   selectPortfolio,
   selectPortfolioLoading,
   selectPortfolioError,
@@ -23,8 +24,18 @@ import {
 import { SkeletonCard, SkeletonTable } from "@/components/ui/Skeleton";
 import ErrorState from "@/components/feedback/ErrorState";
 import EmptyState from "@/components/feedback/EmptyState";
+import Modal from "@/components/overlay/Modal";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
+import { fetchDashboardData } from "@/features/dashboard/dashboardSlice";
+import { fetchFinancialHealth } from "@/features/financialHealth/financialHealthSlice";
+import { fetchForecastData } from "@/features/forecast/forecastSlice";
+import { addActivityLog, fetchActivities } from "@/features/activity/activitySlice";
+import { addNotification } from "@/features/notifications/notificationsSlice";
 import toast from "react-hot-toast";
-import { AlertCircle, RotateCcw } from "lucide-react";
+import { AlertCircle, RotateCcw, Plus } from "lucide-react";
+import useIsDemoActive from "@/hooks/useIsDemoActive";
 
 const colors = [
   "#004ac6",
@@ -38,10 +49,21 @@ const colors = [
 ];
 
 const Portfolio: React.FC = () => {
+  const { isDemoActive } = useIsDemoActive();
   const dispatch = useAppDispatch();
   const assets = useAppSelector(selectPortfolio);
   const loading = useAppSelector(selectPortfolioLoading);
   const error = useAppSelector(selectPortfolioError);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [name, setName] = useState("");
+  const [symbol, setSymbol] = useState("");
+  const [amount, setAmount] = useState<number | "">("");
+  const [purchasePrice, setPurchasePrice] = useState<number | "">("");
+  const [currentPrice, setCurrentPrice] = useState<number | "">("");
+  const [assetType, setAssetType] = useState<number>(0);
 
   const loadData = React.useCallback(() => {
     dispatch(fetchPortfolio());
@@ -53,6 +75,66 @@ const Portfolio: React.FC = () => {
 
   const handleExport = () => {
     toast.success("Portföy detayları dışa aktarılıyor.");
+  };
+
+  const handleAddAsset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !symbol || !amount || !purchasePrice || !currentPrice) {
+      toast.error("Lütfen tüm alanları doldurunuz.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const resultAction = await dispatch(
+        addPortfolioAsset({
+          name,
+          symbol: symbol.toUpperCase(),
+          amount: Number(amount),
+          purchasePrice: Number(purchasePrice),
+          currentPrice: Number(currentPrice),
+          assetType: Number(assetType),
+        }),
+      );
+
+      if (addPortfolioAsset.fulfilled.match(resultAction)) {
+        dispatch(
+          addActivityLog({
+            action: "Varlık Eklendi",
+            category: "Portfolio",
+            description: `"${name}" (${symbol}) portföyünüze eklendi.`,
+            user: "Aygen",
+            icon: "TrendingUp",
+            status: "success",
+          }),
+        );
+        dispatch(
+          addNotification({
+            title: "Varlık Eklendi",
+            message: `"${name}" yatırımı portföyünüze eklendi.`,
+            type: "success",
+            icon: "TrendingUp",
+          }),
+        );
+        dispatch(fetchDashboardData());
+        dispatch(fetchFinancialHealth());
+        dispatch(fetchForecastData());
+        dispatch(fetchActivities());
+        toast.success("Portföy varlığı başarıyla eklendi.");
+        setIsModalOpen(false);
+        setName("");
+        setSymbol("");
+        setAmount("");
+        setPurchasePrice("");
+        setCurrentPrice("");
+      } else {
+        toast.error((resultAction.payload as string) || "Varlık eklenemedi.");
+      }
+    } catch {
+      toast.error("Varlık eklenirken hata oluştu.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const assetsTotal = useMemo(() => calculateNetWorth(assets), [assets]);
@@ -150,50 +232,141 @@ const Portfolio: React.FC = () => {
     );
   }
 
-  if (assets.length === 0) {
-    return (
-      <div className="w-full max-w-container-max mx-auto text-left py-12">
-        <EmptyState
-          title="Portföy Bulunamadı"
-          description="Henüz portföyünüzde herhangi bir yatırım varlığı bulunmamaktadır. İlk varlığınızı ekleyerek bütçenizi zenginleştirebilirsiniz."
-          primaryActionLabel="Yeniden Dene"
-          onPrimaryActionClick={loadData}
-          primaryActionIcon={<RotateCcw size={16} />}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
       {/* Page Header */}
-      <div className="mb-8 select-none">
-        <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-          Portföy Analizi
-        </h2>
-        <p className="font-body-md text-body-md text-on-surface-variant font-medium mt-1">
-          Küresel varlık yatırımlarınızı, maliyet oranlarınızı ve anlık kâr/zarar performansınızı
-          izleyin.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <NetWorthSummary
-          netWorth={assetsTotal}
-          assetsTotal={assetsTotal}
-          largestAssetName={largestAssetName}
-          largestAssetValue={largestAssetValue}
-          trend={trend}
-          trendValue={totalProfitLoss}
-          loading={false}
-        />
-
-        <div className="col-span-1 lg:col-span-2">
-          <AllocationChart data={allocationData} totalValue={assetsTotal} loading={false} />
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 select-none">
+        <div>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
+            Portföy Analizi
+          </h2>
+          <p className="font-body-md text-body-md text-on-surface-variant font-medium mt-1">
+            Küresel varlık yatırımlarınızı, maliyet oranlarınızı ve anlık kâr/zarar performansınızı
+            izleyin.
+          </p>
         </div>
+        <Button
+          variant="primary"
+          icon={<Plus size={18} />}
+          disabled={isDemoActive}
+          title={isDemoActive ? "Demo modunda değişiklik yapılamaz." : undefined}
+          onClick={() => {
+            if (isDemoActive) {
+              toast.error(
+                "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+              );
+              return;
+            }
+            setIsModalOpen(true);
+          }}
+        >
+          Yeni Varlık Ekle
+        </Button>
       </div>
 
-      <HoldingsTable assets={holdingsData} loading={false} onExport={handleExport} />
+      {assets.length === 0 ? (
+        <div className="py-12">
+          <EmptyState
+            title="Portföy Bulunamadı"
+            description="Henüz portföyünüzde herhangi bir yatırım varlığı bulunmamaktadır. İlk varlığınızı ekleyerek bütçenizi zenginleştirebilirsiniz."
+            primaryActionLabel="Yeni Varlık Ekle"
+            onPrimaryActionClick={() => setIsModalOpen(true)}
+            primaryActionIcon={<Plus size={16} />}
+          />
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <NetWorthSummary
+              netWorth={assetsTotal}
+              assetsTotal={assetsTotal}
+              largestAssetName={largestAssetName}
+              largestAssetValue={largestAssetValue}
+              trend={trend}
+              trendValue={totalProfitLoss}
+              loading={false}
+            />
+
+            <div className="col-span-1 lg:col-span-2">
+              <AllocationChart data={allocationData} totalValue={assetsTotal} loading={false} />
+            </div>
+          </div>
+
+          <HoldingsTable assets={holdingsData} loading={false} onExport={handleExport} />
+        </>
+      )}
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Yeni Yatırım Varlığı Ekle"
+      >
+        <form onSubmit={handleAddAsset} className="space-y-4">
+          <Input
+            label="Varlık Adı"
+            placeholder="Örn. Apple Inc. veya Gram Altın"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <Input
+            label="Sembol / Kod"
+            placeholder="Örn. AAPL, THYAO, GOLD, BTC"
+            value={symbol}
+            onChange={(e) => setSymbol(e.target.value)}
+            required
+          />
+          <Select
+            label="Varlık Türü"
+            value={assetType}
+            onChange={(e) => setAssetType(Number(e.target.value))}
+            options={[
+              { value: 0, label: "Hisse Senedi (Stock)" },
+              { value: 1, label: "Kripto Para (Crypto)" },
+              { value: 2, label: "Kıymetli Maden (Commodity)" },
+              { value: 3, label: "Döviz / Nakit (Cash)" },
+              { value: 4, label: "Yatırım Fonu (Fund)" },
+              { value: 5, label: "Gayrimenkul (Real Estate)" },
+            ]}
+          />
+          <Input
+            label="Miktar / Adet"
+            type="number"
+            step="0.0001"
+            placeholder="10"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value === "" ? "" : Number(e.target.value))}
+            required
+          />
+          <Input
+            label="Alış Fiyatı (Maliyet)"
+            type="number"
+            step="0.01"
+            placeholder="150.00"
+            value={purchasePrice}
+            onChange={(e) => setPurchasePrice(e.target.value === "" ? "" : Number(e.target.value))}
+            required
+          />
+          <Input
+            label="Güncel Fiyat"
+            type="number"
+            step="0.01"
+            placeholder="175.00"
+            value={currentPrice}
+            onChange={(e) => setCurrentPrice(e.target.value === "" ? "" : Number(e.target.value))}
+            required
+          />
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
+              İptal
+            </Button>
+            <Button variant="primary" type="submit" loading={isSubmitting}>
+              Kaydet
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

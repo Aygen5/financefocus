@@ -54,7 +54,7 @@ public class DashboardService : IDashboardService
         var budgets = (await _budgetService.GetUserBudgetsAsync(userId)).Data ?? new List<BudgetDto>();
         var goals = (await _goalService.GetUserGoalsAsync(userId)).Data ?? new List<GoalDto>();
         var portfolio = (await _portfolioService.GetPortfolioSummaryAsync(userId)).Data ?? new PortfolioSummaryDto();
-        var subscriptions = (await _subscriptionService.GetSubscriptionSummaryAsync(userId)).Data ?? new SubscriptionSummaryDto();
+        var subscriptions = (await _subscriptionService.GetSubscriptionSummaryAsync(userId, 30)).Data ?? new SubscriptionSummaryDto();
         var recentNotifications = (await _notificationService.GetLatestNotificationsAsync(userId, 5)).Data ?? new List<NotificationDto>();
         var recentActivities = (await _activityLogService.GetLatestActivityLogsAsync(userId, 5)).Data ?? new List<ActivityLogDto>();
 

@@ -119,21 +119,6 @@ export const Goals: React.FC = () => {
     );
   }
 
-  if (goals.length === 0) {
-    return (
-      <div className="w-full max-w-container-max mx-auto text-left py-12">
-        <EmptyState
-          title="Henüz Hedef Oluşturulmadı"
-          description="Birikimlerinizi planlamak ve hayallerinize ulaşmak için ilk hedefinizi oluşturun."
-          icon={<Award size={24} />}
-          primaryActionLabel="Yeni Hedef Ekle"
-          onPrimaryActionClick={() => setIsAddModalOpen(true)}
-          primaryActionIcon={<Plus size={16} />}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
       {/* Page Header */}
@@ -165,17 +150,30 @@ export const Goals: React.FC = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {goals.map((goal) => (
-          <GoalCard
-            key={goal.id}
-            goal={goal}
-            onEdit={handleOpenEdit}
-            onDelete={handleOpenDelete}
-            onView={handleOpenView}
+      {goals.length === 0 ? (
+        <div className="py-12">
+          <EmptyState
+            title="Henüz Hedef Oluşturulmadı"
+            description="Birikimlerinizi planlamak ve hayallerinize ulaşmak için ilk hedefinizi oluşturun."
+            icon={<Award size={24} />}
+            primaryActionLabel="Yeni Hedef Ekle"
+            onPrimaryActionClick={() => setIsAddModalOpen(true)}
+            primaryActionIcon={<Plus size={16} />}
           />
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {goals.map((goal) => (
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              onEdit={handleOpenEdit}
+              onDelete={handleOpenDelete}
+              onView={handleOpenView}
+            />
+          ))}
+        </div>
+      )}
 
       <Modal
         isOpen={isAddModalOpen}

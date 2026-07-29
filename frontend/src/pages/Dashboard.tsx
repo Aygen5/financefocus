@@ -89,8 +89,11 @@ const Dashboard: React.FC = () => {
   }, [dashboardData]);
 
   const subscriptionsMapped = useMemo((): Subscription[] => {
-    if (!dashboardData?.subscriptions?.upcomingRenewals) return [];
-    return dashboardData.subscriptions.upcomingRenewals.map((s) => ({
+    if (!dashboardData?.subscriptions) return [];
+    const upcoming = dashboardData.subscriptions.upcomingRenewals || [];
+    const allSubs = dashboardData.subscriptions.subscriptions || [];
+    const list = upcoming.length > 0 ? upcoming : allSubs.filter((s) => s.isActive);
+    return list.map((s) => ({
       id: s.id,
       userId: s.userId,
       name: s.name,

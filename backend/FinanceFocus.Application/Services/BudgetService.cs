@@ -105,11 +105,27 @@ public class BudgetService : IBudgetService
 
         var budget = _mapper.Map<Budget>(dto);
         budget.UserId = userId;
+        budget.Month = DateTime.SpecifyKind(dto.Month, DateTimeKind.Utc);
 
         await _unitOfWork.Budgets.AddAsync(budget);
+
+        var log = new ActivityLog
+        {
+            UserId = userId,
+            Action = "Bütçe Tanımlama",
+            ActivityType = "Budget",
+            Title = $"{dto.Category} Bütçe Limiti Eklendi",
+            Description = $"{dto.Category} kategorisine {dto.Limit:N2} ₺ bütçe limiti belirlendi.",
+            Category = dto.Category ?? "Budget",
+            Status = "success",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(log);
+
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
 
         var resultDto = _mapper.Map<BudgetDto>(budget);
         return Result<BudgetDto>.Success(resultDto, "Bütçe limiti başarıyla eklendi.");
@@ -134,9 +150,24 @@ public class BudgetService : IBudgetService
         budget.UpdatedAt = DateTime.UtcNow;
 
         _unitOfWork.Budgets.Update(budget);
+
+        var log = new ActivityLog
+        {
+            UserId = userId,
+            Action = "Bütçe Güncelleme",
+            ActivityType = "Budget",
+            Title = $"{dto.Category} Bütçesi Güncellendi",
+            Description = $"{dto.Category} kategorisi bütçe limiti güncellendi.",
+            Category = dto.Category ?? "Budget",
+            Status = "info",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(log);
+
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
 
         var resultDto = _mapper.Map<BudgetDto>(budget);
 
@@ -160,9 +191,24 @@ public class BudgetService : IBudgetService
         }
 
         _unitOfWork.Budgets.Delete(budget);
+
+        var log = new ActivityLog
+        {
+            UserId = userId,
+            Action = "Bütçe Silme",
+            ActivityType = "Budget",
+            Title = $"{budget.Category} Bütçe Limiti Silindi",
+            Description = $"{budget.Category} kategorisi bütçe limiti sistemden kaldırıldı.",
+            Category = budget.Category ?? "Budget",
+            Status = "warning",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(log);
+
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
 
         return Result.Success("Bütçe limiti başarıyla silindi.");
     }

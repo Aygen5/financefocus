@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import PortfolioService from "@/services/modules/portfolio.service";
+import type { CreatePortfolioAssetDto } from "@/api/portfolioApi";
 
 export interface AssetAllocation {
   id: string;
@@ -42,6 +43,21 @@ export const fetchPortfolio = createAsyncThunk(
   },
 );
 
+export const addPortfolioAsset = createAsyncThunk(
+  "portfolio/addPortfolioAsset",
+  async (data: CreatePortfolioAssetDto, { rejectWithValue }) => {
+    try {
+      await PortfolioService.create(data);
+      return (await PortfolioService.getAll()) as AssetAllocation[];
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Portföy varlığı eklenemedi.");
+    }
+  },
+);
+
 export const portfolioSlice = createSlice({
   name: "portfolio",
   initialState,
@@ -64,6 +80,10 @@ export const portfolioSlice = createSlice({
       .addCase(fetchPortfolio.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) || action.error.message || "Portföy yüklenemedi";
+      })
+      .addCase(addPortfolioAsset.fulfilled, (state, action: PayloadAction<AssetAllocation[]>) => {
+        state.loading = false;
+        state.assets = action.payload;
       });
   },
 });

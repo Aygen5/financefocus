@@ -19,7 +19,7 @@ export const BudgetService = {
     const payload: CreateBudgetDto = {
       category: data.category,
       limit: data.limitAmount,
-      month: data.period || new Date().toISOString().substring(0, 7),
+      month: new Date().toISOString(),
     };
     const response = await budgetApi.create(payload);
     return {
@@ -36,7 +36,7 @@ export const BudgetService = {
     const payload: CreateBudgetDto = {
       category: data.category || "Genel",
       limit: data.limitAmount || 0,
-      month: data.period || new Date().toISOString().substring(0, 7),
+      month: new Date().toISOString(),
     };
     const response = await budgetApi.update(id, payload);
     return {

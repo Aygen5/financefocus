@@ -76,9 +76,11 @@ const Budget: React.FC = () => {
         toast.success("Bütçe limiti başarıyla tanımlandı!");
         reset();
         setIsModalOpen(false);
+      } else {
+        toast.error((resultAction.payload as string) || "Bütçe eklenirken hata oluştu.");
       }
     } catch {
-      toast.error("Bütçe eklenirken hata oluştu");
+      toast.error("Bütçe eklenirken hata oluştu.");
     }
   };
 
