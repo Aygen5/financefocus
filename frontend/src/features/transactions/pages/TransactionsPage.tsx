@@ -27,7 +27,11 @@ import {
   WifiOff,
 } from "lucide-react";
 
+import useIsDemoActive from "@/hooks/useIsDemoActive";
+import toast from "react-hot-toast";
+
 export const TransactionsPage: React.FC = () => {
+  const { isDemoActive } = useIsDemoActive();
   const searchInputId = useId();
   const {
     transactions,
@@ -51,15 +55,33 @@ export const TransactionsPage: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
-  const handleOpenEdit = React.useCallback((tx: Transaction) => {
-    setSelectedTransaction(tx);
-    setIsEditModalOpen(true);
-  }, []);
+  const handleOpenEdit = React.useCallback(
+    (tx: Transaction) => {
+      if (isDemoActive) {
+        toast.error(
+          "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+        );
+        return;
+      }
+      setSelectedTransaction(tx);
+      setIsEditModalOpen(true);
+    },
+    [isDemoActive],
+  );
 
-  const handleOpenDelete = React.useCallback((tx: Transaction) => {
-    setSelectedTransaction(tx);
-    setIsDeleteOpen(true);
-  }, []);
+  const handleOpenDelete = React.useCallback(
+    (tx: Transaction) => {
+      if (isDemoActive) {
+        toast.error(
+          "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+        );
+        return;
+      }
+      setSelectedTransaction(tx);
+      setIsDeleteOpen(true);
+    },
+    [isDemoActive],
+  );
 
   const onAddSubmit = React.useCallback(
     async (data: TransactionFormData) => {
@@ -266,8 +288,16 @@ export const TransactionsPage: React.FC = () => {
           </div>
           <Button
             variant="primary"
-            icon={<Plus size={18} />}
-            onClick={() => setIsAddModalOpen(true)}
+            icon={<Plus size={16} />}
+            onClick={() => {
+              if (isDemoActive) {
+                toast.error(
+                  "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+                );
+                return;
+              }
+              setIsAddModalOpen(true);
+            }}
             className="w-full sm:w-auto shrink-0 justify-center"
           >
             Yeni İşlem Ekle

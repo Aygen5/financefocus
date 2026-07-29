@@ -36,6 +36,7 @@ const DataManagementTab: React.FC = () => {
   const handleSeed = async () => {
     setSeedLoading(true);
     try {
+      localStorage.setItem("is_demo_mode", "true");
       const res = await onboardingApi.seedDemoData();
       if (res.success) {
         toast.success(res.message || "Demo verileri başarıyla oluşturuldu!");

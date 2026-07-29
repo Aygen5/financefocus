@@ -14,6 +14,7 @@ const OnboardingCard: React.FC<OnboardingCardProps> = ({ onSeedDemoData }) => {
   const handleSeed = async () => {
     setLoading(true);
     try {
+      localStorage.setItem("is_demo_mode", "true");
       await onSeedDemoData();
     } finally {
       setLoading(false);

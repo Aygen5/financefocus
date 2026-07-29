@@ -21,7 +21,11 @@ import { Plus, RotateCcw, CreditCard, ListFilter } from "lucide-react";
 import type { Subscription } from "@/features/subscriptions/subscriptionsSlice";
 import type { SubscriptionFormData } from "@/features/subscriptions/components/SubscriptionForm";
 
+import useIsDemoActive from "@/hooks/useIsDemoActive";
+import toast from "react-hot-toast";
+
 export const Subscriptions: React.FC = () => {
+  const { isDemoActive } = useIsDemoActive();
   const {
     subscriptions,
     loading,
@@ -43,11 +47,23 @@ export const Subscriptions: React.FC = () => {
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
   const handleOpenEdit = (sub: Subscription) => {
+    if (isDemoActive) {
+      toast.error(
+        "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+      );
+      return;
+    }
     setSelectedSub(sub);
     setIsEditModalOpen(true);
   };
 
   const handleOpenDelete = (sub: Subscription) => {
+    if (isDemoActive) {
+      toast.error(
+        "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+      );
+      return;
+    }
     setSelectedSub(sub);
     setIsDeleteOpen(true);
   };
@@ -171,7 +187,19 @@ export const Subscriptions: React.FC = () => {
             optimize edin.
           </p>
         </div>
-        <Button variant="primary" icon={<Plus size={18} />} onClick={() => setIsAddModalOpen(true)}>
+        <Button
+          variant="primary"
+          icon={<Plus size={18} />}
+          onClick={() => {
+            if (isDemoActive) {
+              toast.error(
+                "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+              );
+              return;
+            }
+            setIsAddModalOpen(true);
+          }}
+        >
           Abonelik Ekle
         </Button>
       </div>

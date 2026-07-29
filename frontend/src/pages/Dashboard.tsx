@@ -15,6 +15,7 @@ import ActiveGoals from "@/features/dashboard/components/ActiveGoals";
 import UpcomingRenewals from "@/features/dashboard/components/UpcomingRenewals";
 import QuickActions from "@/features/dashboard/components/QuickActions";
 import OnboardingCard from "@/features/dashboard/components/OnboardingCard";
+import DemoModeBanner from "@/components/display/DemoModeBanner";
 import { SkeletonCard, SkeletonTable } from "@/components/ui/Skeleton";
 import ErrorState from "@/components/feedback/ErrorState";
 import toast from "react-hot-toast";
@@ -162,6 +163,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="w-full max-w-container-max mx-auto text-left space-y-gutter">
+      <DemoModeBanner />
       {isNewUser && (
         <div className="mb-6">
           <OnboardingCard onSeedDemoData={handleSeedDemoData} />

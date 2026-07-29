@@ -16,7 +16,10 @@ import { addNotification } from "@/features/notifications/notificationsSlice";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 
+import useIsDemoActive from "@/hooks/useIsDemoActive";
+
 const Budget: React.FC = () => {
+  const { isDemoActive } = useIsDemoActive();
   const dispatch = useAppDispatch();
   const { items: budgets, loading } = useAppSelector((state) => state.budget);
 
@@ -92,7 +95,19 @@ const Budget: React.FC = () => {
             Aylık harcama limitlerinizi tanımlayın ve takip edin.
           </p>
         </div>
-        <Button variant="primary" icon={<Plus size={18} />} onClick={() => setIsModalOpen(true)}>
+        <Button
+          variant="primary"
+          icon={<Plus size={18} />}
+          onClick={() => {
+            if (isDemoActive) {
+              toast.error(
+                "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+              );
+              return;
+            }
+            setIsModalOpen(true);
+          }}
+        >
           Yeni Limit Tanımla
         </Button>
       </div>

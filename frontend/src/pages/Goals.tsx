@@ -13,7 +13,11 @@ import { Plus, RotateCcw, Award } from "lucide-react";
 import type { FinancialGoal } from "@/features/goals/goalsSlice";
 import type { GoalFormData } from "@/features/goals/components/GoalForm";
 
+import useIsDemoActive from "@/hooks/useIsDemoActive";
+import toast from "react-hot-toast";
+
 export const Goals: React.FC = () => {
+  const { isDemoActive } = useIsDemoActive();
   const { goals, loading, error, handleRetry, handleAddGoal, handleUpdateGoal, handleDeleteGoal } =
     useGoals();
 
@@ -25,11 +29,23 @@ export const Goals: React.FC = () => {
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
   const handleOpenEdit = (goal: FinancialGoal) => {
+    if (isDemoActive) {
+      toast.error(
+        "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+      );
+      return;
+    }
     setSelectedGoal(goal);
     setIsEditModalOpen(true);
   };
 
   const handleOpenDelete = (goal: FinancialGoal) => {
+    if (isDemoActive) {
+      toast.error(
+        "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+      );
+      return;
+    }
     setSelectedGoal(goal);
     setIsDeleteOpen(true);
   };
@@ -130,7 +146,19 @@ export const Goals: React.FC = () => {
             Geleceğinizi planlayın, tasarruflarınızı ve stratejik finansal hedeflerinizi yönetin.
           </p>
         </div>
-        <Button variant="primary" icon={<Plus size={18} />} onClick={() => setIsAddModalOpen(true)}>
+        <Button
+          variant="primary"
+          icon={<Plus size={18} />}
+          onClick={() => {
+            if (isDemoActive) {
+              toast.error(
+                "Demo modunda değişiklik yapılamaz. Demo'dan çıkıp kendi verilerinizi ekleyebilirsiniz.",
+              );
+              return;
+            }
+            setIsAddModalOpen(true);
+          }}
+        >
           Yeni Hedef Ekle
         </Button>
       </div>
