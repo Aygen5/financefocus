@@ -48,6 +48,21 @@ public class TransactionService : ITransactionService
         transaction.TransactionDate = DateTime.SpecifyKind(dto.TransactionDate, DateTimeKind.Utc);
 
         await _unitOfWork.Transactions.AddAsync(transaction);
+
+        var isInc = transaction.TransactionType == Domain.Enums.TransactionType.Income;
+        var activityLog = new ActivityLog
+        {
+            UserId = userId,
+            Action = isInc ? "Gelir Ekleme" : "Gider Ekleme",
+            ActivityType = "Transaction",
+            Title = $"{transaction.Category} {(isInc ? "Geliri" : "Gideri")} Eklendi",
+            Description = $"{transaction.Amount:N2} ₺ tutarındaki {transaction.Description} işlemi kaydedildi.",
+            Category = string.IsNullOrWhiteSpace(transaction.Category) ? "Transaction" : transaction.Category,
+            Status = isInc ? "success" : "info",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(activityLog);
+
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
@@ -68,6 +83,20 @@ public class TransactionService : ITransactionService
         _mapper.Map(dto, transaction);
         transaction.TransactionDate = DateTime.SpecifyKind(dto.TransactionDate, DateTimeKind.Utc);
         _unitOfWork.Transactions.Update(transaction);
+
+        var activityLog = new ActivityLog
+        {
+            UserId = userId,
+            Action = "İşlem Güncelleme",
+            ActivityType = "Transaction",
+            Title = $"{transaction.Category} İşlemi Güncellendi",
+            Description = $"{transaction.Description} işlemi detayları güncellendi.",
+            Category = string.IsNullOrWhiteSpace(transaction.Category) ? "Transaction" : transaction.Category,
+            Status = "info",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(activityLog);
+
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
@@ -86,6 +115,20 @@ public class TransactionService : ITransactionService
         }
 
         _unitOfWork.Transactions.Delete(transaction);
+
+        var activityLog = new ActivityLog
+        {
+            UserId = userId,
+            Action = "İşlem Silme",
+            ActivityType = "Transaction",
+            Title = $"{transaction.Category} İşlemi Silindi",
+            Description = $"{transaction.Description} işlemi sistemden kaldırıldı.",
+            Category = string.IsNullOrWhiteSpace(transaction.Category) ? "Transaction" : transaction.Category,
+            Status = "warning",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(activityLog);
+
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);

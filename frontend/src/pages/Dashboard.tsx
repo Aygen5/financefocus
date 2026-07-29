@@ -55,18 +55,24 @@ const Dashboard: React.FC = () => {
 
   const recentTransactionsMapped = useMemo(() => {
     if (!dashboardData?.recentTransactions) return [];
-    return dashboardData.recentTransactions.map((t) => ({
-      id: t.id,
-      userId: t.userId,
-      amount: t.amount,
-      transactionType: String(t.transactionType).toLowerCase() === "income" ? "income" : "expense",
-      category: t.category,
-      paymentMethod: t.paymentMethod,
-      date: t.transactionDate || new Date().toISOString(),
-      description: t.description,
-      account: t.account,
-      currency: "TRY",
-    }));
+    return dashboardData.recentTransactions.map((t) => {
+      const txTypeStr = String(t.transactionType).toLowerCase();
+      const isInc = t.transactionType === 0 || txTypeStr === "income";
+      const isTransfer =
+        t.transactionType === 2 || txTypeStr === "transfer" || txTypeStr === "neutral";
+      return {
+        id: t.id,
+        userId: t.userId,
+        amount: t.amount,
+        transactionType: isInc ? "income" : isTransfer ? "neutral" : "expense",
+        category: t.category,
+        paymentMethod: t.paymentMethod,
+        date: t.transactionDate || new Date().toISOString(),
+        description: t.description,
+        account: t.account,
+        currency: "TRY",
+      };
+    });
   }, [dashboardData]);
 
   const goalsMapped = useMemo((): Goal[] => {

@@ -16,9 +16,12 @@ import {
   selectTransactionsError,
 } from "../transactionsSlice";
 import type { Transaction, TransactionFilters } from "../types/transactions.types";
-import { addActivityLog } from "@/features/activity/activitySlice";
+import { addActivityLog, fetchActivities } from "@/features/activity/activitySlice";
 import { addNotification } from "@/features/notifications/notificationsSlice";
 import { selectBudgets, fetchBudgets } from "@/features/budget/budgetSlice";
+import { fetchDashboardData } from "@/features/dashboard/dashboardSlice";
+import { fetchFinancialHealth } from "@/features/financialHealth/financialHealthSlice";
+import { fetchForecastData } from "@/features/forecast/forecastSlice";
 import toast from "react-hot-toast";
 
 export const useTransactions = () => {
@@ -105,6 +108,10 @@ export const useTransactions = () => {
             }
           }
 
+          dispatch(fetchDashboardData());
+          dispatch(fetchFinancialHealth());
+          dispatch(fetchForecastData());
+          dispatch(fetchActivities());
           toast.success("İşlem başarıyla kaydedildi.");
           return true;
         } else {
@@ -142,6 +149,10 @@ export const useTransactions = () => {
               icon: "Edit2",
             }),
           );
+          dispatch(fetchDashboardData());
+          dispatch(fetchFinancialHealth());
+          dispatch(fetchForecastData());
+          dispatch(fetchActivities());
           toast.success("İşlem başarıyla güncellendi.");
           return true;
         } else {
@@ -179,6 +190,10 @@ export const useTransactions = () => {
               icon: "Trash2",
             }),
           );
+          dispatch(fetchDashboardData());
+          dispatch(fetchFinancialHealth());
+          dispatch(fetchForecastData());
+          dispatch(fetchActivities());
           toast.success("İşlem başarıyla silindi.");
           return true;
         } else {

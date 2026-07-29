@@ -1,4 +1,5 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import type { AnyAction } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import type { TypedUseSelectorHook } from "react-redux";
 import authReducer from "@/features/auth/authSlice";
@@ -17,24 +18,37 @@ import settingsReducer from "@/features/settings/settingsSlice";
 import aiReducer from "@/features/ai/aiSlice";
 import themeReducer from "./themeSlice";
 
+const appReducer = combineReducers({
+  auth: authReducer,
+  dashboard: dashboardReducer,
+  transactions: transactionsReducer,
+  budget: budgetReducer,
+  goals: goalsReducer,
+  portfolio: portfolioReducer,
+  subscriptions: subscriptionsReducer,
+  reports: reportsReducer,
+  forecast: forecastReducer,
+  notifications: notificationsReducer,
+  activity: activityReducer,
+  financialHealth: financialHealthReducer,
+  settings: settingsReducer,
+  ai: aiReducer,
+  theme: themeReducer,
+});
+
+const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: AnyAction) => {
+  if (action.type === "auth/logout") {
+    const themeState = state?.theme;
+    state = undefined;
+    if (themeState) {
+      return appReducer({ theme: themeState } as ReturnType<typeof appReducer>, action);
+    }
+  }
+  return appReducer(state, action);
+};
+
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    dashboard: dashboardReducer,
-    transactions: transactionsReducer,
-    budget: budgetReducer,
-    goals: goalsReducer,
-    portfolio: portfolioReducer,
-    subscriptions: subscriptionsReducer,
-    reports: reportsReducer,
-    forecast: forecastReducer,
-    notifications: notificationsReducer,
-    activity: activityReducer,
-    financialHealth: financialHealthReducer,
-    settings: settingsReducer,
-    ai: aiReducer,
-    theme: themeReducer,
-  },
+  reducer: rootReducer,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

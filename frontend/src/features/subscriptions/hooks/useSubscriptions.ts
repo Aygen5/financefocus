@@ -10,8 +10,11 @@ import {
   selectSubscriptionsError,
 } from "../subscriptionsSlice";
 import type { Subscription } from "../subscriptionsSlice";
-import { addActivityLog } from "@/features/activity/activitySlice";
+import { addActivityLog, fetchActivities } from "@/features/activity/activitySlice";
 import { addNotification } from "@/features/notifications/notificationsSlice";
+import { fetchDashboardData } from "@/features/dashboard/dashboardSlice";
+import { fetchFinancialHealth } from "@/features/financialHealth/financialHealthSlice";
+import { fetchForecastData } from "@/features/forecast/forecastSlice";
 import toast from "react-hot-toast";
 
 export const useSubscriptions = () => {
@@ -50,6 +53,10 @@ export const useSubscriptions = () => {
             icon: "CreditCard",
           }),
         );
+        dispatch(fetchDashboardData());
+        dispatch(fetchFinancialHealth());
+        dispatch(fetchForecastData());
+        dispatch(fetchActivities());
         toast.success("Abonelik başarıyla kaydedildi.");
         return true;
       } else {
@@ -98,6 +105,10 @@ export const useSubscriptions = () => {
             icon: "CreditCard",
           }),
         );
+        dispatch(fetchDashboardData());
+        dispatch(fetchFinancialHealth());
+        dispatch(fetchForecastData());
+        dispatch(fetchActivities());
         toast.success("Abonelik başarıyla güncellendi.");
         return true;
       } else {
@@ -132,6 +143,10 @@ export const useSubscriptions = () => {
             icon: "Trash2",
           }),
         );
+        dispatch(fetchDashboardData());
+        dispatch(fetchFinancialHealth());
+        dispatch(fetchForecastData());
+        dispatch(fetchActivities());
         toast.success("Abonelik başarıyla silindi.");
         return true;
       } else {

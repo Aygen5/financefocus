@@ -123,10 +123,24 @@ public class SubscriptionService : ISubscriptionService
 
         var subscription = _mapper.Map<Subscription>(dto);
         subscription.UserId = userId;
+        subscription.NextBillingDate = DateTime.SpecifyKind(dto.NextBillingDate, DateTimeKind.Utc);
 
         await _unitOfWork.Subscriptions.AddAsync(subscription);
-        await _unitOfWork.SaveChangesAsync();
 
+        var log = new ActivityLog
+        {
+            UserId = userId,
+            Action = "Abonelik Oluşturma",
+            ActivityType = "Subscription",
+            Title = $"{dto.Name} Aboneliği Eklendi",
+            Description = $"{dto.Price:N2} ₺ tutarındaki {dto.Name} aboneliği sisteme eklendi.",
+            Category = string.IsNullOrWhiteSpace(dto.Category) ? "Subscription" : dto.Category,
+            Status = "success",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(log);
+
+        await _unitOfWork.SaveChangesAsync();
         await _cacheService.RemoveByPrefixAsync(userId);
 
         var resultDto = _mapper.Map<SubscriptionDto>(subscription);
@@ -149,11 +163,25 @@ public class SubscriptionService : ISubscriptionService
         }
 
         _mapper.Map(dto, subscription);
+        subscription.NextBillingDate = DateTime.SpecifyKind(dto.NextBillingDate, DateTimeKind.Utc);
         subscription.UpdatedAt = DateTime.UtcNow;
 
         _unitOfWork.Subscriptions.Update(subscription);
-        await _unitOfWork.SaveChangesAsync();
 
+        var log = new ActivityLog
+        {
+            UserId = userId,
+            Action = "Abonelik Güncelleme",
+            ActivityType = "Subscription",
+            Title = $"{dto.Name} Aboneliği Güncellendi",
+            Description = $"{dto.Name} abonelik detayları güncellendi.",
+            Category = string.IsNullOrWhiteSpace(dto.Category) ? "Subscription" : dto.Category,
+            Status = "info",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(log);
+
+        await _unitOfWork.SaveChangesAsync();
         await _cacheService.RemoveByPrefixAsync(userId);
 
         var resultDto = _mapper.Map<SubscriptionDto>(subscription);
@@ -169,8 +197,21 @@ public class SubscriptionService : ISubscriptionService
         }
 
         _unitOfWork.Subscriptions.Delete(subscription);
-        await _unitOfWork.SaveChangesAsync();
 
+        var log = new ActivityLog
+        {
+            UserId = userId,
+            Action = "Abonelik Silme",
+            ActivityType = "Subscription",
+            Title = $"{subscription.Name} Aboneliği Silindi",
+            Description = $"{subscription.Name} aboneliği sistemden kaldırıldı.",
+            Category = string.IsNullOrWhiteSpace(subscription.Category) ? "Subscription" : subscription.Category,
+            Status = "warning",
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.ActivityLogs.AddAsync(log);
+
+        await _unitOfWork.SaveChangesAsync();
         await _cacheService.RemoveByPrefixAsync(userId);
 
         return Result.Success("Abonelik başarıyla silindi.");
