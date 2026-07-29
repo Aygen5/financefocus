@@ -37,6 +37,7 @@ import { formatDistanceToNow, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
 import { QuickActionModal } from "./components/QuickActionModal";
 import { HelpModal } from "./components/HelpModal";
+import useIsDemoActive from "@/hooks/useIsDemoActive";
 
 const getNotifIcon = (iconName: string, type: string) => {
   const styles = "w-4 h-4 shrink-0 mt-0.5";
@@ -64,6 +65,7 @@ const Topbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toggleMobileOpen, isCollapsed } = useLayout();
+  const { isDemoActive } = useIsDemoActive();
 
   const { items: notifications = [] } = useAppSelector((state) => state.notifications || {});
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -427,6 +429,15 @@ const Topbar: React.FC = () => {
         className="flex items-center gap-1 sm:gap-2 select-none shrink-0 relative"
         ref={panelRef}
       >
+        {isDemoActive && (
+          <span
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shrink-0 shadow-sm select-none cursor-default"
+            title="Demo Modundasınız. Veriler üzerinde değişiklik yapılamaz."
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            <span>DEMO MODE</span>
+          </span>
+        )}
         <button
           onClick={handleAddTransactionClick}
           className="text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-full p-1.5 sm:p-2 transition-colors duration-200 flex items-center justify-center"
