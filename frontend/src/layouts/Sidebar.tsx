@@ -47,8 +47,11 @@ const Sidebar: React.FC = () => {
   const inactiveStyle =
     "flex items-center gap-3 px-4 py-3 text-slate-550 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl border-l-4 border-transparent transition-all duration-200 select-none font-semibold";
 
-  const displayName = user?.name || "Aygen";
-  const displayEmail = user?.email || "aygen@financefocus.com";
+  const displayName =
+    user?.firstName && user?.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user?.name || user?.email?.split("@")[0] || "Kullanıcı";
+  const displayEmail = user?.email || "";
 
   return (
     <>

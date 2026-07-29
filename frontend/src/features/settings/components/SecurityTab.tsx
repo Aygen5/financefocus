@@ -24,7 +24,7 @@ const SecurityTab: React.FC<SecurityTabProps> = ({
   onToggleTwoFactor,
   onUpdatePassword,
   onDeleteAccount,
-  userEmail = "aygen@financefocus.com",
+  userEmail = "",
 }) => {
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isFirstConfirmOpen, setIsFirstConfirmOpen] = useState(false);
