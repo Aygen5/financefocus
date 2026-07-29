@@ -256,7 +256,7 @@ export const TransactionsPage: React.FC = () => {
         ),
       },
     ],
-    [handleOpenEdit, handleOpenDelete],
+    [handleOpenEdit, handleOpenDelete, isDemoActive],
   );
 
   return (
