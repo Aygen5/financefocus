@@ -12,10 +12,12 @@ namespace FinanceFocus.Application.Services;
 public class OnboardingService : IOnboardingService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
-    public OnboardingService(IUnitOfWork unitOfWork)
+    public OnboardingService(IUnitOfWork unitOfWork, ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<bool>> SeedDemoDataAsync(string userId)
@@ -134,6 +136,7 @@ public class OnboardingService : IOnboardingService
         }
 
         await _unitOfWork.SaveChangesAsync();
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
         return Result<bool>.Success(true, "2026 Production demo verileri başarıyla yükledi.");
     }
 
@@ -141,6 +144,7 @@ public class OnboardingService : IOnboardingService
     {
         await InternalClearDemoDataAsync(userId);
         await _unitOfWork.SaveChangesAsync();
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
         return Result<bool>.Success(true, "Demo verileri başarıyla temizlendi. Gerçek verileriniz korundu.");
     }
 

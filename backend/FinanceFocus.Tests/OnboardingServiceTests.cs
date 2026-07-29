@@ -17,7 +17,8 @@ public class OnboardingServiceTests
     {
         // Arrange
         var mockUow = TestMockBuilder.CreateMockUnitOfWork();
-        var service = new OnboardingService(mockUow.Object);
+        var mockCache = TestMockBuilder.CreateMockCacheService();
+        var service = new OnboardingService(mockUow.Object, mockCache.Object);
         var userId = "user-demo-test-1";
 
         // Act
@@ -32,7 +33,8 @@ public class OnboardingServiceTests
     {
         // Arrange
         var mockUow = TestMockBuilder.CreateMockUnitOfWork();
-        var service = new OnboardingService(mockUow.Object);
+        var mockCache = TestMockBuilder.CreateMockCacheService();
+        var service = new OnboardingService(mockUow.Object, mockCache.Object);
         var userId = "user-isolation-test";
 
         // Act

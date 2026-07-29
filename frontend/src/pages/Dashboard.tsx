@@ -7,6 +7,12 @@ import {
   selectDashboardError,
 } from "@/features/dashboard/dashboardSlice";
 import onboardingApi from "@/api/onboardingApi";
+import { fetchTransactions } from "@/features/transactions/transactionsSlice";
+import { fetchBudgets } from "@/features/budget/budgetSlice";
+import { fetchPortfolio } from "@/features/portfolio/portfolioSlice";
+import { fetchGoals } from "@/features/goals/goalsSlice";
+import { fetchSubscriptions } from "@/features/subscriptions/subscriptionsSlice";
+import { fetchFinancialHealth } from "@/features/financialHealth/financialHealthSlice";
 import SummaryCards from "@/features/dashboard/components/SummaryCards";
 import CashFlowAnalysis from "@/features/dashboard/components/CashFlowAnalysis";
 import RecentTransactions from "@/features/dashboard/components/RecentTransactions";
@@ -33,6 +39,12 @@ const Dashboard: React.FC = () => {
 
   const loadDashboardData = React.useCallback(() => {
     dispatch(fetchDashboardData());
+    dispatch(fetchTransactions());
+    dispatch(fetchBudgets());
+    dispatch(fetchPortfolio());
+    dispatch(fetchGoals());
+    dispatch(fetchSubscriptions());
+    dispatch(fetchFinancialHealth());
   }, [dispatch]);
 
   useEffect(() => {

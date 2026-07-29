@@ -34,10 +34,11 @@ const Settings: React.FC = () => {
     dispatch(fetchSettings());
   }, [dispatch]);
 
-  const userFullName =
-    settings?.fullName ||
-    (authUser ? `${authUser.firstName || ""} ${authUser.lastName || ""}`.trim() : "");
-  const userEmail = settings?.email || authUser?.email || "";
+  const authFullName = authUser
+    ? `${authUser.firstName || ""} ${authUser.lastName || ""}`.trim()
+    : "";
+  const userFullName = authFullName || settings?.fullName || "";
+  const userEmail = authUser?.email || settings?.email || "";
 
   const handleProfileSave = async (data: ProfileFormData) => {
     const resultAction = await dispatch(updateSettings(data));
