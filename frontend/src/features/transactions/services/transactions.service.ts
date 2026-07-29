@@ -15,12 +15,16 @@ export const TransactionsService = {
 
   create: async (data: Omit<Transaction, "id" | "userId">): Promise<Transaction> => {
     const dataObj = data as Record<string, unknown>;
+    const txTypeStr = String(dataObj.transactionType || dataObj.type || "").toLowerCase();
+    const resolvedTxType =
+      txTypeStr === "income" ? 0 : txTypeStr === "transfer" || txTypeStr === "neutral" ? 2 : 1;
+
     const payload: CreateTransactionDto = {
       description: data.description,
       amount: data.amount,
       transactionDate: typeof dataObj.date === "string" ? dataObj.date : new Date().toISOString(),
       category: data.category,
-      transactionType: dataObj.type === "income" ? 0 : 1,
+      transactionType: resolvedTxType,
       paymentMethod:
         typeof dataObj.paymentMethod === "string" ? dataObj.paymentMethod : "Kredi Kartı",
       account: typeof dataObj.account === "string" ? dataObj.account : "Ana Hesap",
@@ -29,19 +33,34 @@ export const TransactionsService = {
     return {
       ...response.data,
       date: response.data.transactionDate,
-      type: response.data.transactionType === 0 ? "income" : "expense",
+      type:
+        response.data.transactionType === 0
+          ? "income"
+          : response.data.transactionType === 2
+            ? "neutral"
+            : "expense",
+      transactionType:
+        response.data.transactionType === 0
+          ? "income"
+          : response.data.transactionType === 2
+            ? "neutral"
+            : "expense",
       status: "completed",
     } as unknown as Transaction;
   },
 
   update: async (id: string, data: Partial<Transaction>): Promise<Transaction> => {
     const dataObj = data as Record<string, unknown>;
+    const txTypeStr = String(dataObj.transactionType || dataObj.type || "").toLowerCase();
+    const resolvedTxType =
+      txTypeStr === "income" ? 0 : txTypeStr === "transfer" || txTypeStr === "neutral" ? 2 : 1;
+
     const payload: CreateTransactionDto = {
       description: data.description || "",
       amount: data.amount || 0,
       transactionDate: typeof dataObj.date === "string" ? dataObj.date : new Date().toISOString(),
       category: data.category || "Genel",
-      transactionType: dataObj.type === "income" ? 0 : 1,
+      transactionType: resolvedTxType,
       paymentMethod:
         typeof dataObj.paymentMethod === "string" ? dataObj.paymentMethod : "Kredi Kartı",
       account: typeof dataObj.account === "string" ? dataObj.account : "Ana Hesap",
@@ -50,7 +69,18 @@ export const TransactionsService = {
     return {
       ...response.data,
       date: response.data.transactionDate,
-      type: response.data.transactionType === 0 ? "income" : "expense",
+      type:
+        response.data.transactionType === 0
+          ? "income"
+          : response.data.transactionType === 2
+            ? "neutral"
+            : "expense",
+      transactionType:
+        response.data.transactionType === 0
+          ? "income"
+          : response.data.transactionType === 2
+            ? "neutral"
+            : "expense",
       status: "completed",
     } as unknown as Transaction;
   },
