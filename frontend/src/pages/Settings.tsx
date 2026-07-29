@@ -22,6 +22,7 @@ type TabType = "profile" | "security" | "appearance" | "notifications" | "region
 const Settings: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { user: authUser } = useAppSelector((state) => state.auth || {});
   const { settings } = useAppSelector((state) => state.settings || {});
   const themeMode = useAppSelector((state) => state.theme.mode);
 
@@ -32,6 +33,11 @@ const Settings: React.FC = () => {
     dispatch(fetchSettings());
   }, [dispatch]);
 
+  const userFullName =
+    settings?.fullName ||
+    (authUser ? `${authUser.firstName || ""} ${authUser.lastName || ""}`.trim() : "");
+  const userEmail = settings?.email || authUser?.email || "";
+
   const handleProfileSave = async (data: ProfileFormData) => {
     const resultAction = await dispatch(updateSettings(data));
     if (updateSettings.fulfilled.match(resultAction)) {
@@ -40,7 +46,7 @@ const Settings: React.FC = () => {
           action: "Settings Updated",
           category: "Settings",
           description: "Profil bilgileri başarıyla güncellendi.",
-          user: "Aygen",
+          user: userFullName || "Kullanıcı",
           icon: "Settings",
           status: "success",
         }),
@@ -67,7 +73,7 @@ const Settings: React.FC = () => {
           description: checked
             ? "İki faktörlü doğrulama aktif edildi."
             : "İki faktörlü doğrulama deaktif edildi.",
-          user: "Aygen",
+          user: userFullName || "Kullanıcı",
           icon: "Lock",
           status: "success",
         }),
@@ -96,7 +102,7 @@ const Settings: React.FC = () => {
           action: "Settings Updated",
           category: "Settings",
           description: "Hesap giriş şifresi değiştirildi.",
-          user: "Aygen",
+          user: userFullName || "Kullanıcı",
           icon: "Lock",
           status: "success",
         }),
@@ -131,7 +137,7 @@ const Settings: React.FC = () => {
         action: "Theme Changed",
         category: "Settings",
         description: `Tema tercihi "${mode}" olarak güncellendi.`,
-        user: "Aygen",
+        user: userFullName || "Kullanıcı",
         icon: "Palette",
         status: "success",
       }),
@@ -155,7 +161,7 @@ const Settings: React.FC = () => {
           action: "Settings Updated",
           category: "Settings",
           description: `Bildirim tercihi "${key}" güncellendi.`,
-          user: "Aygen",
+          user: userFullName || "Kullanıcı",
           icon: "Bell",
           status: "success",
         }),
@@ -163,7 +169,7 @@ const Settings: React.FC = () => {
       dispatch(
         addNotification({
           title: "Settings güncellendi",
-          message: `Bildirim tercihleri güncellendi.`,
+          message: `Bildirim tercihleriniz güncellendi.`,
           type: "success",
           icon: "Bell",
         }),
@@ -180,7 +186,7 @@ const Settings: React.FC = () => {
           action: "Settings Updated",
           category: "Settings",
           description: `Bölgesel ayar "${key}" değeri "${value}" olarak değiştirildi.`,
-          user: "Aygen",
+          user: userFullName || "Kullanıcı",
           icon: "Globe",
           status: "success",
         }),
@@ -248,8 +254,8 @@ const Settings: React.FC = () => {
           {activeTab === "profile" && (
             <ProfileTab
               initialData={{
-                fullName: settings.fullName || "",
-                email: settings.email || "",
+                fullName: userFullName,
+                email: userEmail,
                 bio: settings.bio || "",
                 profilePicture: settings.profilePicture || "",
               }}
@@ -263,7 +269,7 @@ const Settings: React.FC = () => {
               onToggleTwoFactor={handleToggleTwoFactor}
               onUpdatePassword={handleUpdatePassword}
               onDeleteAccount={handleDeleteAccount}
-              userEmail={settings.email}
+              userEmail={userEmail}
             />
           )}
 

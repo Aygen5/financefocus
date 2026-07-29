@@ -7,8 +7,9 @@ export interface FinancialHealthScoreProps {
 }
 
 const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score, loading = false }) => {
+  const isZero = !score || score === 0;
   const strokeLength = 110;
-  const strokeOffset = strokeLength - (strokeLength * score) / 100;
+  const strokeOffset = isZero ? strokeLength : strokeLength - (strokeLength * score) / 100;
 
   return (
     <Card title="Finansal Sağlık" className="flex flex-col items-center text-center">
@@ -33,20 +34,22 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score, load
                 strokeLinecap="round"
               />
 
-              <path
-                d="M 15 50 A 35 35 0 0 1 85 50"
-                fill="none"
-                stroke="#0053db"
-                strokeWidth="10"
-                strokeLinecap="round"
-                strokeDasharray={strokeLength}
-                strokeDashoffset={strokeOffset}
-                className="transition-all duration-1000 ease-out"
-              />
+              {!isZero && (
+                <path
+                  d="M 15 50 A 35 35 0 0 1 85 50"
+                  fill="none"
+                  stroke="#0053db"
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                  strokeDasharray={strokeLength}
+                  strokeDashoffset={strokeOffset}
+                  className="transition-all duration-1000 ease-out"
+                />
+              )}
             </svg>
             <div className="absolute bottom-1 flex flex-col items-center">
               <span className="text-3xl font-extrabold text-slate-800 dark:text-white leading-none">
-                {score}
+                {isZero ? "—" : score}
               </span>
               <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1 select-none">
                 100 üzerinden
@@ -54,9 +57,14 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score, load
             </div>
           </div>
 
-          <p className="text-[13px] text-slate-700 dark:text-slate-350 bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-200/50 dark:border-slate-800/60 leading-relaxed mt-4 w-full text-left">
-            Kullanıcıların **en iyi %15'lik** dilimindesiniz. Düşük limit kullanımını korumaya devam
-            edin.
+          <p className="text-[13px] text-slate-700 dark:text-slate-350 bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-200/50 dark:border-slate-800/60 leading-relaxed mt-4 w-full text-left font-medium">
+            {isZero
+              ? "Henüz yeterli veri bulunmuyor. İlk finansal işlemlerinizi ekledikten sonra sağlık skorunuz hesaplanacaktır."
+              : score >= 80
+                ? "Tebrikler! Finansal sağlık skorunuz mükemmel seviyede."
+                : score >= 50
+                  ? "Finansal sağlığınız dengeli seviyede. Bütçe ve birikimlerinizi artırarak skoru yükseltebilirsiniz."
+                  : "Finansal alışkanlıklarınızı gözden geçirerek skorunuzu iyileştirebilirsiniz."}
           </p>
         </div>
       )}

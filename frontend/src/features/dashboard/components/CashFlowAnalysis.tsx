@@ -10,7 +10,7 @@ import {
   Legend,
 } from "recharts";
 import Card from "@/components/ui/Card";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, BarChart2 } from "lucide-react";
 
 import { useAppSelector } from "@/store";
 import { selectThemeMode } from "@/store/themeSlice";
@@ -39,6 +39,10 @@ const CashFlowAnalysis: React.FC<CashFlowAnalysisProps> = ({ data, loading = fal
     return false;
   }, [themeMode]);
 
+  const hasData = React.useMemo(() => {
+    return data && data.length > 0 && data.some((d) => (d.income || 0) > 0 || (d.expense || 0) > 0);
+  }, [data]);
+
   const gridColor = isDark ? "#1e293b" : "#e2e8f0";
   const textColor = isDark ? "#94a3b8" : "#64748b";
   const tooltipBg = isDark ? "#0f172a" : "#ffffff";
@@ -57,6 +61,18 @@ const CashFlowAnalysis: React.FC<CashFlowAnalysisProps> = ({ data, loading = fal
     >
       {loading ? (
         <div className="h-64 w-full animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
+      ) : !hasData ? (
+        <div className="h-64 w-full flex flex-col items-center justify-center text-center p-6 bg-slate-50/50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+          <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-slate-800 text-primary dark:text-brand-400 flex items-center justify-center mb-3">
+            <BarChart2 size={24} />
+          </div>
+          <h4 className="font-bold text-sm text-slate-800 dark:text-white mb-1">
+            Henüz veri bulunmuyor
+          </h4>
+          <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm">
+            İlk işleminizi eklediğinizde nakit akışı burada görüntülenecektir.
+          </p>
+        </div>
       ) : (
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">

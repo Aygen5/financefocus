@@ -16,8 +16,8 @@ export interface ProfileTabProps {
 
 const ProfileTab: React.FC<ProfileTabProps> = ({
   initialData = {
-    fullName: "Alex Rivera",
-    email: "alex.rivera@financefocus.com",
+    fullName: "",
+    email: "",
     bio: "",
     profilePicture: "",
   },
@@ -94,7 +94,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-headline-sm text-headline-sm text-slate-800 dark:text-white font-bold leading-tight">
-            Kamu Profili
+            Profil
           </h3>
           <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">
             Fotoğrafınızı ve kişisel bilgilerinizi güncelleyin.

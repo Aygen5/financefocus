@@ -57,7 +57,7 @@ const Budget: React.FC = () => {
             action: "Budget Updated",
             category: "Budget",
             description: `"${data.category}" kategorisi için ${data.limit} TRY bütçe limiti tanımlandı.`,
-            user: "Aygen",
+            user: "Kullanıcı",
             icon: "Sliders",
             status: "success",
           }),
@@ -98,9 +98,9 @@ const Budget: React.FC = () => {
       </div>
 
       <BudgetSummaryCards
-        totalBudget={totalBudget || 5000}
-        spent={spent || 3200}
-        remaining={remaining || 1800}
+        totalBudget={totalBudget}
+        spent={spent}
+        remaining={remaining}
         loading={loading}
       />
 

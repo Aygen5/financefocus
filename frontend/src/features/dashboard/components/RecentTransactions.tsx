@@ -5,6 +5,7 @@ import type { Column } from "@/components/display/DataTable";
 import Badge from "@/components/display/Badge";
 import CurrencyDisplay from "@/components/display/CurrencyDisplay";
 import type { Transaction } from "@/features/transactions/transactionsSlice";
+import { Receipt, Plus } from "lucide-react";
 
 export interface RecentTransactionsProps {
   transactions: Transaction[];
@@ -83,14 +84,35 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({
         </Link>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={transactions}
-        loading={loading}
-        emptyTitle="İşlem Bulunamadı"
-        emptyDescription="Yakın zamanda gerçekleştirilmiş herhangi bir işlem kaydı bulunmamaktadır."
-        className="border-0 shadow-none rounded-none"
-      />
+      {!loading && transactions.length === 0 ? (
+        <div className="py-12 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-3">
+            <Receipt size={24} />
+          </div>
+          <h4 className="font-bold text-sm text-slate-800 dark:text-white mb-1">
+            Herhangi bir işlem bulunamadı.
+          </h4>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">
+            İlk gelirinizi veya giderinizi ekleyerek finansal takibe başlayın.
+          </p>
+          <Link
+            to="/transactions"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary dark:bg-brand-500 text-white font-bold text-xs hover:bg-primary-dark transition-colors shadow-sm cursor-pointer"
+          >
+            <Plus size={14} />
+            <span>İlk İşlemi Ekle</span>
+          </Link>
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={transactions}
+          loading={loading}
+          emptyTitle="Herhangi bir işlem bulunamadı."
+          emptyDescription="İlk gelirinizi veya giderinizi ekleyerek finansal takibe başlayın."
+          className="border-0 shadow-none rounded-none"
+        />
+      )}
     </div>
   );
 };

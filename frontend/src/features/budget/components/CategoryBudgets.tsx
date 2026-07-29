@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Utensils, Car, Film, ShieldAlert, HeartHandshake } from "lucide-react";
+import { Home, Utensils, Car, Film, ShieldAlert, HeartHandshake, PieChart } from "lucide-react";
 import ProgressBar from "@/components/display/ProgressBar";
 import type { Budget } from "../budgetSlice";
 import { formatCurrency } from "@/utils/financial";
@@ -15,6 +15,22 @@ const CategoryBudgets: React.FC<CategoryBudgetsProps> = ({ budgets, loading = fa
       <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
         <div className="h-44 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
         <div className="h-44 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
+      </div>
+    );
+  }
+
+  if (budgets.length === 0) {
+    return (
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-12 text-center shadow-soft-sm">
+        <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-slate-800 text-primary dark:text-brand-400 flex items-center justify-center mx-auto mb-3">
+          <PieChart size={28} />
+        </div>
+        <h4 className="text-base font-bold text-slate-800 dark:text-white mb-1">
+          Henüz bütçe limiti bulunmuyor
+        </h4>
+        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+          Kategorilerinize harcama limitleri tanımlayarak bütçe disiplininizi kolayca takip edin.
+        </p>
       </div>
     );
   }

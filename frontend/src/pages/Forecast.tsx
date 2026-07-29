@@ -100,7 +100,7 @@ export const Forecast: React.FC = () => {
           description: isNegativeTrend
             ? "Negatif nakit akışı eğilimi tespit edildi! Giderler gelirlerden yüksek."
             : "Gelecek dönem finansal tahmin raporu başarıyla oluşturuldu.",
-          user: "Aygen",
+          user: "Kullanıcı",
           icon: "Sliders",
           status: isNegativeTrend ? "warning" : "success",
         }),

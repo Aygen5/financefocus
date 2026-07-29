@@ -53,6 +53,7 @@ export const FinancialHealth: React.FC = () => {
   }, [loadAllData]);
 
   const score = healthData?.financialHealthScore ?? 0;
+  const isZero = !score || score === 0;
   const breakdown = healthData?.scoreBreakdown;
   const insights = healthData?.insights || [];
 
@@ -62,6 +63,13 @@ export const FinancialHealth: React.FC = () => {
   };
 
   const getStatusConfig = (s: number) => {
+    if (isZero)
+      return {
+        label: "Henüz Yeterli Veri Yok",
+        color: "text-slate-400",
+        bg: "bg-slate-500/10",
+        fill: "#94a3b8",
+      };
     if (s >= 80)
       return {
         label: "Mükemmel",
@@ -84,7 +92,7 @@ export const FinancialHealth: React.FC = () => {
   const status = getStatusConfig(score);
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (score / 100) * circumference;
+  const strokeDashoffset = isZero ? circumference : circumference - (score / 100) * circumference;
 
   if (loading) {
     return (
@@ -153,22 +161,24 @@ export const FinancialHealth: React.FC = () => {
                 strokeWidth="12"
                 fill="transparent"
               />
-              <circle
-                cx="88"
-                cy="88"
-                r={radius}
-                stroke={status.fill}
-                strokeWidth="12"
-                fill="transparent"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                className="transition-all duration-1000 ease-out"
-              />
+              {!isZero && (
+                <circle
+                  cx="88"
+                  cy="88"
+                  r={radius}
+                  stroke={status.fill}
+                  strokeWidth="12"
+                  fill="transparent"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                  className="transition-all duration-1000 ease-out"
+                />
+              )}
             </svg>
             <div className="absolute flex flex-col items-center justify-center">
               <span className="text-4xl font-black text-slate-850 dark:text-white leading-none">
-                {score}
+                {isZero ? "—" : score}
               </span>
               <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-1">
                 / 100
@@ -185,8 +195,9 @@ export const FinancialHealth: React.FC = () => {
           </div>
 
           <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 mt-5 leading-relaxed max-w-xs">
-            Skorunuz 5 farklı temel finansal disiplin analizinin ağırlıklı ortalamasıyla reaktif
-            hesaplanır.
+            {isZero
+              ? "Henüz yeterli veri bulunmuyor. İlk finansal işlemlerinizi ekledikten sonra sağlık skorunuz hesaplanacaktır."
+              : "Skorunuz 5 farklı temel finansal disiplin analizinin ağırlıklı ortalamasıyla reaktif hesaplanır."}
           </p>
         </div>
 
@@ -197,7 +208,7 @@ export const FinancialHealth: React.FC = () => {
                 Gelir / Gider Dengesi
               </span>
               <div className="text-lg font-black text-slate-850 dark:text-white leading-none">
-                {breakdown?.incomeExpenseScore?.toFixed(1) || 0} / 25
+                {isZero ? "—" : `${breakdown?.incomeExpenseScore?.toFixed(1) || 0} / 25`}
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
@@ -211,7 +222,7 @@ export const FinancialHealth: React.FC = () => {
                 Bütçe Uyum Puanı
               </span>
               <div className="text-lg font-black text-slate-855 dark:text-white leading-none">
-                {breakdown?.budgetAdherenceScore?.toFixed(1) || 0} / 20
+                {isZero ? "—" : `${breakdown?.budgetAdherenceScore?.toFixed(1) || 0} / 20`}
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
@@ -225,7 +236,7 @@ export const FinancialHealth: React.FC = () => {
                 Tasarruf Oranı
               </span>
               <div className="text-sm font-black text-slate-855 dark:text-white leading-none">
-                {breakdown?.savingsRateScore?.toFixed(1) || 0} / 20
+                {isZero ? "—" : `${breakdown?.savingsRateScore?.toFixed(1) || 0} / 20`}
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
@@ -239,7 +250,7 @@ export const FinancialHealth: React.FC = () => {
                 Hedef İlerlemesi
               </span>
               <div className="text-lg font-black text-slate-855 dark:text-white leading-none">
-                {breakdown?.goalProgressScore?.toFixed(1) || 0} / 15
+                {isZero ? "—" : `${breakdown?.goalProgressScore?.toFixed(1) || 0} / 15`}
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
@@ -253,7 +264,7 @@ export const FinancialHealth: React.FC = () => {
                 Portföy Büyüklüğü
               </span>
               <div className="text-lg font-black text-slate-855 dark:text-white leading-none">
-                {breakdown?.portfolioSizeScore?.toFixed(1) || 0} / 10
+                {isZero ? "—" : `${breakdown?.portfolioSizeScore?.toFixed(1) || 0} / 10`}
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
@@ -267,7 +278,7 @@ export const FinancialHealth: React.FC = () => {
                 Abonelik Yükü
               </span>
               <div className="text-lg font-black text-slate-855 dark:text-white leading-none">
-                {breakdown?.subscriptionOverheadScore?.toFixed(1) || 0} / 10
+                {isZero ? "—" : `${breakdown?.subscriptionOverheadScore?.toFixed(1) || 0} / 10`}
               </div>
             </div>
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500">
@@ -283,10 +294,13 @@ export const FinancialHealth: React.FC = () => {
           Insights)
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {insights.length === 0 ? (
-            <p className="text-xs text-slate-400 font-bold col-span-2">
-              Finansal verileriniz analiz edilerek yapay zeka tavsiyeleri oluşturulmaktadır.
-            </p>
+          {insights.length === 0 || isZero ? (
+            <div className="col-span-2 p-6 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Henüz yeterli veri bulunmuyor. İlk işlemlerinizi ekledikten sonra AI analizleri
+                burada görüntülenecektir.
+              </p>
+            </div>
           ) : (
             insights.map((item, idx) => (
               <div

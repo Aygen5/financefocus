@@ -34,9 +34,9 @@ const defaultSettings: UserSettings = {
   twoFactorEnabled: false,
   dateFormat: "dd.MM.yyyy",
   numberFormat: "Turkish",
-  fullName: "Aygen",
-  email: "aygen@financefocus.com",
-  bio: "Finansal özgürlük yolcusu.",
+  fullName: "",
+  email: "",
+  bio: "",
 };
 
 const initialState: SettingsState = {
