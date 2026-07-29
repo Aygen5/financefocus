@@ -23,4 +23,11 @@ public class OnboardingController : BaseApiController
         var result = await _onboardingService.SeedDemoDataAsync(CurrentUserId);
         return ActionResultFrom(result);
     }
+
+    [HttpPost("clear-demo-data")]
+    public async Task<IActionResult> ClearDemoData()
+    {
+        var result = await _onboardingService.ClearDemoDataAsync(CurrentUserId);
+        return ActionResultFrom(result);
+    }
 }

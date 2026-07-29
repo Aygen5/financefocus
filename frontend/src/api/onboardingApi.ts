@@ -6,6 +6,11 @@ export const onboardingApi = {
     const res = await axiosClient.post<ApiResponse<boolean>>("/onboarding/seed-demo-data");
     return res.data;
   },
+
+  clearDemoData: async (): Promise<ApiResponse<boolean>> => {
+    const res = await axiosClient.post<ApiResponse<boolean>>("/onboarding/clear-demo-data");
+    return res.data;
+  },
 };
 
 export default onboardingApi;

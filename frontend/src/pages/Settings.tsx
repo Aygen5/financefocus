@@ -7,7 +7,8 @@ import SecurityTab from "@/features/settings/components/SecurityTab";
 import AppearanceTab from "@/features/settings/components/AppearanceTab";
 import NotificationsTab from "@/features/settings/components/NotificationsTab";
 import RegionalTab from "@/features/settings/components/RegionalTab";
-import { User, Lock, Palette, Bell, Globe, HelpCircle, ChevronRight } from "lucide-react";
+import DataManagementTab from "@/features/settings/components/DataManagementTab";
+import { User, Lock, Palette, Bell, Globe, Database, HelpCircle, ChevronRight } from "lucide-react";
 import { addActivityLog } from "@/features/activity/activitySlice";
 import { addNotification } from "@/features/notifications/notificationsSlice";
 import { HelpModal } from "@/layouts/components/HelpModal";
@@ -17,7 +18,7 @@ import toast from "react-hot-toast";
 
 import type { ProfileFormData, ChangePasswordFormData } from "@/features/settings/settings.types";
 
-type TabType = "profile" | "security" | "appearance" | "notifications" | "regional";
+type TabType = "profile" | "security" | "appearance" | "notifications" | "regional" | "data";
 
 const Settings: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -209,6 +210,7 @@ const Settings: React.FC = () => {
     { id: "appearance" as TabType, label: "Görünüm", icon: <Palette size={20} /> },
     { id: "notifications" as TabType, label: "Bildirimler", icon: <Bell size={20} /> },
     { id: "regional" as TabType, label: "Bölgesel Ayarlar", icon: <Globe size={20} /> },
+    { id: "data" as TabType, label: "Veri Yönetimi & Demo", icon: <Database size={20} /> },
   ];
 
   if (!settings) return null;
@@ -296,6 +298,8 @@ const Settings: React.FC = () => {
               onChangeRegional={handleChangeRegional}
             />
           )}
+
+          {activeTab === "data" && <DataManagementTab />}
         </div>
       </div>
 

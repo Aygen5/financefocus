@@ -6,4 +6,5 @@ namespace FinanceFocus.Application.Interfaces;
 public interface IOnboardingService
 {
     Task<Result<bool>> SeedDemoDataAsync(string userId);
+    Task<Result<bool>> ClearDemoDataAsync(string userId);
 }

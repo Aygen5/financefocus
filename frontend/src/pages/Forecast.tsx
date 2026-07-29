@@ -216,8 +216,25 @@ export const Forecast: React.FC = () => {
     );
   }
 
+  const hasNoData = transactions.length === 0 && assets.length === 0;
+
   return (
     <div className="w-full max-w-container-max mx-auto text-left">
+      {hasNoData && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-12 text-center shadow-soft-sm mb-8">
+          <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-slate-800 text-primary dark:text-brand-400 flex items-center justify-center mx-auto mb-4">
+            <TrendingUp size={32} />
+          </div>
+          <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+            Henüz yeterli finansal veri bulunmuyor
+          </h4>
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+            İlk finansal işlemlerinizi ve yatırımlarınızı ekledikten sonra gelecek dönem
+            projeksiyonları ve tahmin motoru otomatik olarak hesaplanacaktır.
+          </p>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8 select-none">
         <div>
