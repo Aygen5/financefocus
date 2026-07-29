@@ -348,6 +348,12 @@ FinanceFocus projesi geliştirilirken aşağıdaki yazılım mühendisliği ilke
 
 ---
 
+## 📄 Lisans (License)
+
+Bu proje [MIT Lisansı](file:///C:/Projects/FinanceFocus/LICENSE) altında lisanslanmıştır. Detaylar için [LICENSE](file:///C:/Projects/FinanceFocus/LICENSE) dosyasını inceleyebilirsiniz.
+
+---
+
 ## 🎯 Sonuç
 
 FinanceFocus; modern web teknolojileri, sağlam backend mimarisi, yerel yapay zeka entegrasyonu ve yüksek matematiksel hassasiyete sahip hesaplama motoru ile bireysel finans yönetiminde yüksek kaliteli bir standart sunmaktadır. Temiz kod prensipleri, uçtan uca test kapsayıcılığı ve kurumsal mimari yaklaşımı sayesinde ölçeklenebilir ve sürdürülebilir bir açık kaynak projesidir.
