@@ -57,11 +57,21 @@ public static class TestMockBuilder
         mockGoalRepo.Setup(r => r.GetByIdAsync(It.IsAny<string>()))
             .ReturnsAsync((string id) => goalList.FirstOrDefault(g => g.Id == id));
 
+        var mockActRepo = new Mock<IActivityLogRepository>();
+        mockActRepo.Setup(r => r.GetByUserIdAsync(It.IsAny<string>()))
+            .ReturnsAsync(new List<ActivityLog>());
+
+        var mockNotifRepo = new Mock<INotificationRepository>();
+        mockNotifRepo.Setup(r => r.GetByUserIdAsync(It.IsAny<string>()))
+            .ReturnsAsync(new List<Notification>());
+
         mockUow.Setup(u => u.Transactions).Returns(mockTxRepo.Object);
         mockUow.Setup(u => u.Subscriptions).Returns(mockSubRepo.Object);
         mockUow.Setup(u => u.PortfolioAssets).Returns(mockPortRepo.Object);
         mockUow.Setup(u => u.Budgets).Returns(mockBudgetRepo.Object);
         mockUow.Setup(u => u.Goals).Returns(mockGoalRepo.Object);
+        mockUow.Setup(u => u.ActivityLogs).Returns(mockActRepo.Object);
+        mockUow.Setup(u => u.Notifications).Returns(mockNotifRepo.Object);
         mockUow.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 
         return mockUow;
