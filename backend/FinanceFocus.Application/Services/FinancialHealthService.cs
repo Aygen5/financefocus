@@ -72,14 +72,7 @@ public class FinancialHealthService : IFinancialHealthService
         var expense = metrics.MonthlyExpense;
 
         decimal incomeExpenseScore = income > expense ? 25m : (income > 0 ? Math.Max(0m, (income / (expense > 0 ? expense : 1m)) * 15m) : 10m);
-        decimal savingsRateScore = metrics.SavingsRate switch
-        {
-            >= 30m => 20m,
-            >= 20m => 16m,
-            >= 10m => 12m,
-            > 0m => 8m,
-            _ => 0m
-        };
+        decimal savingsRateScore = metrics.SavingsRate >= 30m ? 20m : (metrics.SavingsRate >= 20m ? 16m : (metrics.SavingsRate >= 10m ? 12m : 8m));
 
         var budgets = (await _budgetService.GetUserBudgetsAsync(userId)).Data?.ToList() ?? new List<DTOs.Budgets.BudgetDto>();
         decimal budgetScore = budgets.Any() ? Math.Round(((decimal)budgets.Count(b => b.SpentAmount <= b.Limit) / budgets.Count) * 15m, 2) : 12m;

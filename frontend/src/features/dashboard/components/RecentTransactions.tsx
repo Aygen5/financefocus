@@ -7,6 +7,8 @@ import CurrencyDisplay from "@/components/display/CurrencyDisplay";
 import type { Transaction } from "@/features/transactions/transactionsSlice";
 import { Receipt, Plus } from "lucide-react";
 
+import { getTransactionTypeInfo } from "@/utils/financialMath";
+
 export interface RecentTransactionsProps {
   transactions: Transaction[];
   loading?: boolean;
@@ -60,13 +62,10 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({
       key: "amount",
       header: "Tutar",
       className: "text-right",
-      render: (row) => (
-        <CurrencyDisplay
-          amount={row.transactionType === "expense" ? -row.amount : row.amount}
-          type={row.transactionType}
-          colored
-        />
-      ),
+      render: (row) => {
+        const info = getTransactionTypeInfo(row.transactionType, row.amount);
+        return <CurrencyDisplay amount={info.signedAmount} type={info.type} colored />;
+      },
     },
   ];
 

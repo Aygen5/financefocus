@@ -1,4 +1,5 @@
 import React, { useId, useState, useEffect, useRef } from "react";
+import { getTransactionTypeInfo } from "@/utils/financialMath";
 import {
   Menu,
   Bell,
@@ -299,31 +300,41 @@ const Topbar: React.FC = () => {
                     <p className="px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
                       İşlemler
                     </p>
-                    {filteredTransactions.map((tx) => (
-                      <button
-                        key={tx.id}
-                        onClick={() => {
-                          navigate("/transactions");
-                          setSearchQuery("");
-                          setIsSearchFocused(false);
-                        }}
-                        className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl flex items-center gap-3 transition-colors cursor-pointer group"
-                      >
-                        <div
-                          className={`w-8 h-8 rounded-lg ${tx.transactionType === "income" ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"} flex items-center justify-center group-hover:scale-105 transition-transform shrink-0`}
+                    {filteredTransactions.map((tx) => {
+                      const txInfo = getTransactionTypeInfo(tx.transactionType, tx.amount);
+                      return (
+                        <button
+                          key={tx.id}
+                          onClick={() => {
+                            navigate("/transactions");
+                            setSearchQuery("");
+                            setIsSearchFocused(false);
+                          }}
+                          className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-xl flex items-center gap-3 transition-colors cursor-pointer group"
                         >
-                          <CreditCard size={16} />
-                        </div>
-                        <div className="truncate flex-1">
-                          <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold truncate group-hover:text-primary dark:group-hover:text-brand-400 transition-colors">
-                            {tx.description}
-                          </p>
-                          <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-500 truncate">
-                            {tx.category} • {tx.amount.toLocaleString("tr-TR")} ₺
-                          </p>
-                        </div>
-                      </button>
-                    ))}
+                          <div
+                            className={`w-8 h-8 rounded-lg ${
+                              txInfo.isIncome
+                                ? "bg-emerald-500/10 text-emerald-500"
+                                : txInfo.isTransfer
+                                  ? "bg-slate-500/10 text-slate-500"
+                                  : "bg-red-500/10 text-red-500"
+                            } flex items-center justify-center group-hover:scale-105 transition-transform shrink-0`}
+                          >
+                            <CreditCard size={16} />
+                          </div>
+                          <div className="truncate flex-1">
+                            <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold truncate group-hover:text-primary dark:group-hover:text-brand-400 transition-colors">
+                              {tx.description}
+                            </p>
+                            <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-500 truncate">
+                              {tx.category} • {txInfo.sign}
+                              {tx.amount.toLocaleString("tr-TR")} ₺
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
 
