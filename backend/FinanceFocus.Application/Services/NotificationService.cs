@@ -31,6 +31,7 @@ public class NotificationService : INotificationService
 
     public async Task<Result<IEnumerable<NotificationDto>>> GetUserNotificationsAsync(string userId)
     {
+        await GenerateSystemNotificationsAsync(userId);
         var notifications = (await _unitOfWork.Notifications.GetByUserIdAsync(userId))
             .OrderByDescending(n => n.CreatedAt);
         var dtos = _mapper.Map<IEnumerable<NotificationDto>>(notifications);

@@ -28,6 +28,16 @@ export const notificationsApi = {
     return res.data;
   },
 
+  create: async (data: {
+    title: string;
+    message: string;
+    type: number;
+    category?: string;
+  }): Promise<ApiResponse<NotificationDto>> => {
+    const res = await axiosClient.post<ApiResponse<NotificationDto>>("/notifications", data);
+    return res.data;
+  },
+
   delete: async (id: string): Promise<ApiResponse<boolean>> => {
     const res = await axiosClient.delete<ApiResponse<boolean>>(`/notifications/${id}`);
     return res.data;

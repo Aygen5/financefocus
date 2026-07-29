@@ -40,6 +40,21 @@ const mapNotificationType = (typeNum: number): "success" | "info" | "warning" | 
   }
 };
 
+const mapNotificationTypeToNum = (typeStr: string): number => {
+  switch (typeStr) {
+    case "info":
+      return 0;
+    case "success":
+      return 1;
+    case "warning":
+      return 2;
+    case "error":
+      return 3;
+    default:
+      return 0;
+  }
+};
+
 export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
   async (_, { rejectWithValue }) => {
@@ -70,13 +85,42 @@ export const fetchNotifications = createAsyncThunk(
 export const addNotification = createAsyncThunk(
   "notifications/addNotification",
   async (newNotif: Omit<SystemNotification, "id" | "isRead" | "createdAt">) => {
-    const logData: SystemNotification = {
-      ...newNotif,
-      id: `notif-${Math.random().toString(36).substr(2, 9)}`,
-      isRead: false,
-      createdAt: new Date().toISOString(),
-    };
-    return logData;
+    try {
+      const typeNum = mapNotificationTypeToNum(newNotif.type);
+      const response = await notificationsApi.create({
+        title: newNotif.title,
+        message: newNotif.message,
+        type: typeNum,
+        category: newNotif.category || "General",
+      });
+
+      if (response.success && response.data) {
+        return {
+          id: response.data.id,
+          title: response.data.title,
+          message: response.data.message,
+          type: mapNotificationType(response.data.type),
+          isRead: response.data.isRead,
+          createdAt: response.data.createdAt || new Date().toISOString(),
+          icon: newNotif.icon || "Bell",
+          category: response.data.category,
+        } as SystemNotification;
+      }
+
+      return {
+        ...newNotif,
+        id: `notif-${Math.random().toString(36).substring(2, 11)}`,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      } as SystemNotification;
+    } catch {
+      return {
+        ...newNotif,
+        id: `notif-${Math.random().toString(36).substring(2, 11)}`,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      } as SystemNotification;
+    }
   },
 );
 
@@ -143,7 +187,11 @@ export const notificationsSlice = createSlice({
         fetchNotifications.fulfilled,
         (state, action: PayloadAction<SystemNotification[]>) => {
           state.loading = false;
-          state.items = action.payload.sort(
+          const backendItems = action.payload || [];
+          const tempItems = state.items.filter((item) => item.id.startsWith("notif-"));
+          const existingIds = new Set(backendItems.map((b) => b.id));
+          const combined = [...tempItems.filter((t) => !existingIds.has(t.id)), ...backendItems];
+          state.items = combined.sort(
             (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
           );
           state.error = null;
