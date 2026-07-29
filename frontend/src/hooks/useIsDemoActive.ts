@@ -20,25 +20,40 @@ export const useIsDemoActive = () => {
   const { assets = [] } = useAppSelector((state) => state.portfolio || {});
   const { items: goals = [] } = useAppSelector((state) => state.goals || {});
   const { items: subscriptions = [] } = useAppSelector((state) => state.subscriptions || {});
+  const { logs: activities = [] } = useAppSelector((state) => state.activity || {});
+  const { notifications = [] } = useAppSelector((state) => state.notifications || {});
 
+  // Dynamic counts based on actual EF Core DB / API entity flags (IsDemo == true)
+  const demoCounts = useMemo(() => {
+    const isDemoItem = (item: Record<string, unknown>) => Boolean(item.isDemo || item.IsDemo);
+
+    const demoTrans = transactions.filter(isDemoItem).length;
+    const demoBudgets = budgets.filter(isDemoItem).length;
+    const demoAssets = assets.filter(isDemoItem).length;
+    const demoGoals = goals.filter(isDemoItem).length;
+    const demoSubs = subscriptions.filter(isDemoItem).length;
+    const demoActs = activities.filter(isDemoItem).length;
+    const demoNotifs = notifications.filter(isDemoItem).length;
+
+    return {
+      transactions: demoTrans,
+      budgets: demoBudgets,
+      portfolio: demoAssets,
+      goals: demoGoals,
+      subscriptions: demoSubs,
+      activities: demoActs,
+      notifications: demoNotifs,
+      total: demoTrans + demoBudgets + demoAssets + demoGoals + demoSubs + demoActs + demoNotifs,
+    };
+  }, [transactions, budgets, assets, goals, subscriptions, activities, notifications]);
+
+  // Single Source of Truth: Is Demo Mode active based on actual DB records?
   const isDemoActive = useMemo(() => {
+    if (demoCounts.total > 0) return true;
+    // Transient fallback while Redux state is loading
     const isStoredDemo = localStorage.getItem("is_demo_mode") === "true";
-    const hasDemoTrans = transactions.some((t: Record<string, unknown>) =>
-      Boolean(t.isDemo || t.IsDemo),
-    );
-    const hasDemoBudget = budgets.some((b: Record<string, unknown>) =>
-      Boolean(b.isDemo || b.IsDemo),
-    );
-    const hasDemoAsset = assets.some((a: Record<string, unknown>) => Boolean(a.isDemo || a.IsDemo));
-    const hasDemoGoal = goals.some((g: Record<string, unknown>) => Boolean(g.isDemo || g.IsDemo));
-    const hasDemoSub = subscriptions.some((s: Record<string, unknown>) =>
-      Boolean(s.isDemo || s.IsDemo),
-    );
-
-    return (
-      isStoredDemo || hasDemoTrans || hasDemoBudget || hasDemoAsset || hasDemoGoal || hasDemoSub
-    );
-  }, [transactions, budgets, assets, goals, subscriptions]);
+    return isStoredDemo;
+  }, [demoCounts]);
 
   const exitDemoMode = useCallback(async () => {
     try {
@@ -65,6 +80,7 @@ export const useIsDemoActive = () => {
 
   return {
     isDemoActive,
+    demoCounts,
     exitDemoMode,
   };
 };

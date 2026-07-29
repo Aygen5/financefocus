@@ -190,6 +190,8 @@ export const Subscriptions: React.FC = () => {
         <Button
           variant="primary"
           icon={<Plus size={18} />}
+          disabled={isDemoActive}
+          title={isDemoActive ? "Demo modunda değişiklik yapılamaz." : undefined}
           onClick={() => {
             if (isDemoActive) {
               toast.error(

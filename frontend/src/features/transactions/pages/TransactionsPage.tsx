@@ -237,16 +237,18 @@ export const TransactionsPage: React.FC = () => {
         render: (row) => (
           <div className="flex justify-end gap-2">
             <button
+              disabled={isDemoActive}
               onClick={() => handleOpenEdit(row)}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 hover:text-primary dark:hover:text-brand-400 transition-colors cursor-pointer"
-              title="Düzenle"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 hover:text-primary dark:hover:text-brand-400 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              title={isDemoActive ? "Demo modunda değişiklik yapılamaz." : "Düzenle"}
             >
               <Edit2 size={14} />
             </button>
             <button
+              disabled={isDemoActive}
               onClick={() => handleOpenDelete(row)}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-red-50 dark:hover:bg-red-950/20 text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors cursor-pointer"
-              title="Sil"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-red-50 dark:hover:bg-red-950/20 text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              title={isDemoActive ? "Demo modunda değişiklik yapılamaz." : "Sil"}
             >
               <Trash2 size={14} />
             </button>
@@ -289,6 +291,8 @@ export const TransactionsPage: React.FC = () => {
           <Button
             variant="primary"
             icon={<Plus size={16} />}
+            disabled={isDemoActive}
+            title={isDemoActive ? "Demo modunda değişiklik yapılamaz." : undefined}
             onClick={() => {
               if (isDemoActive) {
                 toast.error(
