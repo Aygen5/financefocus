@@ -105,7 +105,11 @@ public class MemoryCacheService : ICacheService
 
     public Task RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
     {
-        var matchingKeys = _cacheKeys.Keys.Where(k => k.Contains(prefix)).ToList();
+        if (string.IsNullOrWhiteSpace(prefix)) return Task.CompletedTask;
+
+        var matchingKeys = _cacheKeys.Keys
+            .Where(k => !string.IsNullOrEmpty(k) && k.Contains(prefix, StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
         foreach (var key in matchingKeys)
         {

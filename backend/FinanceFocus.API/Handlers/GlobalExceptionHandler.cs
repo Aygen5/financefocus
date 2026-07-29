@@ -29,9 +29,23 @@ public class GlobalExceptionHandler : IExceptionHandler
         CancellationToken cancellationToken)
     {
         var correlationId = httpContext.Items["X-Correlation-ID"]?.ToString() ?? httpContext.TraceIdentifier;
+        var userId = httpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                     ?? httpContext.User?.FindFirst("sub")?.Value
+                     ?? "Anonymous";
+        var endpoint = $"{httpContext.Request.Method} {httpContext.Request.Path}{httpContext.Request.QueryString}";
+        var innerExceptionMessage = exception.InnerException?.Message ?? "None";
+        var sqlError = (exception as Microsoft.EntityFrameworkCore.DbUpdateException)?.InnerException?.Message ?? "N/A";
 
-        _logger.LogError(exception, "Unhandled exception occurred. TraceId: {TraceId}, Message: {Message}",
-            correlationId, exception.Message);
+        _logger.LogError(
+            exception,
+            "Unhandled Exception Occurred | CorrelationId: {CorrelationId} | UserId: {UserId} | Endpoint: {Endpoint} | Message: {Message} | InnerException: {InnerException} | SqlError: {SqlError} | StackTrace: {StackTrace}",
+            correlationId,
+            userId,
+            endpoint,
+            exception.Message,
+            innerExceptionMessage,
+            sqlError,
+            exception.StackTrace);
 
         var (statusCode, title, type, extensions) = MapException(exception);
 

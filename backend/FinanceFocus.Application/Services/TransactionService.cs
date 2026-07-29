@@ -45,11 +45,13 @@ public class TransactionService : ITransactionService
     {
         var transaction = _mapper.Map<Transaction>(dto);
         transaction.UserId = userId;
+        transaction.TransactionDate = DateTime.SpecifyKind(dto.TransactionDate, DateTimeKind.Utc);
 
         await _unitOfWork.Transactions.AddAsync(transaction);
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
 
         var resultDto = _mapper.Map<TransactionDto>(transaction);
         return Result<TransactionDto>.Success(resultDto, "İşlem başarıyla eklendi.");
@@ -64,10 +66,12 @@ public class TransactionService : ITransactionService
         }
 
         _mapper.Map(dto, transaction);
+        transaction.TransactionDate = DateTime.SpecifyKind(dto.TransactionDate, DateTimeKind.Utc);
         _unitOfWork.Transactions.Update(transaction);
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
 
         var resultDto = _mapper.Map<TransactionDto>(transaction);
         return Result<TransactionDto>.Success(resultDto, "İşlem başarıyla güncellendi.");
@@ -85,6 +89,7 @@ public class TransactionService : ITransactionService
         await _unitOfWork.SaveChangesAsync();
 
         await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
 
         return Result.Success("İşlem başarıyla silindi.");
     }
