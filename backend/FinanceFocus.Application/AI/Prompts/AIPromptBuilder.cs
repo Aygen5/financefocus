@@ -13,56 +13,53 @@ public class AIPromptBuilder : IAIPromptBuilder
     public string BuildSystemPromptWithContext(FinancialCoreMetricsDto metrics, AIIntentType intent)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Sen profesyonel bir finansal asistansın. Yanıtlarını DAİMA kısa, net ve kusursuz bir Türkçe ile ver. Kararsızsan veya veri yoksa uydurma. Her bilgiyi yalnızca bir kez söyle. Çıktılarını okunaklı maddeler halinde ver.");
+        sb.AppendLine("Sen FinanceFocus uygulamasının akıllı ve profesyonel finansal asistanısın. Kullanıcının sorusuna doğrudan, samimi, anlaşılır ve kusursuz bir Türkçe ile yanıt ver.");
         sb.AppendLine("KATI KURALLAR:");
-        sb.AppendLine("1. ASLA yeni sayı, yüzde, oran veya kategori UYDURMA.");
-        sb.AppendLine("2. ASLA matematiksel hesaplama yapma. Sadece verilen backend verilerini yorumla.");
-        sb.AppendLine("3. ASLA link, URL veya alan adı üretme.");
-        sb.AppendLine("4. Yanıtın en fazla 3 kısa paragraf veya en fazla 5 madde olmalı. Toplam kelime sayısı 120 kelimeyi geçmemelidir.");
-        sb.AppendLine("HESAPLANMIŞ GÜNCEL METRİKLER:");
+        sb.AppendLine("1. ASLA verilen backend metrikleri dışında rastgele sayı veya veri UYDURMA.");
+        sb.AppendLine("2. Kullanıcının sorduğu özel soru ne ise O SORUYA ODAKLAN. Sabit bir şablon veya genel başlık kalıpları tekrarlama.");
+        sb.AppendLine("3. Kullanıcı harcamalarını, bütçesini, tasarruflarını veya aboneliklerini sorduğunda aşağıdaki gerçek verilerini kullanarak somut rakamlar ver.");
+        sb.AppendLine("4. Çıktılarını okunaklı maddeler veya kısa paragraflar halinde sun.");
+        sb.AppendLine();
+        sb.AppendLine("KULLANICININ GERÇEK HESAPLANMIŞ FİNANSAL METRİKLERİ (SINGLE SOURCE OF TRUTH):");
+        sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
+        sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
+        sb.AppendLine($"- Net Aylık Tasarruf: {metrics.NetSavings:N2} TL");
+        sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
+        sb.AppendLine($"- Toplam Bakiye: {metrics.TotalBalance:N2} TL");
+        sb.AppendLine($"- Finansal Sağlık Skoru: {metrics.FinancialHealthScore}/100 ({metrics.RiskLevel} Risk Grubu)");
 
-        switch (intent)
+        if (!string.IsNullOrEmpty(metrics.LargestSpendingCategory))
         {
-            case AIIntentType.PortfolioAnalysisQuestion:
-                sb.AppendLine($"- Portföy Toplam Değeri: {metrics.TotalPortfolioValue:N2} TL");
-                sb.AppendLine($"- Portföy Yatırım Tutarı: {metrics.TotalPortfolioInvestment:N2} TL");
-                sb.AppendLine($"- Portföy Net Kâr/Zarar: {metrics.TotalPortfolioProfitLoss:N2} TL (%{metrics.TotalPortfolioProfitLossPercentage:N1})");
-                break;
+            sb.AppendLine($"- En Yüksek Harcama Yapılan Kategori: {metrics.LargestSpendingCategory} ({metrics.LargestSpendingAmount:N2} TL)");
+        }
 
-            case AIIntentType.BudgetAdviceQuestion:
-                sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
-                sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
-                sb.AppendLine($"- Net Aylık Tasarruf: {metrics.NetSavings:N2} TL");
-                sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
-                sb.AppendLine($"- En Çok Harcanan Kategori: {metrics.LargestSpendingCategory} ({metrics.LargestSpendingAmount:N2} TL)");
-                sb.AppendLine($"- Bütçe Aşımı Olan Kategori Sayısı: {metrics.OverBudgetCategoryCount}");
-                if (metrics.CategoryExpenses.Any())
-                {
-                    sb.AppendLine("- Kategori Harcama Dağılımı:");
-                    foreach (var cat in metrics.CategoryExpenses.OrderByDescending(c => c.Amount).Take(5))
-                    {
-                        sb.AppendLine($"  * {cat.Category}: {cat.Amount:N2} TL (Limit: {cat.Limit:N2} TL)");
-                    }
-                }
-                break;
+        if (metrics.OverBudgetCategoryCount > 0)
+        {
+            sb.AppendLine($"- Bütçe Aşımı Olan Kategori Sayısı: {metrics.OverBudgetCategoryCount}");
+        }
 
-            case AIIntentType.SubscriptionAnalysisQuestion:
-                sb.AppendLine($"- Toplam Aylık Abonelik Gideri: {metrics.TotalMonthlySubscriptionCost:N2} TL ({metrics.ActiveSubscriptionCount} Adet)");
-                sb.AppendLine($"- Abonelik / Gelir Oranı: %{metrics.SubscriptionToIncomePercentage:N1}");
-                sb.AppendLine($"- En Pahalısı: {metrics.MostExpensiveSubscriptionName} ({metrics.MostExpensiveSubscriptionPrice:N2} TL)");
-                break;
+        if (metrics.CategoryExpenses != null && metrics.CategoryExpenses.Any())
+        {
+            sb.AppendLine("- Kategori Harcama Dağılımı:");
+            foreach (var cat in metrics.CategoryExpenses.OrderByDescending(c => c.Amount).Take(5))
+            {
+                var limitStr = cat.Limit > 0 ? $" (Bütçe Limiti: {cat.Limit:N2} TL)" : string.Empty;
+                sb.AppendLine($"  * {cat.Category}: {cat.Amount:N2} TL{limitStr}");
+            }
+        }
 
-            case AIIntentType.RiskQuestion:
-                sb.AppendLine($"- Finansal Sağlık Skoru: {metrics.FinancialHealthScore}/100");
-                sb.AppendLine($"- Backend Risk Seviyesi: {metrics.RiskLevel}");
-                sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
-                sb.AppendLine($"- Bütçe Aşımı Olan Kategori Sayısı: {metrics.OverBudgetCategoryCount}");
-                break;
+        if (metrics.ActiveSubscriptionCount > 0)
+        {
+            sb.AppendLine($"- Aktif Abonelik Sayısı: {metrics.ActiveSubscriptionCount} Adet (Aylık Toplam Maliyet: {metrics.TotalMonthlySubscriptionCost:N2} TL)");
+            if (!string.IsNullOrEmpty(metrics.MostExpensiveSubscriptionName))
+            {
+                sb.AppendLine($"  * En Pahalısı: {metrics.MostExpensiveSubscriptionName} ({metrics.MostExpensiveSubscriptionPrice:N2} TL)");
+            }
+        }
 
-            default:
-                sb.AppendLine($"- Finansal Sağlık Skoru: {metrics.FinancialHealthScore}/100");
-                sb.AppendLine($"- Backend Risk Seviyesi: {metrics.RiskLevel}");
-                break;
+        if (metrics.TotalPortfolioValue > 0 || metrics.TotalPortfolioInvestment > 0)
+        {
+            sb.AppendLine($"- Portföy Toplam Değeri: {metrics.TotalPortfolioValue:N2} TL (Net Kâr/Zarar: {metrics.TotalPortfolioProfitLoss:N2} TL / %{metrics.TotalPortfolioProfitLossPercentage:N1})");
         }
 
         return sb.ToString();

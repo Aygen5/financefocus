@@ -6,6 +6,8 @@ public enum AIIntentType
     ExpenseQuestion,
     SavingsQuestion,
     SavingsRateQuestion,
+    SavingsAdviceQuestion,
+    SpendingAnalysisQuestion,
     ExpenseComparisonQuestion,
     LargestExpenseQuestion,
     PortfolioValueQuestion,
