@@ -29,13 +29,16 @@ const initialState: ActivityState = {
   error: null,
 };
 
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
+
 export const fetchActivities = createAsyncThunk(
   "activity/fetchActivities",
   async (_, { rejectWithValue }) => {
     try {
+      const requestingUserId = getActiveUserId();
       const response = await activityApi.getAll();
       if (response.success && Array.isArray(response.data)) {
-        return response.data.map((item) => ({
+        const logs = response.data.map((item) => ({
           id: item.id,
           action: item.action || item.title || "Aktivite",
           category: item.category || "General",
@@ -51,8 +54,9 @@ export const fetchActivities = createAsyncThunk(
           activityType: item.activityType,
           title: item.title,
         }));
+        return { logs, requestingUserId };
       }
-      return [];
+      return { logs: [], requestingUserId };
     } catch (err: unknown) {
       if (err instanceof Error) {
         return rejectWithValue(err.message);
@@ -94,9 +98,19 @@ export const activitySlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchActivities.fulfilled, (state, action: PayloadAction<ActivityLog[]>) => {
+      .addCase(fetchActivities.fulfilled, (state, action) => {
         state.loading = false;
-        state.logs = action.payload.sort(
+        const payloadObj = action.payload as
+          { logs?: ActivityLog[]; requestingUserId?: string } | ActivityLog[];
+        const requestingUserId = Array.isArray(payloadObj)
+          ? undefined
+          : payloadObj.requestingUserId;
+        const logs = Array.isArray(payloadObj) ? payloadObj : payloadObj.logs || [];
+
+        if (!isCurrentSessionUser(requestingUserId)) {
+          return;
+        }
+        state.logs = logs.sort(
           (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
         );
         state.error = null;

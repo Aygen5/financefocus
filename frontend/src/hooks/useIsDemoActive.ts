@@ -24,6 +24,8 @@ export const useIsDemoActive = () => {
   const { logs: activities = [] } = useAppSelector((state) => state.activity || {});
   const { notifications = [] } = useAppSelector((state) => state.notifications || {});
 
+  const user = useAppSelector((state) => state.auth?.user);
+
   // Dynamic counts based on actual EF Core DB / API entity flags (IsDemo == true)
   const demoCounts = useMemo(() => {
     const isDemoItem = (item: Record<string, unknown>) => Boolean(item.isDemo || item.IsDemo);
@@ -48,13 +50,12 @@ export const useIsDemoActive = () => {
     };
   }, [transactions, budgets, assets, goals, subscriptions, activities, notifications]);
 
-  // Single Source of Truth: Is Demo Mode active based on actual DB records?
+  // Single Source of Truth: Is Demo Mode active?
   const isDemoActive = useMemo(() => {
-    if (demoCounts.total > 0) return true;
-    // Transient fallback while Redux state is loading
     const isStoredDemo = localStorage.getItem("is_demo_mode") === "true";
-    return isStoredDemo;
-  }, [demoCounts]);
+    const isDemoUser = user?.email?.toLowerCase() === "demo@financefocus.com";
+    return isStoredDemo || isDemoUser;
+  }, [user]);
 
   const exitDemoMode = useCallback(async () => {
     try {

@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import BudgetService from "@/services/modules/budget.service";
 
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
+
 export interface Budget {
   id: string;
   userId: string;
@@ -28,7 +30,9 @@ export const fetchBudgets = createAsyncThunk(
   "budget/fetchBudgets",
   async (_, { rejectWithValue }) => {
     try {
-      return await BudgetService.getAll();
+      const requestingUserId = getActiveUserId();
+      const items = await BudgetService.getAll();
+      return { items, requestingUserId };
     } catch (error: unknown) {
       if (error instanceof Error) {
         return rejectWithValue(error.message);
@@ -66,9 +70,19 @@ export const budgetSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchBudgets.fulfilled, (state, action: PayloadAction<Budget[]>) => {
+      .addCase(fetchBudgets.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        const payloadObj = action.payload as
+          { items?: Budget[]; requestingUserId?: string } | Budget[];
+        const requestingUserId = Array.isArray(payloadObj)
+          ? undefined
+          : payloadObj.requestingUserId;
+        const items = Array.isArray(payloadObj) ? payloadObj : payloadObj.items || [];
+
+        if (!isCurrentSessionUser(requestingUserId)) {
+          return;
+        }
+        state.items = items;
         state.error = null;
       })
       .addCase(fetchBudgets.rejected, (state, action) => {

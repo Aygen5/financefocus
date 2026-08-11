@@ -55,13 +55,16 @@ const mapNotificationTypeToNum = (typeStr: string): number => {
   }
 };
 
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
+
 export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
   async (_, { rejectWithValue }) => {
     try {
+      const requestingUserId = getActiveUserId();
       const response = await notificationsApi.getAll();
       if (response.success && Array.isArray(response.data)) {
-        return response.data.map((item) => ({
+        const notifications = response.data.map((item) => ({
           id: item.id,
           title: item.title,
           message: item.message,
@@ -71,8 +74,9 @@ export const fetchNotifications = createAsyncThunk(
           icon: "Bell",
           category: item.category,
         }));
+        return { notifications, requestingUserId };
       }
-      return [];
+      return { notifications: [], requestingUserId };
     } catch (err: unknown) {
       if (err instanceof Error) {
         return rejectWithValue(err.message);
@@ -183,20 +187,29 @@ export const notificationsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        fetchNotifications.fulfilled,
-        (state, action: PayloadAction<SystemNotification[]>) => {
-          state.loading = false;
-          const backendItems = action.payload || [];
-          const tempItems = state.items.filter((item) => item.id.startsWith("notif-"));
-          const existingIds = new Set(backendItems.map((b) => b.id));
-          const combined = [...tempItems.filter((t) => !existingIds.has(t.id)), ...backendItems];
-          state.items = combined.sort(
-            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-          );
-          state.error = null;
-        },
-      )
+      .addCase(fetchNotifications.fulfilled, (state, action) => {
+        state.loading = false;
+        const payloadObj = action.payload as
+          | { notifications?: SystemNotification[]; requestingUserId?: string }
+          | SystemNotification[];
+        const requestingUserId = Array.isArray(payloadObj)
+          ? undefined
+          : payloadObj.requestingUserId;
+        const backendItems = Array.isArray(payloadObj)
+          ? payloadObj
+          : payloadObj.notifications || [];
+
+        if (!isCurrentSessionUser(requestingUserId)) {
+          return;
+        }
+        const tempItems = state.items.filter((item) => item.id.startsWith("notif-"));
+        const existingIds = new Set(backendItems.map((b) => b.id));
+        const combined = [...tempItems.filter((t) => !existingIds.has(t.id)), ...backendItems];
+        state.items = combined.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+        state.error = null;
+      })
       .addCase(fetchNotifications.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) || "Bildirimler yüklenemedi.";

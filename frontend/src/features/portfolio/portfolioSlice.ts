@@ -3,6 +3,8 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import PortfolioService from "@/services/modules/portfolio.service";
 import type { CreatePortfolioAssetDto } from "@/api/portfolioApi";
 
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
+
 export interface AssetAllocation {
   id: string;
   userId: string;
@@ -33,7 +35,9 @@ export const fetchPortfolio = createAsyncThunk(
   "portfolio/fetchPortfolio",
   async (_, { rejectWithValue }) => {
     try {
-      return (await PortfolioService.getAll()) as AssetAllocation[];
+      const requestingUserId = getActiveUserId();
+      const assets = (await PortfolioService.getAll()) as AssetAllocation[];
+      return { assets, requestingUserId };
     } catch (error: unknown) {
       if (error instanceof Error) {
         return rejectWithValue(error.message);
@@ -72,9 +76,19 @@ export const portfolioSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchPortfolio.fulfilled, (state, action: PayloadAction<AssetAllocation[]>) => {
+      .addCase(fetchPortfolio.fulfilled, (state, action) => {
         state.loading = false;
-        state.assets = action.payload;
+        const payloadObj = action.payload as
+          { assets?: AssetAllocation[]; requestingUserId?: string } | AssetAllocation[];
+        const requestingUserId = Array.isArray(payloadObj)
+          ? undefined
+          : payloadObj.requestingUserId;
+        const assets = Array.isArray(payloadObj) ? payloadObj : payloadObj.assets || [];
+
+        if (!isCurrentSessionUser(requestingUserId)) {
+          return;
+        }
+        state.assets = assets;
         state.error = null;
       })
       .addCase(fetchPortfolio.rejected, (state, action) => {

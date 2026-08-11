@@ -3,6 +3,8 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import dashboardApi from "@/api/dashboardApi";
 import type { DashboardDto } from "@/api/dashboardApi";
 
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
+
 export interface DashboardState {
   data: DashboardDto | null;
   loading: boolean;
@@ -19,9 +21,10 @@ export const fetchDashboardData = createAsyncThunk(
   "dashboard/fetchDashboardData",
   async (_, { rejectWithValue }) => {
     try {
+      const requestingUserId = getActiveUserId();
       const response = await dashboardApi.getFullDashboard();
       if (response.success && response.data) {
-        return response.data;
+        return { data: response.data, requestingUserId };
       }
       return rejectWithValue(response.message || "Dashboard verisi yüklenemedi.");
     } catch (err: unknown) {
@@ -50,9 +53,19 @@ export const dashboardSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchDashboardData.fulfilled, (state, action: PayloadAction<DashboardDto>) => {
+      .addCase(fetchDashboardData.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
+        const payloadObj = action.payload as
+          { data?: DashboardDto; requestingUserId?: string } | DashboardDto;
+        const requestingUserId =
+          "requestingUserId" in payloadObj ? payloadObj.requestingUserId : undefined;
+        const data =
+          "data" in payloadObj && payloadObj.data ? payloadObj.data : (payloadObj as DashboardDto);
+
+        if (!isCurrentSessionUser(requestingUserId)) {
+          return;
+        }
+        state.data = data;
         state.error = null;
       })
       .addCase(fetchDashboardData.rejected, (state, action) => {

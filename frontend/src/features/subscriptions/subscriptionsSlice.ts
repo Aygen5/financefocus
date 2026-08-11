@@ -33,11 +33,15 @@ const initialState: SubscriptionsState = {
   error: null,
 };
 
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
+
 export const fetchSubscriptions = createAsyncThunk(
   "subscriptions/fetchSubscriptions",
   async (_, { rejectWithValue }) => {
     try {
-      return (await SubscriptionsService.getAll()) as Subscription[];
+      const requestingUserId = getActiveUserId();
+      const items = (await SubscriptionsService.getAll()) as Subscription[];
+      return { items, requestingUserId };
     } catch (error: unknown) {
       if (error instanceof Error) {
         return rejectWithValue(error.message);
@@ -104,9 +108,19 @@ export const subscriptionsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchSubscriptions.fulfilled, (state, action: PayloadAction<Subscription[]>) => {
+      .addCase(fetchSubscriptions.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        const payloadObj = action.payload as
+          { items?: Subscription[]; requestingUserId?: string } | Subscription[];
+        const requestingUserId = Array.isArray(payloadObj)
+          ? undefined
+          : payloadObj.requestingUserId;
+        const items = Array.isArray(payloadObj) ? payloadObj : payloadObj.items || [];
+
+        if (!isCurrentSessionUser(requestingUserId)) {
+          return;
+        }
+        state.items = items;
         state.error = null;
       })
       .addCase(fetchSubscriptions.rejected, (state, action) => {

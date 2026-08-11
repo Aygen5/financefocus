@@ -40,11 +40,15 @@ const initialState: TransactionsState = {
   error: null,
 };
 
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
+
 export const fetchTransactions = createAsyncThunk(
   "transactions/fetchTransactions",
   async (_, { rejectWithValue }) => {
     try {
-      return await TransactionsService.getAll();
+      const requestingUserId = getActiveUserId();
+      const items = await TransactionsService.getAll();
+      return { items, requestingUserId };
     } catch (error: unknown) {
       if (error instanceof Error) {
         return rejectWithValue(error.message);
@@ -120,9 +124,19 @@ export const transactionsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchTransactions.fulfilled, (state, action: PayloadAction<Transaction[]>) => {
+      .addCase(fetchTransactions.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        const payloadObj = action.payload as
+          { items?: Transaction[]; requestingUserId?: string } | Transaction[];
+        const requestingUserId = Array.isArray(payloadObj)
+          ? undefined
+          : payloadObj.requestingUserId;
+        const items = Array.isArray(payloadObj) ? payloadObj : payloadObj.items || [];
+
+        if (!isCurrentSessionUser(requestingUserId)) {
+          return;
+        }
+        state.items = items;
         state.error = null;
       })
       .addCase(fetchTransactions.rejected, (state, action) => {

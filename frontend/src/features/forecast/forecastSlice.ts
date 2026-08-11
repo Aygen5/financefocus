@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
 import forecastApi from "@/api/forecastApi";
 import type { ForecastDto } from "@/api/forecastApi";
+
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
 
 export interface ForecastState {
   data: ForecastDto | null;
@@ -19,9 +20,10 @@ export const fetchForecastData = createAsyncThunk(
   "forecast/fetchForecastData",
   async (_, { rejectWithValue }) => {
     try {
+      const requestingUserId = getActiveUserId();
       const response = await forecastApi.getFullForecast();
       if (response.success && response.data) {
-        return response.data;
+        return { data: response.data, requestingUserId };
       }
       return rejectWithValue(response.message || "Tahmin verisi yüklenemedi.");
     } catch (err: unknown) {
@@ -47,9 +49,19 @@ export const forecastSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchForecastData.fulfilled, (state, action: PayloadAction<ForecastDto>) => {
+      .addCase(fetchForecastData.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
+        const payloadObj = action.payload as
+          { data?: ForecastDto; requestingUserId?: string } | ForecastDto;
+        const requestingUserId =
+          "requestingUserId" in payloadObj ? payloadObj.requestingUserId : undefined;
+        const data =
+          "data" in payloadObj && payloadObj.data ? payloadObj.data : (payloadObj as ForecastDto);
+
+        if (!isCurrentSessionUser(requestingUserId)) {
+          return;
+        }
+        state.data = data;
         state.error = null;
       })
       .addCase(fetchForecastData.rejected, (state, action) => {

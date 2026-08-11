@@ -40,6 +40,14 @@ const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: A
   if (action.type === "auth/logout") {
     const themeState = state?.theme;
     state = undefined;
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("user_settings");
+      localStorage.removeItem("is_demo_mode");
+    } catch {
+      // Ignore localStorage errors
+    }
     if (themeState) {
       return appReducer({ theme: themeState } as ReturnType<typeof appReducer>, action);
     }

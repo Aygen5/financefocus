@@ -3,6 +3,8 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import financialHealthApi from "@/api/financialHealthApi";
 import type { FinancialHealthDto } from "@/api/financialHealthApi";
 
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
+
 export interface FinancialHealthState {
   healthData: FinancialHealthDto | null;
   score: number;
@@ -23,9 +25,10 @@ export const fetchFinancialHealth = createAsyncThunk(
   "financialHealth/fetchFinancialHealth",
   async (_, { rejectWithValue }) => {
     try {
+      const requestingUserId = getActiveUserId();
       const response = await financialHealthApi.getFullHealth();
       if (response.success && response.data) {
-        return response.data;
+        return { data: response.data, requestingUserId };
       }
       return rejectWithValue(response.message || "Finansal sağlık verisi alınamadı.");
     } catch (err: unknown) {
@@ -55,11 +58,14 @@ export const financialHealthSlice = createSlice({
       })
       .addCase(
         fetchFinancialHealth.fulfilled,
-        (state, action: PayloadAction<FinancialHealthDto>) => {
+        (state, action: PayloadAction<{ data: FinancialHealthDto; requestingUserId?: string }>) => {
           state.loading = false;
-          state.healthData = action.payload;
-          state.score = action.payload.financialHealthScore;
-          state.riskLevel = action.payload.riskLevel;
+          if (!isCurrentSessionUser(action.payload.requestingUserId)) {
+            return;
+          }
+          state.healthData = action.payload.data;
+          state.score = action.payload.data.financialHealthScore;
+          state.riskLevel = action.payload.data.riskLevel;
           state.error = null;
         },
       )

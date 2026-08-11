@@ -31,9 +31,13 @@ const initialState: GoalsState = {
   error: null,
 };
 
+import { getActiveUserId, isCurrentSessionUser } from "@/utils/session";
+
 export const fetchGoals = createAsyncThunk("goals/fetchGoals", async (_, { rejectWithValue }) => {
   try {
-    return (await GoalsService.getAll()) as FinancialGoal[];
+    const requestingUserId = getActiveUserId();
+    const items = (await GoalsService.getAll()) as FinancialGoal[];
+    return { items, requestingUserId };
   } catch (error: unknown) {
     if (error instanceof Error) {
       return rejectWithValue(error.message);
@@ -99,9 +103,19 @@ export const goalsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchGoals.fulfilled, (state, action: PayloadAction<FinancialGoal[]>) => {
+      .addCase(fetchGoals.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        const payloadObj = action.payload as
+          { items?: FinancialGoal[]; requestingUserId?: string } | FinancialGoal[];
+        const requestingUserId = Array.isArray(payloadObj)
+          ? undefined
+          : payloadObj.requestingUserId;
+        const items = Array.isArray(payloadObj) ? payloadObj : payloadObj.items || [];
+
+        if (!isCurrentSessionUser(requestingUserId)) {
+          return;
+        }
+        state.items = items;
         state.error = null;
       })
       .addCase(fetchGoals.rejected, (state, action) => {

@@ -136,6 +136,7 @@ public class OnboardingService : IOnboardingService
         }
 
         await _unitOfWork.SaveChangesAsync();
+        await _cacheService.RemoveByPrefixAsync(userId);
         await _cacheService.RemoveAsync($"financial:engine:{userId}");
         return Result<bool>.Success(true, "2026 Production demo verileri başarıyla yükledi.");
     }
@@ -144,6 +145,7 @@ public class OnboardingService : IOnboardingService
     {
         await InternalClearDemoDataAsync(userId);
         await _unitOfWork.SaveChangesAsync();
+        await _cacheService.RemoveByPrefixAsync(userId);
         await _cacheService.RemoveAsync($"financial:engine:{userId}");
         return Result<bool>.Success(true, "Demo verileri başarıyla temizlendi. Gerçek verileriniz korundu.");
     }
