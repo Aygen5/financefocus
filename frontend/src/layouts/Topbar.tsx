@@ -87,10 +87,6 @@ const Topbar: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchNotifications());
-    dispatch(fetchTransactions());
-    dispatch(fetchBudgets());
-    dispatch(fetchGoals());
-    dispatch(fetchSubscriptions());
   }, [dispatch]);
 
   useEffect(() => {
@@ -251,7 +247,13 @@ const Topbar: React.FC = () => {
             placeholder="Arayın... (örn: Migros, Bütçe, Maaş)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setIsSearchFocused(true)}
+            onFocus={() => {
+              setIsSearchFocused(true);
+              if (!transactions.length) dispatch(fetchTransactions());
+              if (!budgets.length) dispatch(fetchBudgets());
+              if (!goals.length) dispatch(fetchGoals());
+              if (!subscriptions.length) dispatch(fetchSubscriptions());
+            }}
             className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-full py-1.5 pl-10 pr-4 font-semibold text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder-slate-400"
           />
         </div>
