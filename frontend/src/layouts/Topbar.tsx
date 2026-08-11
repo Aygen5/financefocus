@@ -40,6 +40,8 @@ import { QuickActionModal } from "./components/QuickActionModal";
 import { HelpModal } from "./components/HelpModal";
 import useIsDemoActive from "@/hooks/useIsDemoActive";
 
+import { normalizeForSearch } from "@/utils/search";
+
 const getNotifIcon = (iconName: string, type: string) => {
   const styles = "w-4 h-4 shrink-0 mt-0.5";
   switch (iconName) {
@@ -91,11 +93,11 @@ const Topbar: React.FC = () => {
 
   useEffect(() => {
     const handleShortcuts = (e: KeyboardEvent) => {
-      if (e.altKey && e.key.toLowerCase() === "h") {
+      if (e.altKey && e.key?.toLowerCase() === "h") {
         e.preventDefault();
         setIsHelpOpen(true);
       }
-      if (e.altKey && e.key.toLowerCase() === "n") {
+      if (e.altKey && e.key?.toLowerCase() === "n") {
         e.preventDefault();
         setIsQuickActionOpen(true);
       }
@@ -144,13 +146,15 @@ const Topbar: React.FC = () => {
   const currentMenu = navigationConfig.find((item) => item.path === currentPath);
   const pageTitle = currentMenu ? currentMenu.label : "FinanceFocus";
 
-  const query = searchQuery.toLowerCase().trim();
+  const query = normalizeForSearch(searchQuery);
 
   const filteredTransactions = query
     ? transactions
         .filter(
           (t) =>
-            t.description.toLowerCase().includes(query) || t.category.toLowerCase().includes(query),
+            normalizeForSearch(t?.description).includes(query) ||
+            normalizeForSearch(t?.category).includes(query) ||
+            normalizeForSearch(t?.account).includes(query),
         )
         .slice(0, 3)
     : [];
@@ -159,7 +163,9 @@ const Topbar: React.FC = () => {
     ? budgets
         .filter(
           (b) =>
-            b.category.toLowerCase().includes(query) || b.limitAmount.toString().includes(query),
+            normalizeForSearch(b?.category).includes(query) ||
+            normalizeForSearch(b?.limitAmount).includes(query) ||
+            normalizeForSearch(b?.description).includes(query),
         )
         .slice(0, 3)
     : [];
@@ -168,9 +174,9 @@ const Topbar: React.FC = () => {
     ? goals
         .filter(
           (g) =>
-            g.name.toLowerCase().includes(query) ||
-            (g.notes && g.notes.toLowerCase().includes(query)) ||
-            g.category.toLowerCase().includes(query),
+            normalizeForSearch(g?.name).includes(query) ||
+            normalizeForSearch(g?.notes).includes(query) ||
+            normalizeForSearch(g?.category).includes(query),
         )
         .slice(0, 3)
     : [];
@@ -178,7 +184,9 @@ const Topbar: React.FC = () => {
   const filteredSubscriptions = query
     ? subscriptions
         .filter(
-          (s) => s.name.toLowerCase().includes(query) || s.category.toLowerCase().includes(query),
+          (s) =>
+            normalizeForSearch(s?.name).includes(query) ||
+            normalizeForSearch(s?.category).includes(query),
         )
         .slice(0, 3)
     : [];
@@ -187,7 +195,8 @@ const Topbar: React.FC = () => {
     ? navigationConfig
         .filter(
           (item) =>
-            item.label.toLowerCase().includes(query) || item.path.toLowerCase().includes(query),
+            normalizeForSearch(item?.label).includes(query) ||
+            normalizeForSearch(item?.path).includes(query),
         )
         .slice(0, 3)
     : [];
@@ -327,11 +336,11 @@ const Topbar: React.FC = () => {
                           </div>
                           <div className="truncate flex-1">
                             <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold truncate group-hover:text-primary dark:group-hover:text-brand-400 transition-colors">
-                              {tx.description}
+                              {tx.description || tx.category || "İşlem"}
                             </p>
                             <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-500 truncate">
-                              {tx.category} • {txInfo.sign}
-                              {tx.amount.toLocaleString("tr-TR")} ₺
+                              {tx.category || "Genel"} • {txInfo.sign}
+                              {(tx.amount || 0).toLocaleString("tr-TR")} ₺
                             </p>
                           </div>
                         </button>
@@ -360,10 +369,10 @@ const Topbar: React.FC = () => {
                         </div>
                         <div className="truncate flex-1">
                           <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold truncate group-hover:text-primary dark:group-hover:text-brand-400 transition-colors">
-                            {b.category} Bütçesi
+                            {b.category || "Genel"} Bütçesi
                           </p>
                           <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-500 truncate">
-                            Limit: {b.limitAmount.toLocaleString("tr-TR")} ₺
+                            Limit: {(b.limitAmount || 0).toLocaleString("tr-TR")} ₺
                           </p>
                         </div>
                       </button>
@@ -391,10 +400,10 @@ const Topbar: React.FC = () => {
                         </div>
                         <div className="truncate flex-1">
                           <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold truncate group-hover:text-primary dark:group-hover:text-brand-400 transition-colors">
-                            {g.name}
+                            {g.name || "Hedef"}
                           </p>
                           <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-500 truncate">
-                            Hedef: {g.targetAmount.toLocaleString("tr-TR")} ₺
+                            Hedef: {(g.targetAmount || 0).toLocaleString("tr-TR")} ₺
                           </p>
                         </div>
                       </button>
@@ -422,10 +431,10 @@ const Topbar: React.FC = () => {
                         </div>
                         <div className="truncate flex-1">
                           <p className="font-label-md text-label-md text-slate-800 dark:text-white font-bold truncate group-hover:text-primary dark:group-hover:text-brand-400 transition-colors">
-                            {s.name} Aboneliği
+                            {s.name || "Abonelik"} Aboneliği
                           </p>
                           <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-500 truncate">
-                            Ücret: {s.cost.toLocaleString("tr-TR")} ₺ / aylık
+                            Ücret: {(s.cost || s.price || 0).toLocaleString("tr-TR")} ₺ / aylık
                           </p>
                         </div>
                       </button>
