@@ -6,6 +6,7 @@ import {
   selectDashboardLoading,
   selectDashboardError,
 } from "@/features/dashboard/dashboardSlice";
+import { clearChat } from "@/features/ai/aiSlice";
 import onboardingApi from "@/api/onboardingApi";
 import SummaryCards from "@/features/dashboard/components/SummaryCards";
 import CashFlowAnalysis from "@/features/dashboard/components/CashFlowAnalysis";
@@ -109,6 +110,7 @@ const Dashboard: React.FC = () => {
       const res = await onboardingApi.seedDemoData();
       if (res.success) {
         toast.success(res.message || "Demo verileri başarıyla oluşturuldu!");
+        dispatch(clearChat());
         loadDashboardData();
       } else {
         toast.error(res.message || "Demo verileri oluşturulamadı.");

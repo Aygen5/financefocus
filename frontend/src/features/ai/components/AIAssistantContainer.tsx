@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   addUserMessage,
@@ -60,8 +60,15 @@ export const AIAssistantContainer: React.FC = () => {
       : "bg-emerald-500 animate-pulse";
   const statusText = loading ? "Yanıt Üretiliyor (Qwen 2.5)" : "Hazır (Ollama Local)";
 
-  const [inputValue, setInputValue] = useState("");
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const activeUserId = useAppSelector((state) => state.auth?.user?.id);
+  const prevUserIdRef = useRef<string | undefined>(activeUserId);
+
+  useEffect(() => {
+    if (prevUserIdRef.current !== activeUserId) {
+      prevUserIdRef.current = activeUserId;
+      dispatch(clearChat());
+    }
+  }, [activeUserId, dispatch]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });

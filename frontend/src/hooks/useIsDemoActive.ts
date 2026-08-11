@@ -10,6 +10,7 @@ import { fetchSubscriptions } from "@/features/subscriptions/subscriptionsSlice"
 import { fetchFinancialHealth } from "@/features/financialHealth/financialHealthSlice";
 import { fetchActivities } from "@/features/activity/activitySlice";
 import { fetchNotifications } from "@/features/notifications/notificationsSlice";
+import { clearChat } from "@/features/ai/aiSlice";
 import toast from "react-hot-toast";
 
 export const useIsDemoActive = () => {
@@ -61,6 +62,7 @@ export const useIsDemoActive = () => {
       if (res.success) {
         localStorage.removeItem("is_demo_mode");
         toast.success("Demo modundan çıkıldı. Demo verileri temizlendi.");
+        dispatch(clearChat());
         dispatch(fetchDashboardData());
         dispatch(fetchTransactions());
         dispatch(fetchBudgets());
