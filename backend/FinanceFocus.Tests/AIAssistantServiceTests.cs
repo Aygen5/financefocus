@@ -60,6 +60,34 @@ public class AIAssistantServiceTests
     }
 
     [Theory]
+    [InlineData("Finansal sağlığımı yorumla.")]
+    [InlineData("Finansal durumumu analiz et.")]
+    [InlineData("Bu ay harcamalarımı yorumla.")]
+    [InlineData("Tasarruf durumumu değerlendir.")]
+    [InlineData("Bütçemi nasıl iyileştirebilirim?")]
+    public async Task ProcessChatMessageAsync_FiveMandatoryInterpretationQuestions_ReturnMultiSentenceAnalyticalEvaluations(string userQuestion)
+    {
+        var request = new AIChatRequestDto { Prompt = userQuestion };
+        var result = await _service.ProcessChatMessageAsync("user-123", request);
+
+        Assert.NotNull(result);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
+
+        var answer = result.Data.Answer;
+
+        // Verify answer is NOT a single sentence or raw number string
+        Assert.True(answer.Length > 150, $"Expected detailed analysis text (length > 150), got: {answer}");
+        Assert.DoesNotContain("Finansal konular dışındaki sorulara yanıt veremiyorum", answer);
+
+        // Verify it contains contextual analytical words (e.g. skor, tasarruf, gelir, bütçe, değerlendir, göster, kısıtlayarak)
+        Assert.True(
+            answer.Contains("göster") || answer.Contains("etki") || answer.Contains("faktör") ||
+            answer.Contains("öneri") || answer.Contains("seviye") || answer.Contains("ağırlık") ||
+            answer.Contains("oranı") || answer.Contains("değerlendirm"));
+    }
+
+    [Theory]
     [InlineData("Bu ay nerede fazla harcadım?")]
     [InlineData("Bütçemi nasıl iyileştirebilirim?")]
     [InlineData("Tasarruf önerisi oluştur.")]

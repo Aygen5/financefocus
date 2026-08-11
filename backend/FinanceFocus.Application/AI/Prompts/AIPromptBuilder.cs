@@ -13,18 +13,22 @@ public class AIPromptBuilder : IAIPromptBuilder
     public string BuildSystemPromptWithContext(FinancialCoreMetricsDto metrics, AIIntentType intent)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Sen FinanceFocus uygulamasının akıllı ve profesyonel finansal asistanısın. Kullanıcının sorusuna doğrudan, samimi, anlaşılır ve kusursuz bir Türkçe ile yanıt ver.");
-        sb.AppendLine("KATI KURALLAR:");
+        sb.AppendLine("Sen FinanceFocus uygulamasının uzman, akıllı ve samimi finansal asistanısın. Kullanıcının sorusuna doğrudan, detaylı ve kusursuz bir Türkçe ile yanıt ver.");
+        sb.AppendLine("KATI TALİMATLAR:");
         sb.AppendLine("1. ASLA verilen backend metrikleri dışında rastgele sayı veya veri UYDURMA.");
-        sb.AppendLine("2. Kullanıcının sorduğu özel soru ne ise O SORUYA ODAKLAN. Sabit bir şablon veya genel başlık kalıpları tekrarlama.");
-        sb.AppendLine("3. Kullanıcı harcamalarını, bütçesini, tasarruflarını veya aboneliklerini sorduğunda aşağıdaki gerçek verilerini kullanarak somut rakamlar ver.");
-        sb.AppendLine("4. Çıktılarını okunaklı maddeler veya kısa paragraflar halinde sun.");
+        sb.AppendLine("2. SADECE METRİKLERİ VE RAKAMLARI LİSTELEME! Kullanıcı 'Finansal sağlığımı yorumla', 'Harcamalarımı analiz et', 'Bütçemi değerlendir' gibi analiz/yorum istediğinde:");
+        sb.AppendLine("   - Metriğin (skor, harcama tutarı, tasarruf oranı vb.) NE ANLAMA GELDİĞİNİ ve NEDEN bu seviyede olduğunu açıkla.");
+        sb.AppendLine("   - Gelir/gider dengesini, harcama dağılımını, abonelik yükünü ve tasarruf kapasitesini birbiriyle ilişkilendirerek güçlü ve zayıf yönleri değerlendir.");
+        sb.AppendLine("   - Kullanıcıya durumunu iyileştirmesi için 2-3 somut, uygulanabilir tavsiye ve eylem adımı sun.");
+        sb.AppendLine("   - Yanıtın tek cümlelik veya yüzeysel olmamalı; en az 4-6 cümlelik anlamlı ve bütüncül bir değerlendirme içermelidir.");
+        sb.AppendLine("3. Kullanıcı finansal olmayan bir soru sorduğunda (örn: hava durumu) kibarca sadece finansal konularda yardımcı olabileceğini belirt.");
         sb.AppendLine();
         sb.AppendLine("KULLANICININ GERÇEK HESAPLANMIŞ FİNANSAL METRİKLERİ (SINGLE SOURCE OF TRUTH):");
         sb.AppendLine($"- Aylık Gelir: {metrics.MonthlyIncome:N2} TL");
         sb.AppendLine($"- Aylık Gider: {metrics.MonthlyExpense:N2} TL");
         sb.AppendLine($"- Net Aylık Tasarruf: {metrics.NetSavings:N2} TL");
         sb.AppendLine($"- Tasarruf Oranı: %{metrics.SavingsRate:N0}");
+        sb.AppendLine($"- Gelir / Gider Oranı: {metrics.IncomeToExpenseRatio:N1} Kat");
         sb.AppendLine($"- Toplam Bakiye: {metrics.TotalBalance:N2} TL");
         sb.AppendLine($"- Finansal Sağlık Skoru: {metrics.FinancialHealthScore}/100 ({metrics.RiskLevel} Risk Grubu)");
 
