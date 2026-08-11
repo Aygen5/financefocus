@@ -46,6 +46,11 @@ export const dashboardSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    resetDashboard: (state) => {
+      state.data = null;
+      state.loading = false;
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -80,5 +85,5 @@ export const selectDashboardLoading = (state: { dashboard: DashboardState }) =>
   state.dashboard.loading;
 export const selectDashboardError = (state: { dashboard: DashboardState }) => state.dashboard.error;
 
-export const { setLoading, setError } = dashboardSlice.actions;
+export const { setLoading, setError, resetDashboard } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

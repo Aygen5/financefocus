@@ -1,16 +1,25 @@
 import { useMemo, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
 import onboardingApi from "@/api/onboardingApi";
-import { fetchDashboardData } from "@/features/dashboard/dashboardSlice";
-import { fetchTransactions } from "@/features/transactions/transactionsSlice";
-import { fetchBudgets } from "@/features/budget/budgetSlice";
-import { fetchPortfolio } from "@/features/portfolio/portfolioSlice";
-import { fetchGoals } from "@/features/goals/goalsSlice";
-import { fetchSubscriptions } from "@/features/subscriptions/subscriptionsSlice";
-import { fetchFinancialHealth } from "@/features/financialHealth/financialHealthSlice";
-import { fetchActivities } from "@/features/activity/activitySlice";
-import { fetchNotifications } from "@/features/notifications/notificationsSlice";
+import { fetchDashboardData, resetDashboard } from "@/features/dashboard/dashboardSlice";
+import { fetchTransactions, clearTransactions } from "@/features/transactions/transactionsSlice";
+import { fetchBudgets, clearBudgets } from "@/features/budget/budgetSlice";
+import { fetchPortfolio, clearPortfolio } from "@/features/portfolio/portfolioSlice";
+import { fetchGoals, clearGoals } from "@/features/goals/goalsSlice";
+import {
+  fetchSubscriptions,
+  clearSubscriptions,
+} from "@/features/subscriptions/subscriptionsSlice";
+import { fetchFinancialHealth, resetHealth } from "@/features/financialHealth/financialHealthSlice";
+import { fetchForecastData, clearForecast } from "@/features/forecast/forecastSlice";
+import { clearReports } from "@/features/reports/reportsSlice";
+import { fetchActivities, clearActivities } from "@/features/activity/activitySlice";
+import {
+  fetchNotifications,
+  clearNotifications,
+} from "@/features/notifications/notificationsSlice";
 import { clearChat } from "@/features/ai/aiSlice";
+import { logout } from "@/features/auth/authSlice";
 import toast from "react-hot-toast";
 
 export const useIsDemoActive = () => {
@@ -60,26 +69,50 @@ export const useIsDemoActive = () => {
   const exitDemoMode = useCallback(async () => {
     try {
       const res = await onboardingApi.clearDemoData();
+      localStorage.removeItem("is_demo_mode");
+
+      // 1. Instantly purge all Redux slice states to clean empty slate
+      dispatch(resetDashboard());
+      dispatch(clearTransactions());
+      dispatch(clearBudgets());
+      dispatch(clearPortfolio());
+      dispatch(clearGoals());
+      dispatch(clearSubscriptions());
+      dispatch(resetHealth());
+      dispatch(clearForecast());
+      dispatch(clearReports());
+      dispatch(clearActivities());
+      dispatch(clearNotifications());
+      dispatch(clearChat());
+
+      // 2. If logged in under the Demo account (demo@financefocus.com), log out completely
+      if (user?.email?.toLowerCase() === "demo@financefocus.com") {
+        dispatch(logout());
+        toast.success("Demo hesabından çıkış yapıldı.");
+        return;
+      }
+
+      // 3. For real users, notify and re-fetch real data (which will now return clean 0s)
       if (res.success) {
-        localStorage.removeItem("is_demo_mode");
-        toast.success("Demo modundan çıkıldı. Demo verileri temizlendi.");
-        dispatch(clearChat());
-        dispatch(fetchDashboardData());
-        dispatch(fetchTransactions());
-        dispatch(fetchBudgets());
-        dispatch(fetchPortfolio());
-        dispatch(fetchGoals());
-        dispatch(fetchSubscriptions());
-        dispatch(fetchFinancialHealth());
-        dispatch(fetchActivities());
-        dispatch(fetchNotifications());
+        toast.success("Demo modundan çıkıldı. Tüm demo verileri silindi.");
       } else {
         toast.error(res.message || "Demo verileri temizlenirken hata oluştu.");
       }
+
+      dispatch(fetchDashboardData());
+      dispatch(fetchTransactions());
+      dispatch(fetchBudgets());
+      dispatch(fetchPortfolio());
+      dispatch(fetchGoals());
+      dispatch(fetchSubscriptions());
+      dispatch(fetchFinancialHealth());
+      dispatch(fetchForecastData());
+      dispatch(fetchActivities());
+      dispatch(fetchNotifications());
     } catch {
       toast.error("Demo verileri temizlenirken hata oluştu.");
     }
-  }, [dispatch]);
+  }, [dispatch, user]);
 
   return {
     isDemoActive,
