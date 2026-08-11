@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authApi from "../../api/authApi";
 import type { LoginRequestDto, RegisterRequestDto, UserDto } from "../../api/authApi";
+import { purgeAllSessionStorage } from "@/utils/session";
 
 export interface AuthState {
   user: UserDto | null;
@@ -73,10 +74,7 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("user_settings");
-      localStorage.removeItem("is_demo_mode");
+      purgeAllSessionStorage();
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;

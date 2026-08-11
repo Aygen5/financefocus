@@ -19,3 +19,19 @@ export const isCurrentSessionUser = (requestingUserId?: string): boolean => {
   if (!currentActiveId) return false; // User logged out while request was in flight
   return currentActiveId === requestingUserId;
 };
+
+/**
+ * Completely purges all user data and fallback database keys from localStorage.
+ */
+export const purgeAllSessionStorage = (): void => {
+  try {
+    const keysToPreserve = ["theme_mode"];
+    Object.keys(localStorage).forEach((key) => {
+      if (!keysToPreserve.includes(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch {
+    // Ignore storage access errors
+  }
+};

@@ -21,7 +21,7 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { loading, error, isAuthenticated, user } = useAppSelector((state) => state.auth);
 
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isForgotSuccess, setIsForgotSuccess] = useState(false);
@@ -56,12 +56,17 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      const loggedInUserName =
+        user?.firstName && user?.lastName
+          ? `${user.firstName} ${user.lastName}`
+          : user?.name || user?.email || "Kullanıcı";
+
       dispatch(
         addActivityLog({
           action: "Giriş Yap",
           category: "Auth",
           description: "Kullanıcı sisteme başarıyla giriş yaptı.",
-          user: "Demo Kullanıcı",
+          user: loggedInUserName,
           icon: "LogIn",
           status: "success",
         }),
@@ -76,7 +81,7 @@ const Login: React.FC = () => {
       );
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, dispatch]);
+  }, [isAuthenticated, navigate, dispatch, user]);
 
   useEffect(() => {
     if (error) {
