@@ -19,7 +19,6 @@ import {
   clearNotifications,
 } from "@/features/notifications/notificationsSlice";
 import { clearChat } from "@/features/ai/aiSlice";
-import { logout } from "@/features/auth/authSlice";
 import toast from "react-hot-toast";
 
 export const useIsDemoActive = () => {
@@ -32,8 +31,6 @@ export const useIsDemoActive = () => {
   const { items: subscriptions = [] } = useAppSelector((state) => state.subscriptions || {});
   const { logs: activities = [] } = useAppSelector((state) => state.activity || {});
   const { notifications = [] } = useAppSelector((state) => state.notifications || {});
-
-  const user = useAppSelector((state) => state.auth?.user);
 
   // Dynamic counts based on actual EF Core DB / API entity flags (IsDemo == true)
   const demoCounts = useMemo(() => {
@@ -62,9 +59,8 @@ export const useIsDemoActive = () => {
   // Single Source of Truth: Is Demo Mode active?
   const isDemoActive = useMemo(() => {
     const isStoredDemo = localStorage.getItem("is_demo_mode") === "true";
-    const isDemoUser = user?.email?.toLowerCase() === "demo@financefocus.com";
-    return isStoredDemo || isDemoUser;
-  }, [user]);
+    return isStoredDemo || demoCounts.total > 0;
+  }, [demoCounts.total]);
 
   const exitDemoMode = useCallback(async () => {
     try {
@@ -85,34 +81,29 @@ export const useIsDemoActive = () => {
       dispatch(clearNotifications());
       dispatch(clearChat());
 
-      // 2. If logged in under the Demo account (demo@financefocus.com), log out completely
-      if (user?.email?.toLowerCase() === "demo@financefocus.com") {
-        dispatch(logout());
-        toast.success("Demo hesabından çıkış yapıldı.");
-        return;
-      }
-
-      // 3. For real users, notify and re-fetch real data (which will now return clean 0s)
+      // 2. Notify and re-fetch real user data from backend (which returns clean 0s + any real user items)
       if (res.success) {
-        toast.success("Demo modundan çıkıldı. Tüm demo verileri silindi.");
+        toast.success("Demo modundan çıkıldı. Demo verileri temizlendi.");
       } else {
         toast.error(res.message || "Demo verileri temizlenirken hata oluştu.");
       }
 
-      dispatch(fetchDashboardData());
-      dispatch(fetchTransactions());
-      dispatch(fetchBudgets());
-      dispatch(fetchPortfolio());
-      dispatch(fetchGoals());
-      dispatch(fetchSubscriptions());
-      dispatch(fetchFinancialHealth());
-      dispatch(fetchForecastData());
-      dispatch(fetchActivities());
-      dispatch(fetchNotifications());
+      await Promise.all([
+        dispatch(fetchDashboardData()),
+        dispatch(fetchTransactions()),
+        dispatch(fetchBudgets()),
+        dispatch(fetchPortfolio()),
+        dispatch(fetchGoals()),
+        dispatch(fetchSubscriptions()),
+        dispatch(fetchFinancialHealth()),
+        dispatch(fetchForecastData()),
+        dispatch(fetchActivities()),
+        dispatch(fetchNotifications()),
+      ]);
     } catch {
       toast.error("Demo verileri temizlenirken hata oluştu.");
     }
-  }, [dispatch, user]);
+  }, [dispatch]);
 
   return {
     isDemoActive,
