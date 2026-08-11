@@ -8,6 +8,7 @@ public enum AIIntentType
     SavingsRateQuestion,
     SavingsAdviceQuestion,
     SpendingAnalysisQuestion,
+    ExpenseReductionQuestion,
     ExpenseComparisonQuestion,
     LargestExpenseQuestion,
     PortfolioValueQuestion,
@@ -15,7 +16,9 @@ public enum AIIntentType
     SubscriptionQuestion,
     SubscriptionAnalysisQuestion,
     RiskQuestion,
+    FinancialHealthQuestion,
     BudgetAdviceQuestion,
+    ForecastQuestion,
     GeneralConversation
 }
 

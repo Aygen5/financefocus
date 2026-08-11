@@ -14,12 +14,31 @@ public class AIIntentClassifier : IAIIntentClassifier
 
         var q = Normalize(prompt);
 
-        if (q.Contains("merhaba") || q.Contains("selam") || q.Contains("hava nasil") || q.Contains("gunaydin") || q.Contains("iyi gunler"))
+        // Non-financial greetings / weather / trivia
+        if (q.Contains("merhaba") || q.Contains("selam") || q.Contains("hava nasil") || q.Contains("gunaydin") || q.Contains("iyi gunler") || q.Contains("fikra") || q.Contains("en sevdigin"))
         {
             return AIIntentType.GeneralConversation;
         }
 
-        // Subscriptions ("Aboneliklerim ne kadar", "En pahalı abonelik", "Abonelik harcamaları")
+        // 1. Forecast / Future Predictions ("Önümüzdeki ay beni ne bekliyor?", "Gelecek ay tahmini")
+        if (q.Contains("onumuzdeki") || q.Contains("gelecek") || q.Contains("bekliyor") || q.Contains("tahmin") || q.Contains("onumuzdeki ay"))
+        {
+            return AIIntentType.ForecastQuestion;
+        }
+
+        // 2. Financial Health Analysis ("Finansal sağlığımı analiz et", "Finansal durumum nasıl?", "Sağlık skorum ne?")
+        if (q.Contains("saglik") || q.Contains("skor") || q.Contains("risk") || (q.Contains("finansal") && (q.Contains("analiz") || q.Contains("durum") || q.Contains("nasil"))))
+        {
+            return AIIntentType.FinancialHealthQuestion;
+        }
+
+        // 3. Expense Reduction ("Giderlerimi nasıl azaltabilirim?", "Harcamalarımı nasıl düşürebilirim?", "Nereden kısabilirim?")
+        if ((q.Contains("gider") || q.Contains("harcama")) && (q.Contains("azalt") || q.Contains("dusur") || q.Contains("kisa") || q.Contains("kisabi")))
+        {
+            return AIIntentType.ExpenseReductionQuestion;
+        }
+
+        // 4. Subscriptions ("Aboneliklerime ne kadar para gidiyor?", "En pahalı aboneliğim hangisi?")
         if (q.Contains("abone"))
         {
             if (q.Contains("en pahali") || q.Contains("en yuksek") || q.Contains("en fazla") || q.Contains("hangisi"))
@@ -29,46 +48,47 @@ public class AIIntentClassifier : IAIIntentClassifier
             return AIIntentType.SubscriptionAnalysisQuestion;
         }
 
-        // Expense Comparison ("Gelirime göre giderlerim fazla mı?", "Gelir ve gider karşılaştır")
-        if (q.Contains("gelirim giderim") || (q.Contains("gelir") && q.Contains("gider")))
+        // 5. Income vs Expense Comparison ("Gelirime göre giderlerim fazla mı?")
+        if (q.Contains("gelirim giderim") || (q.Contains("gelir") && q.Contains("gider") && (q.Contains("kat") || q.Contains("karsilastir") || q.Contains("fazla"))))
         {
             return AIIntentType.ExpenseComparisonQuestion;
         }
 
-        // Savings Rate ("Tasarruf oranım nasıl?", "Tasarruf oranı")
+        // 6. Savings Rate / Savings Amount
         if (q.Contains("tasarruf oran") || (q.Contains("tasarruf") && (q.Contains("oran") || q.Contains("orani"))))
         {
             return AIIntentType.SavingsRateQuestion;
         }
 
-        // Savings Advice ("Tasarruf önerisi oluştur", "Nasıl tasarruf ederim", "Nereden kısabilirim")
-        if (q.Contains("tasarruf") && (q.Contains("oner") || q.Contains("tavsiye") || q.Contains("olustur") || q.Contains("kis") || q.Contains("artir") || q.Contains("yapabilirim")))
+        // 7. Savings Advice ("Tasarruf önerisi oluştur", "Nasıl tasarruf ederim")
+        if (q.Contains("tasarruf") && (q.Contains("oner") || q.Contains("tavsiye") || q.Contains("olustur") || q.Contains("nasil") || q.Contains("artir") || q.Contains("yapabilirim")))
         {
             return AIIntentType.SavingsAdviceQuestion;
         }
 
         if (q.Contains("tasarr"))
         {
-            if (q.Contains("net") || q.Contains("kac") || q.Contains("ne kadar"))
+            if (q.Contains("ettim") || q.Contains("net") || q.Contains("kac") || q.Contains("ne kadar"))
             {
                 return AIIntentType.SavingsQuestion;
             }
             return AIIntentType.SavingsAdviceQuestion;
         }
 
-        // Spending Analysis ("Bu ay nerede fazla harcadım?", "Harcama analizim", "En çok nereye gitti")
-        if (q.Contains("nerede") || q.Contains("nerelere") || q.Contains("harcadim") || q.Contains("dokum") || (q.Contains("harcama") && (q.Contains("analiz") || q.Contains("dağılım") || q.Contains("dagilim") || q.Contains("detay"))))
-        {
-            return AIIntentType.SpendingAnalysisQuestion;
-        }
-
-        // Largest Expense
-        if (q.Contains("en cok hangi") || q.Contains("en yuksek harcama") || q.Contains("en pahali kategori"))
+        // 8. Largest Expense Category ("En çok hangi kategoride harcama yaptım?", "En yüksek harcama")
+        if (q.Contains("en cok hangi") || q.Contains("en yuksek harcama") || q.Contains("en pahali kategori") || (q.Contains("en cok") && q.Contains("kategori")))
         {
             return AIIntentType.LargestExpenseQuestion;
         }
 
-        // Portfolio / Investments
+        // 9. Spending Analysis ("Bu ay nerede fazla harcadım?", "En çok param nereye gitmiş?", "Hangi kategoride fazla para harcadım?")
+        if (q.Contains("nerede") || q.Contains("nerelere") || q.Contains("harcadim") || q.Contains("para gitt") || q.Contains("para verdim") || q.Contains("buyuk kalem") ||
+            (q.Contains("harcama") && (q.Contains("analiz") || q.Contains("dagilim") || q.Contains("detay") || q.Contains("nasil") || q.Contains("kategori") || q.Contains("fazla"))))
+        {
+            return AIIntentType.SpendingAnalysisQuestion;
+        }
+
+        // 10. Portfolio / Investments ("Portföyümün durumu nasıl?", "Portföy değerim ne kadar?")
         if (q.Contains("portf") || q.Contains("varlik"))
         {
             if (q.Contains("yorum") || q.Contains("analiz") || q.Contains("degerlen") || q.Contains("nasil") || q.Contains("durum"))
@@ -78,18 +98,13 @@ public class AIIntentClassifier : IAIIntentClassifier
             return AIIntentType.PortfolioValueQuestion;
         }
 
-        // Financial Health / Risk ("Bu ay finansal durumum nasıl?", "Risk seviyem ne?")
-        if (q.Contains("risk") || q.Contains("saglik") || q.Contains("skor") || (q.Contains("finansal") && q.Contains("durum")))
-        {
-            return AIIntentType.RiskQuestion;
-        }
-
-        // Budget Advice ("Bütçemi nasıl iyileştirebilirim?", "Bütçe önerisi")
+        // 11. Budget Advice ("Bütçemi nasıl iyileştirebilirim?", "Bütçe planlaması")
         if (q.Contains("butc") || q.Contains("iyilest") || q.Contains("plan"))
         {
             return AIIntentType.BudgetAdviceQuestion;
         }
 
+        // 12. Income / Expense basic questions
         if (q.Contains("gider") || q.Contains("harcama"))
         {
             return AIIntentType.ExpenseQuestion;
