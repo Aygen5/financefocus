@@ -150,6 +150,15 @@ public class OnboardingService : IOnboardingService
         return Result<bool>.Success(true, "Demo verileri başarıyla temizlendi. Gerçek verileriniz korundu.");
     }
 
+    public async Task<Result<bool>> ClearAllUserDataAsync(string userId)
+    {
+        await InternalClearAllUserDataAsync(userId);
+        await _unitOfWork.SaveChangesAsync();
+        await _cacheService.RemoveByPrefixAsync(userId);
+        await _cacheService.RemoveAsync($"financial:engine:{userId}");
+        return Result<bool>.Success(true, "Tüm kullanıcı verileri sıfırlandı.");
+    }
+
     private async Task InternalClearDemoDataAsync(string userId)
     {
         var existingTrans = (await _unitOfWork.Transactions.GetByUserIdAsync(userId)).Where(t => t.IsDemo).ToList();
@@ -189,6 +198,51 @@ public class OnboardingService : IOnboardingService
         }
 
         var existingNotifs = (await _unitOfWork.Notifications.GetByUserIdAsync(userId)).Where(n => n.IsDemo).ToList();
+        foreach (var n in existingNotifs)
+        {
+            _unitOfWork.Notifications.Delete(n);
+        }
+    }
+
+    private async Task InternalClearAllUserDataAsync(string userId)
+    {
+        var existingTrans = (await _unitOfWork.Transactions.GetByUserIdAsync(userId)).ToList();
+        foreach (var t in existingTrans)
+        {
+            _unitOfWork.Transactions.Delete(t);
+        }
+
+        var existingBudgets = (await _unitOfWork.Budgets.GetByUserIdAsync(userId)).ToList();
+        foreach (var b in existingBudgets)
+        {
+            _unitOfWork.Budgets.Delete(b);
+        }
+
+        var existingGoals = (await _unitOfWork.Goals.GetByUserIdAsync(userId)).ToList();
+        foreach (var g in existingGoals)
+        {
+            _unitOfWork.Goals.Delete(g);
+        }
+
+        var existingSubs = (await _unitOfWork.Subscriptions.GetByUserIdAsync(userId)).ToList();
+        foreach (var s in existingSubs)
+        {
+            _unitOfWork.Subscriptions.Delete(s);
+        }
+
+        var existingAssets = (await _unitOfWork.PortfolioAssets.GetByUserIdAsync(userId)).ToList();
+        foreach (var a in existingAssets)
+        {
+            _unitOfWork.PortfolioAssets.Delete(a);
+        }
+
+        var existingLogs = (await _unitOfWork.ActivityLogs.GetByUserIdAsync(userId)).ToList();
+        foreach (var l in existingLogs)
+        {
+            _unitOfWork.ActivityLogs.Delete(l);
+        }
+
+        var existingNotifs = (await _unitOfWork.Notifications.GetByUserIdAsync(userId)).ToList();
         foreach (var n in existingNotifs)
         {
             _unitOfWork.Notifications.Delete(n);

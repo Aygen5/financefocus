@@ -13,6 +13,7 @@ import { addGoal } from "@/features/goals/goalsSlice";
 import { addSubscription } from "@/features/subscriptions/subscriptionsSlice";
 import { addActivityLog } from "@/features/activity/activitySlice";
 import { addNotification } from "@/features/notifications/notificationsSlice";
+import useIsDemoActive from "@/hooks/useIsDemoActive";
 import toast from "react-hot-toast";
 
 export interface QuickActionModalProps {
@@ -53,7 +54,18 @@ const subscriptionSchema = z.object({
 
 export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onClose }) => {
   const dispatch = useAppDispatch();
+  const { isDemoActive } = useIsDemoActive();
   const [activeTab, setActiveTab] = useState<TabType>("transaction");
+
+  const checkDemoGuard = () => {
+    if (isDemoActive) {
+      toast.error(
+        "Demo modunda değişiklik yapılamaz. Kendi verilerinizi eklemek için lütfen Demo Modundan Çıkın.",
+      );
+      return true;
+    }
+    return false;
+  };
 
   const txForm = useForm({
     resolver: zodResolver(transactionSchema),
@@ -132,6 +144,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
   };
 
   const handleBudgetSubmit = async (data: z.infer<typeof budgetSchema>) => {
+    if (checkDemoGuard()) return;
     try {
       const resultAction = await dispatch(addBudget({ ...data, period: "monthly" }));
       if (addBudget.fulfilled.match(resultAction)) {
@@ -163,6 +176,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
   };
 
   const handleGoalSubmit = async (data: z.infer<typeof goalSchema>) => {
+    if (checkDemoGuard()) return;
     try {
       const resultAction = await dispatch(
         addGoal({
@@ -205,6 +219,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({ isOpen, onCl
   };
 
   const handleSubSubmit = async (data: z.infer<typeof subscriptionSchema>) => {
+    if (checkDemoGuard()) return;
     try {
       const resultAction = await dispatch(
         addSubscription({

@@ -7,4 +7,5 @@ public interface IOnboardingService
 {
     Task<Result<bool>> SeedDemoDataAsync(string userId);
     Task<Result<bool>> ClearDemoDataAsync(string userId);
+    Task<Result<bool>> ClearAllUserDataAsync(string userId);
 }

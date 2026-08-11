@@ -78,6 +78,12 @@ public class AuthService : IAuthService
             return Result<AuthResponseDto>.Failure("Geçersiz e-posta veya şifre.");
         }
 
+        // Always guarantee a clean slate (0s across all entities) whenever logging into demo account
+        if (user.Email != null && user.Email.Equals("demo@financefocus.com", System.StringComparison.OrdinalIgnoreCase))
+        {
+            await _onboardingService.ClearAllUserDataAsync(user.Id);
+        }
+
         var token = _jwtTokenGenerator.GenerateToken(user);
         var userDto = MapToUserDto(user);
 
