@@ -13,6 +13,8 @@ export interface AIChatResponseDto {
   respondedAt: string;
 }
 
+const BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
+
 export const aiAssistantApi = {
   chat: async (
     prompt: string,
@@ -49,7 +51,8 @@ export const aiAssistantApi = {
     onChunk: (chunk: string) => void,
   ): Promise<void> => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    const response = await fetch("http://localhost:5000/api/v1/aiassistant/chat-stream", {
+    const streamUrl = `${BASE_URL}/aiassistant/chat-stream`;
+    const response = await fetch(streamUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

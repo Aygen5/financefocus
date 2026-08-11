@@ -59,16 +59,30 @@ public class AIAssistantService : IAIAssistantService
             });
         }
 
-        var chatResponse = await _aiProvider.ProcessChatPromptAsync(
-            userId,
-            request.Prompt,
-            intent,
-            request.History,
-            metrics);
+        try
+        {
+            var chatResponse = await _aiProvider.ProcessChatPromptAsync(
+                userId,
+                request.Prompt,
+                intent,
+                request.History,
+                metrics);
 
-        chatResponse.Answer = SanitizeAndValidateResponse(chatResponse.Answer, metrics);
+            chatResponse.Answer = SanitizeAndValidateResponse(chatResponse.Answer, metrics);
 
-        return Result<AIChatResponseDto>.Success(chatResponse);
+            return Result<AIChatResponseDto>.Success(chatResponse);
+        }
+        catch (FinanceFocus.Application.Services.Providers.OllamaUnavailableException)
+        {
+            var fallbackAnswer = GenerateFallbackAdvisorResponse(intent, metrics);
+            return Result<AIChatResponseDto>.Success(new AIChatResponseDto
+            {
+                Answer = fallbackAnswer,
+                Category = "Akıllı Finansal Analiz (Fact Engine)",
+                ProviderUsed = "FinanceFocus AI Engine (Cloud Advisor)",
+                RespondedAt = DateTime.UtcNow
+            });
+        }
     }
 
     public async IAsyncEnumerable<string> StreamChatMessageAsync(
@@ -86,9 +100,91 @@ public class AIAssistantService : IAIAssistantService
             yield break;
         }
 
-        await foreach (var token in _aiProvider.StreamChatPromptAsync(userId, request.Prompt, intent, request.History, metrics, cancellationToken))
+        bool isOllamaUnavailable = false;
+        IAsyncEnumerator<string>? enumerator = null;
+
+        try
         {
-            yield return token;
+            enumerator = _aiProvider.StreamChatPromptAsync(userId, request.Prompt, intent, request.History, metrics, cancellationToken).GetAsyncEnumerator(cancellationToken);
+        }
+        catch (FinanceFocus.Application.Services.Providers.OllamaUnavailableException)
+        {
+            isOllamaUnavailable = true;
+        }
+
+        if (isOllamaUnavailable)
+        {
+            yield return GenerateFallbackAdvisorResponse(intent, metrics);
+            yield break;
+        }
+
+        while (enumerator != null)
+        {
+            bool hasNext = false;
+            try
+            {
+                hasNext = await enumerator.MoveNextAsync();
+            }
+            catch (FinanceFocus.Application.Services.Providers.OllamaUnavailableException)
+            {
+                isOllamaUnavailable = true;
+            }
+
+            if (isOllamaUnavailable)
+            {
+                yield return GenerateFallbackAdvisorResponse(intent, metrics);
+                yield break;
+            }
+
+            if (!hasNext) break;
+
+            yield return enumerator.Current;
+        }
+    }
+
+    private static string GenerateFallbackAdvisorResponse(AIIntentType intent, FinancialCoreMetricsDto metrics)
+    {
+        bool hasNoData = metrics.MonthlyIncome == 0 && metrics.MonthlyExpense == 0 && metrics.TotalPortfolioValue == 0;
+        if (hasNoData)
+        {
+            return "Henüz finansal veriniz (gelir/gider) eklenmemiş görünüyor. İlk gelir ve gider işlemlerinizi ekleyerek kişiselleştirilmiş bütçe tavsiyeleri alabilirsiniz.";
+        }
+
+        switch (intent)
+        {
+            case AIIntentType.BudgetAdviceQuestion:
+                var adviceBuilder = new System.Text.StringBuilder();
+                adviceBuilder.AppendLine("### 📊 Kişiselleştirilmiş Bütçe İyileştirme Analizi\n");
+                adviceBuilder.AppendLine($"• **Finansal Sağlık Skorunuz:** {metrics.FinancialHealthScore}/100 ({metrics.RiskLevel} Risk Grubu)");
+                adviceBuilder.AppendLine($"• **Aylık Net Tasarrufunuz:** **{metrics.NetSavings:N2} TL** (Tasarruf Oranı: **%{metrics.SavingsRate:N0}**)");
+                adviceBuilder.AppendLine();
+                adviceBuilder.AppendLine("**Stratejik Tavsiyeler:**");
+                if (metrics.SavingsRate < 20m)
+                {
+                    adviceBuilder.AppendLine("1. **Tasarruf Oranını Artırın:** Mevcut tasarruf oranınız %20 hedefinin altında. Gelirinizin en az %20'sini tasarrufa ayırmayı hedefleyin.");
+                }
+                else
+                {
+                    adviceBuilder.AppendLine("1. **Tasarruf Performansı:** Tasarruf oranınız mükemmel! Biriken tutarı yatırım araçlarında değerlendirebilirsiniz.");
+                }
+                if (!string.IsNullOrEmpty(metrics.LargestSpendingCategory))
+                {
+                    adviceBuilder.AppendLine($"2. **En Yüksek Harcama:** En çok harcama yapılan **{metrics.LargestSpendingCategory}** ({metrics.LargestSpendingAmount:N2} TL) kategorisinde esnek giderleri gözden geçirin.");
+                }
+                if (metrics.ActiveSubscriptionCount > 0)
+                {
+                    adviceBuilder.AppendLine($"3. **Abonelik Kontrolü:** Toplam {metrics.ActiveSubscriptionCount} adet aktif aboneliğiniz (Aylık {metrics.TotalMonthlySubscriptionCost:N2} TL) bulunuyor. Az kullanılan abonelikleri iptal etmeyi değerlendirebilirsiniz.");
+                }
+                return adviceBuilder.ToString();
+
+            case AIIntentType.PortfolioAnalysisQuestion:
+                return $"Portföyünüzün toplam değeri **{metrics.TotalPortfolioValue:N2} TL** seviyesindedir. Toplam yatırım tutarınız **{metrics.TotalPortfolioInvestment:N2} TL** olup net kâr/zarar durumunuz **{metrics.TotalPortfolioProfitLoss:N2} TL** (%{metrics.TotalPortfolioProfitLossPercentage:N1}) olarak hesaplanmıştır.";
+
+            case AIIntentType.RiskQuestion:
+                return $"Finansal sağlık skorunuz **{metrics.FinancialHealthScore}/100** olarak hesaplanmıştır. Risk profili: **{metrics.RiskLevel}**. Aylık gelirinizin giderinize oranı **{metrics.IncomeToExpenseRatio:N1} kat**'tır.";
+
+            default:
+                return $"Finansal Durum Özetiniz: Aylık Tasarruf Oranınız **%{metrics.SavingsRate:N0}**, Net Tasarrufunuz **{metrics.NetSavings:N2} TL** ve Finansal Sağlık Skorunuz **{metrics.FinancialHealthScore}/100**'dür.";
         }
     }
 
