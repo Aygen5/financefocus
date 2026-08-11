@@ -273,7 +273,7 @@ public class AIAssistantService : IAIAssistantService
                 return true;
 
             case AIIntentType.GeneralConversation:
-                factResponse = "Ben FinanceFocus finansal asistanıyım. Sadece gelir, gider, bütçe, tasarruf ve portföy gibi finansal konularınızda yardımcı olabilirim.";
+                factResponse = "Ben FinanceFocus finansal asistanıyım. Sadece gelir, gider, bütçe, abonelikler, tasarruf ve portföy gibi finansal konularda yardımcı olabilirim.";
                 return true;
 
             default:
