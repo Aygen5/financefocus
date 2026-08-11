@@ -54,8 +54,8 @@ public class AIAssistantService : IAIAssistantService
             return Result<AIChatResponseDto>.Success(new AIChatResponseDto
             {
                 Answer = factAnswer,
-                Category = "Doğrudan Finansal Veri (Fact Engine)",
-                ProviderUsed = "FinancialEngineService (Fact Engine)",
+                Category = "Finansal Asistan Bilgilendirme",
+                ProviderUsed = "FinanceFocus AI Engine",
                 RespondedAt = DateTime.UtcNow
             });
         }
@@ -173,7 +173,7 @@ public class AIAssistantService : IAIAssistantService
                             var pct = metrics.MonthlyExpense > 0 ? (cat.Amount / metrics.MonthlyExpense) * 100m : 0m;
                             var limitStr = cat.Limit > 0 ? $" (Bütçe Limiti: {cat.Limit:N2} TL)" : string.Empty;
                             var overWarning = cat.Limit > 0 && cat.Amount > cat.Limit ? " ⚠️ **[Bütçe Aşıldı]**" : string.Empty;
-                            sb.AppendLine($"{rank}. **{cat.Category}:** **{cat.Amount:N2} TL** (Harcamaların %{pct:N1}'i){limitStr}{overWarning}");
+                            sb.AppendLine($"{rank}. 📌 **{cat.Category}:** **{cat.Amount:N2} TL** (Harcamaların %{pct:N1}'i){limitStr}{overWarning}");
                             rank++;
                         }
                     }
@@ -224,6 +224,7 @@ public class AIAssistantService : IAIAssistantService
                     sb.AppendLine("### 📊 Kişiselleştirilmiş Bütçe İyileştirme Analizi\n");
                     sb.AppendLine($"• **Finansal Sağlık Skoru:** **{metrics.FinancialHealthScore}/100** ({metrics.RiskLevel} Risk Grubu)");
                     sb.AppendLine($"• **Aylık Gelir / Gider:** Gelir: **{metrics.MonthlyIncome:N2} TL** | Gider: **{metrics.MonthlyExpense:N2} TL**");
+                    sb.AppendLine($"• **Tasarruf Oranı:** **%{metrics.SavingsRate:N0}** (Aylık Net Akış: **{metrics.NetSavings:N2} TL**)");
                     sb.AppendLine($"• **Bütçe Aşımı Olan Kategori:** **{metrics.OverBudgetCategoryCount}** adet\n");
 
                     sb.AppendLine("**Stratejik Bütçe Tavsiyeleri:**");
@@ -244,108 +245,92 @@ public class AIAssistantService : IAIAssistantService
                     return sb.ToString();
                 }
 
+            case AIIntentType.SubscriptionAnalysisQuestion:
+            case AIIntentType.SubscriptionQuestion:
+                {
+                    if (metrics.ActiveSubscriptionCount == 0)
+                    {
+                        return "Henüz aktif bir abonelik kaydınız bulunmamaktadır. Abonelikler sayfasından ilk aboneliğinizi ekleyebilirsiniz.";
+                    }
+
+                    var sb = new StringBuilder();
+                    sb.AppendLine("### 💳 Abonelik Harcama ve Maliyet Analizi\n");
+                    sb.AppendLine($"• **Aktif Abonelik Sayısı:** **{metrics.ActiveSubscriptionCount} Adet**");
+                    sb.AppendLine($"• **Toplam Aylık Maliyet:** **{metrics.TotalMonthlySubscriptionCost:N2} TL** (Aylık gelirinizin **%{metrics.SubscriptionToIncomePercentage:N1}**'i)");
+                    sb.AppendLine($"• **En Yüksek Giderli Abonelik:** **{metrics.MostExpensiveSubscriptionName}** (**{metrics.MostExpensiveSubscriptionPrice:N2} TL/Ay**)");
+                    return sb.ToString();
+                }
+
             case AIIntentType.PortfolioAnalysisQuestion:
-                return $"Portföyünüzün toplam güncel değeri **{metrics.TotalPortfolioValue:N2} TL** seviyesindedir. Toplam yatırım maliyetiniz **{metrics.TotalPortfolioInvestment:N2} TL** olup net kâr/zarar durumunuz **{metrics.TotalPortfolioProfitLoss:N2} TL** (%{metrics.TotalPortfolioProfitLossPercentage:N1}) olarak hesaplanmıştır.";
+            case AIIntentType.PortfolioValueQuestion:
+                {
+                    if (metrics.TotalPortfolioValue == 0 && metrics.TotalPortfolioInvestment == 0)
+                    {
+                        return "Henüz portföyünüzde bir varlık kaydı bulunmamaktadır. Portföy sayfasından ilk hisse, altın veya kripto varlığınızı ekleyebilirsiniz.";
+                    }
+
+                    var sb = new StringBuilder();
+                    sb.AppendLine("### 📈 Portföy ve Yatırım Durum Analizi\n");
+                    sb.AppendLine($"• **Toplam Portföy Değeri:** **{metrics.TotalPortfolioValue:N2} TL**");
+                    sb.AppendLine($"• **Toplam Yatırım Maliyeti:** **{metrics.TotalPortfolioInvestment:N2} TL**");
+                    sb.AppendLine($"• **Net Kâr / Zarar:** **{metrics.TotalPortfolioProfitLoss:N2} TL** (%{metrics.TotalPortfolioProfitLossPercentage:N1})");
+                    return sb.ToString();
+                }
 
             case AIIntentType.RiskQuestion:
-                return $"Finansal sağlık skorunuz **{metrics.FinancialHealthScore}/100** olarak hesaplanmıştır. Risk profili: **{metrics.RiskLevel}**. Aylık gelirinizin giderinize oranı **{metrics.IncomeToExpenseRatio:N1} kat**'tır.";
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendLine("### 🛡️ Finansal Sağlık ve Risk Profili Analizi\n");
+                    sb.AppendLine($"• **Finansal Sağlık Skoru:** **{metrics.FinancialHealthScore}/100**");
+                    sb.AppendLine($"• **Backend Risk Seviyesi:** **{metrics.RiskLevel}**");
+                    sb.AppendLine($"• **Gelir / Gider Oranı:** Geliriniz giderinizin **{metrics.IncomeToExpenseRatio:N1} katıdır** (Gelir: {metrics.MonthlyIncome:N2} TL, Gider: {metrics.MonthlyExpense:N2} TL)");
+                    sb.AppendLine($"• **Tasarruf Oranı:** **%{metrics.SavingsRate:N0}**");
+                    return sb.ToString();
+                }
+
+            case AIIntentType.IncomeQuestion:
+                return $"Aylık geliriniz **{metrics.MonthlyIncome:N2} TL**'dir. (Aylık net tasarrufunuz: **{metrics.NetSavings:N2} TL**).";
+
+            case AIIntentType.ExpenseQuestion:
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendLine($"Aylık toplam gideriniz **{metrics.MonthlyExpense:N2} TL**'dir.");
+                    if (!string.IsNullOrEmpty(metrics.LargestSpendingCategory))
+                    {
+                        sb.AppendLine($"En çok harcama yapılan alan **{metrics.LargestSpendingCategory}** ({metrics.LargestSpendingAmount:N2} TL) olmuştur.");
+                    }
+                    return sb.ToString();
+                }
+
+            case AIIntentType.SavingsQuestion:
+            case AIIntentType.SavingsRateQuestion:
+                return $"Aylık net tasarrufunuz **{metrics.NetSavings:N2} TL** olup tasarruf oranınız **%{metrics.SavingsRate:N0}** seviyesindedir.";
+
+            case AIIntentType.ExpenseComparisonQuestion:
+                var isHigher = metrics.MonthlyIncome >= metrics.MonthlyExpense;
+                var compPrefix = isHigher ? "Geliriniz giderinizden fazladır" : "Gideriniz gelirinizden fazladır";
+                return $"{compPrefix}. Geliriniz giderinizin yaklaşık **{metrics.IncomeToExpenseRatio:N1} katıdır** (Aylık Gelir: **{metrics.MonthlyIncome:N2} TL**, Aylık Gider: **{metrics.MonthlyExpense:N2} TL**).";
 
             default:
-                return $"Finansal Özetiniz: Aylık Gelir **{metrics.MonthlyIncome:N2} TL**, Aylık Gider **{metrics.MonthlyExpense:N2} TL**, Net Tasarruf **{metrics.NetSavings:N2} TL** (%{metrics.SavingsRate:N0}) ve Finansal Sağlık Skoru **{metrics.FinancialHealthScore}/100**'dür.";
+                var defSb = new StringBuilder();
+                defSb.AppendLine("### 📊 Genel Finansal Durum Özetiniz\n");
+                defSb.AppendLine($"• **Aylık Gelir:** **{metrics.MonthlyIncome:N2} TL**");
+                defSb.AppendLine($"• **Aylık Gider:** **{metrics.MonthlyExpense:N2} TL**");
+                defSb.AppendLine($"• **Net Tasarruf:** **{metrics.NetSavings:N2} TL** (%{metrics.SavingsRate:N0})");
+                defSb.AppendLine($"• **Finansal Sağlık Skoru:** **{metrics.FinancialHealthScore}/100** ({metrics.RiskLevel})");
+                return defSb.ToString();
         }
     }
 
     private static bool TryGetFactResponse(AIIntentType intent, FinancialCoreMetricsDto metrics, out string factResponse)
     {
         factResponse = string.Empty;
-        bool hasNoData = metrics.MonthlyIncome == 0 && metrics.MonthlyExpense == 0 && metrics.TotalPortfolioValue == 0 && metrics.ActiveSubscriptionCount == 0;
-        switch (intent)
+        if (intent == AIIntentType.GeneralConversation)
         {
-            case AIIntentType.IncomeQuestion:
-                factResponse = metrics.MonthlyIncome > 0
-                    ? $"Aylık geliriniz **{metrics.MonthlyIncome:N2} TL**'dir."
-                    : "Henüz gelir kaydınız bulunmamaktadır. İlk gelirinizi ekleyerek başlayabilirsiniz.";
-                return true;
-
-            case AIIntentType.ExpenseQuestion:
-                factResponse = metrics.MonthlyExpense > 0
-                    ? $"Aylık gideriniz **{metrics.MonthlyExpense:N2} TL**'dir."
-                    : "Henüz gider kaydınız bulunmamaktadır. İlk giderinizi ekleyerek başlayabilirsiniz.";
-                return true;
-
-            case AIIntentType.SavingsQuestion:
-                factResponse = !hasNoData
-                    ? $"Net aylık tasarrufunuz **{metrics.NetSavings:N2} TL**'dir."
-                    : "Henüz gelir ve gider kaydınız bulunmadığı için tasarruf hesabı yapılamamaktadır.";
-                return true;
-
-            case AIIntentType.ExpenseComparisonQuestion:
-                if (hasNoData)
-                {
-                    factResponse = "Henüz gelir ve gider kaydınız bulunmamaktadır.";
-                    return true;
-                }
-                var isHigher = metrics.MonthlyIncome >= metrics.MonthlyExpense;
-                var compPrefix = isHigher ? "Evet, geliriniz giderinizden" : "Hayır, geliriniz giderinizden azdır ve";
-                factResponse = $"{compPrefix} yaklaşık **{metrics.IncomeToExpenseRatio:N1} kat** daha fazladır (Gelir: {metrics.MonthlyIncome:N0} TL, Gider: {metrics.MonthlyExpense:N0} TL).";
-                return true;
-
-            case AIIntentType.SavingsRateQuestion:
-                if (metrics.MonthlyIncome == 0)
-                {
-                    factResponse = "Henüz gelir kaydınız bulunmadığı için tasarruf oranı hesaplanamamaktadır.";
-                    return true;
-                }
-                var isGood = metrics.SavingsRate >= 20m;
-                var evalText = isGood ? "mükemmel bir seviyededir" : "geliştirilmeye açık bir seviyededir";
-                factResponse = $"Evet, %{metrics.SavingsRate:N0} tasarruf oranınız {evalText} (Finansal standartlarda %20 ve üzeri başarılı kabul edilir).";
-                return true;
-
-            case AIIntentType.LargestExpenseQuestion:
-                if (metrics.MonthlyExpense == 0)
-                {
-                    factResponse = "Henüz harcama kaydınız bulunmamaktadır.";
-                    return true;
-                }
-                var hasOverBudget = metrics.OverBudgetCategoryCount > 0;
-                var overText = hasOverBudget ? "Evet, bütçe aşımınız bulunmaktadır." : "Hayır, bütçenizi aşmadınız.";
-                factResponse = $"{overText} Bu ay en yüksek harcamanız **{metrics.LargestSpendingCategory}** kategorisindedir (Harcama Tutarı: **{metrics.LargestSpendingAmount:N2} TL**).";
-                return true;
-
-            case AIIntentType.SubscriptionQuestion:
-                if (metrics.ActiveSubscriptionCount == 0)
-                {
-                    factResponse = "Henüz aktif bir aboneliğiniz bulunmamaktadır.";
-                    return true;
-                }
-                factResponse = $"En yüksek tutarlı aktif aboneliğiniz **{metrics.MostExpensiveSubscriptionName}** aboneliğidir (Aylık Tutarı: **{metrics.MostExpensiveSubscriptionPrice:N2} TL**).";
-                return true;
-
-            case AIIntentType.SubscriptionAnalysisQuestion:
-                if (metrics.ActiveSubscriptionCount == 0)
-                {
-                    factResponse = "Henüz aktif bir aboneliğiniz bulunmamaktadır.";
-                    return true;
-                }
-                factResponse = $"Toplam **{metrics.ActiveSubscriptionCount}** adet aktif aboneliğiniz bulunmakta olup aylık maliyeti **{metrics.TotalMonthlySubscriptionCost:N2} TL**'dir (Gelirinizin **%{metrics.SubscriptionToIncomePercentage:N1}**'i). En yüksek giderli aboneliğiniz **{metrics.MostExpensiveSubscriptionName}**'dir.";
-                return true;
-
-            case AIIntentType.PortfolioValueQuestion:
-                if (metrics.TotalPortfolioValue == 0 && metrics.TotalPortfolioInvestment == 0)
-                {
-                    factResponse = "Henüz portföy yatırım kaydınız bulunmamaktadır.";
-                    return true;
-                }
-                factResponse = $"Toplam portföy değeriniz **{metrics.TotalPortfolioValue:N2} TL**'dir (Yatırım Tutarı: **{metrics.TotalPortfolioInvestment:N2} TL**, Net Kâr: **{metrics.TotalPortfolioProfitLoss:N2} TL** / **%{metrics.TotalPortfolioProfitLossPercentage:N1}**).";
-                return true;
-
-            case AIIntentType.GeneralConversation:
-                factResponse = "Ben FinanceFocus finansal asistanıyım. Sadece gelir, gider, bütçe, abonelikler, tasarruf ve portföy gibi finansal konularda yardımcı olabilirim.";
-                return true;
-
-            default:
-                return false;
+            factResponse = "Ben FinanceFocus finansal asistanıyım. Gelir, gider, bütçe, harcama dağılımı, abonelikler, tasarruf ve portföy gibi finansal konularda sorularınızı sorabilirsiniz.";
+            return true;
         }
+        return false;
     }
 
     private static string SanitizeAndValidateResponse(string rawAnswer, FinancialCoreMetricsDto metrics)
